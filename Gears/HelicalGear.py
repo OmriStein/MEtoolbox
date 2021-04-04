@@ -1,0 +1,392 @@
+from math import sin, cos, radians, pi, tan, atan, sqrt, degrees
+from Gears.SpurGear import SpurGear  # for inheritance
+from Gears import Transmission  # for doc string
+from tools import TableInterpolation
+import numpy as np
+import os
+
+
+class HelicalGear(SpurGear):
+    """ a gear object that contains all of its design parameters (AGMA 2001-D04)"""
+
+    def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset, enclosure, hardness,
+                 pressure_angle, helix_angle, grade, work_hours=0, number_of_cycles=0, crowned=False, adjusted=False,
+                 sensitive_use=False, nitriding=False, case_carb=False, material='steel'):
+        super().__init__(name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset, enclosure, hardness,
+                         pressure_angle, grade, work_hours, number_of_cycles, crowned, adjusted,
+                         sensitive_use, nitriding, case_carb, material)
+
+        self.helix_angle = helix_angle
+
+    @property
+    def pitch_diameter(self):
+        """ calculate pitch_diameter """
+        return self.teeth_num * self.tangent_modulus  # pitch diameter [mm]
+
+    @property
+    def tangent_pitch(self):
+        return self.pitch / cos(radians(self.helix_angle))
+
+    @property
+    def axial_pitch(self):
+        return self.pitch / sin(radians(self.helix_angle))
+
+    @property
+    def tangent_modulus(self):
+        return self.modulus / cos(radians(self.helix_angle))
+
+    @property
+    def axial_modulus(self):
+        return self.modulus / sin(radians(self.helix_angle))
+
+    @property
+    def tangent_pressure_angle(self):
+        return degrees(atan(tan(radians(self.pressure_angle)) / cos(radians(self.helix_angle))))
+
+    @staticmethod
+    def Y_j(gear1, gear2):
+        """ return Geometry factors for helical gear and pinion
+        Yj is dependent on the gear ratio, helix angle and both gears teeth numbers
+
+        :keyword gear1: gear object
+        :type gear1: HelicalGear
+        :keyword gear2: gear object
+        :type gear2: HelicalGear
+        :return: Yj - geometric factor
+        :rtype: float """
+
+        Np = gear1.teeth_num
+        Ng = gear2.teeth_num
+        helix_angle = gear1.helix_angle
+
+        # files path
+        j75_path = os.path.dirname(__file__) + "\\tables\\J75 - helix gear geometry factors.csv"
+        jPrime_path = os.path.dirname(__file__) + "\\tables\\JPrime - helix gear geometry factors.csv"
+
+        # load data
+        j75_data = np.genfromtxt(j75_path, delimiter=',')
+        jPrime_data = np.genfromtxt(jPrime_path, delimiter=',')
+
+        # data interpolation
+        j75 = TableInterpolation(Np, helix_angle, j75_data)
+        jPrime = TableInterpolation(Ng, helix_angle, jPrime_data)
+
+        # calculate geometric factor Yj
+        Y_j = j75 * jPrime
+
+        gear1.Yj = Y_j
+        gear2.Yj = Y_j
+
+    @staticmethod
+    def ZI(gear1, gear2):
+        """ return geometric factor for contact failure
+            ZI is dependent on the gear ratio, pressure angle, modulus and both gears teeth numbers
+
+            :keyword gear1: gear object
+            :type gear1: HelicalGear
+            :keyword gear2: gear object
+            :type gear2: HelicalGear
+            :return: ZI - geometric factor
+            :rtype: float """
+
+        mG = gear2.teeth_num/gear1.teeth_num
+        phi_t = radians(gear1.tangent_pressure_angle)
+        phi_n = radians(gear1.pressure_angle)
+        modulus = gear1.modulus
+        tangent_modulus = gear1.tangent_modulus
+        Np = gear1.teeth_num
+        Ng = gear2.teeth_num
+        z1 = sqrt((0.5 * tangent_modulus * Np + modulus) ** 2 - (0.5 * tangent_modulus * Np * cos(phi_t)) ** 2)
+        z2 = sqrt((0.5 * tangent_modulus * Ng + modulus) ** 2 - (0.5 * tangent_modulus * Ng * cos(phi_t)) ** 2)
+        z3 = 0.5 * tangent_modulus * Np * (1 + mG) * sin(phi_t)
+
+        if z1 > z3 and z2 > z3:
+            z = z3
+        elif z1 > z3:
+            z = z2
+        elif z2 > z3:
+            z = z1
+        else:
+            z = z1 + z2 - z3
+        if gear1.width >= 2 * gear1.axial_pitch:
+            mN = (gear1.pitch * cos(phi_n)) / (0.95 * z)
+        else:
+            raise ValueError(f"at ZI factor: gear width should be at least two times the axial pitch "
+                             f"2Px={2*gear1.axial_pitch:.2f}")
+        Z_I = (cos(phi_t) * sin(phi_t) * mG) / (2 * mN * (mG + 1))
+        # print(f"ZI={Z_I}, mG={mG}, modulus={modulus}, Np={Np}, Ng={Ng}, Px={gear1.axial_pitch}")
+        return Z_I
+
+    @staticmethod
+    def CalculateForces(gear, power):
+        """ calculate forces on helical gear
+
+        :keyword gear: gear object
+        :type gear: HelicalGear
+        :keyword power: power
+        :type power: float
+        :returns: Wt - tangent force in [N], Wr - radial force in [N], Wx - axial force in [N]
+        :rtype: tuple
+            """
+
+        phi_t = radians(gear.tangent_pressure_angle)
+        Wt = (60e3 / pi) * (power / (gear.pitch_diameter * gear.rpm))
+        Wr = Wt * tan(radians(phi_t))
+        Wx = Wt * tan(radians(gear.helix_angle))
+        return Wt, Wr, Wx
+
+    def Optimization(self, transmission, optimize_feature='all', verbose=False):
+        """ perform gear optimization
+            :keyword transmission: Transmission object associated with the gear
+            :type transmission: Transmission
+            :keyword optimize_feature: property to optimize for ('width'/'volume'/'center')
+            :type optimize_feature: str
+            :keyword verbose: print optimization stages
+            :type verbose: bool
+            :return: optimized result (width in mm, volume in mm^3, center distance in mm)
+            :rtype: dict """
+
+        gear = self
+
+        # saving original attribute values
+        original_teeth_num = gear.teeth_num  # saving original attribute
+        original_width = gear.width
+        original_modulus = gear.modulus
+
+        # choosing the minimum number of teeth to start with
+        initial_teeth_num = 21
+
+        modulus_list = [0.3, 0.4, 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25]
+        modulus_list.sort(reverse=True)
+
+        results_list = []
+        for modulus in modulus_list:
+            # set gear modulus
+            gear.modulus = modulus
+            gear.teeth_num = initial_teeth_num  # updating attribute
+
+            # because the width range is (3πm,5πm) the initial guess is 4πm
+            # initial_width = 0.5 * (2 * self.axial_pitch + self.pitch_diameter)
+            initial_width = gear.axial_pitch + 0.5 * gear.pitch_diameter
+            gear.width = initial_width
+            # print(modulus, initial_teeth_num, initial_width)
+            while True:
+                # update Yj factors after attribute changed
+                transmission.gear1.Y_j(transmission.gear1, transmission.gear2)
+                try:
+                    transmission.ZI = self.ZI(transmission.gear1, transmission.gear2)
+                except ValueError:
+                    pass
+
+                # KH is a function of the gear width, we assumed an initial width of 4πm to calculate KH,
+                # we recalculate KH and the width until KH converges
+                kh_not_converging = False
+                while True:
+
+                    # calculate minimum gear width for bending and contact stress
+                    bending_minimum_width = transmission.MinimumWidthForBending(gear)
+                    contact_minimum_width = transmission.MinimumWidthForContact(gear)
+                    # print(f"bending={bending_minimum_width}, contact={contact_minimum_width}")
+
+                    # the new width is the max value of the two minimum width
+                    new_width = max(bending_minimum_width, contact_minimum_width)
+                    if new_width > 1020:
+                        print("error: KH is not converging for m=", self.modulus)
+                        kh_not_converging = True
+                        break
+
+                    # save old KH for comparison later
+                    oldKH = gear.KH
+
+                    # save new gear width
+                    gear.width = new_width
+
+                    # update Yj factors after width changed
+                    transmission.gear1.Y_j(transmission.gear1, transmission.gear2)
+                    try:
+                        transmission.ZI = self.ZI(transmission.gear1, transmission.gear2)
+                    except ValueError:
+                        pass
+
+                    newKH = gear.KH
+                    # checking convergence
+                    if abs(newKH - oldKH) < 1e-6:
+                        break
+
+                # in case KH couldn't converge exit optimization for current modulus
+                if kh_not_converging:
+                    break
+
+                alpha = contact_minimum_width / bending_minimum_width
+                centers_distance = 0.5 * gear.modulus * gear.teeth_num * (transmission.gear_ratio + 1)
+                volume = 0.25 * pi * (gear.pitch_diameter ** 2) * gear.width
+                f_string = f"m={gear.modulus}, N={gear.teeth_num}, b={gear.width:.2f}," \
+                           f"spring_index={centers_distance:.2f}, V={volume:.2f}, α={alpha:.4f}"
+
+                if gear.width < 2*pi*gear.axial_pitch:
+                    # gear width is less than 2Px (b<Px), gear width should be increased
+                    # because the initial teeth number is minimal decrease modulus
+
+                    modulus_list = [0.3, 0.4, 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25]
+                    # get previous modulus on the list
+                    if gear.modulus > 0.3:
+                        new_modulus = modulus_list[modulus_list.index(gear.modulus) - 1]
+                    else:
+                        raise ValueError(f"at Optimize: b<2Px but the modulus is the lowest possible")
+
+                    if verbose:
+                        # printing step result
+                        if not isinstance(gear.maximum_velocity, str):
+                            msg = "b<2Px" if gear.tangent_velocity < gear.maximum_velocity else f"b<2Px, v>v_max"
+                        else:
+                            msg = "b<2Px"
+                        print(f_string, ',', msg)
+
+                    # setting changes
+                    gear.modulus = new_modulus
+
+                elif gear.width > gear.pitch_diameter:
+                    # gear width is more than 5πm (b>Pd), gear width should be decreased
+                    # because initial modulus is maximal increase teeth number
+
+                    if verbose:
+                        # print step result
+                        if not isinstance(gear.maximum_velocity, str):
+                            msg = "b>Pd" if gear.tangent_velocity < gear.maximum_velocity else f"b>Pd, v>v_max"
+                        else:
+                            msg = "b>Pd"
+                        print(f_string, ',', msg)
+
+                    # increasing teeth number by one
+                    # (note: the gear teeth number can't exceed the biggest number specified in the Yj factor tables
+                    # and for a pinion a number that will make its gear pass this number.
+                    # this error is handled at the Yj function)
+                    gear.teeth_num += 1
+                else:
+                    # gear width is within range (3πm<b<5πm)
+                    if alpha > 1:
+                        # if α>1 increase number of teeth
+                        if verbose:
+                            # print step result
+                            if not isinstance(gear.maximum_velocity, str):
+                                print(f"{f_string}, 2Px<b<Pd, α>1"
+                                      if gear.tangent_velocity < gear.maximum_velocity else f"2Px<b<Pd, α>1, v>v_max")
+                            else:
+                                print(f"{f_string}, 2Px<b<Pd, α>1")
+                        # add result to least of viable results
+                        results_list.append({'m': gear.modulus, 'N': gear.teeth_num, 'b': gear.width,
+                                             'spring_index': centers_distance, 'V': volume, 'alpha': alpha})
+                        # increase teeth number
+                        gear.teeth_num += 1
+                    else:
+                        # if α<=1 stop optimization and return the optimized value
+                        # and a list of all viable options
+
+                        # print optimization progress
+                        if verbose:
+                            # print step result
+                            if not isinstance(gear.maximum_velocity, str):
+                                print(f"{f_string}, 2Px<b<Pd, α<=1"
+                                      if gear.tangent_velocity < gear.maximum_velocity else f"2Px<b<Pd, α<=1, v>v_max")
+                            else:
+                                print(f"{f_string}, 2Px<b<Pd, α<=1")
+
+                        # find optimize feature
+                        # optimize by width
+                        if optimize_feature == 'width':
+                            # create list of widths
+                            width_list = [(dic['b'], index) for index, dic in enumerate(results_list)]
+                            # get minimum width index
+                            result_index = min(width_list)[1]
+                            optimized_result = results_list[result_index]
+
+                        # optimize by volume
+                        elif optimize_feature == 'volume':
+                            # create list of volumes
+                            volume_list = [(dic['V'], index) for index, dic in enumerate(results_list)]
+                            # get minimum volume index
+                            result_index = min(volume_list)[1]
+                            optimized_result = results_list[result_index]
+
+                        # optimize by center distance
+                        elif optimize_feature == 'center':
+                            # create list of center distances
+                            center_list = [(dic['spring_index'], index) for index, dic in enumerate(results_list)]
+                            # get minimum center distance index
+                            result_index = min(center_list)[1]
+                            optimized_result = results_list[result_index]
+
+                        elif optimize_feature == 'all':
+                            width_list = [(dic['b'], index) for index, dic in enumerate(results_list)]
+                            volume_list = [(dic['V'], index) for index, dic in enumerate(results_list)]
+                            center_list = [(dic['spring_index'], index) for index, dic in enumerate(results_list)]
+
+                            optimized_result = {'optimized width': results_list[min(width_list)[1]],
+                                                'optimized volume': results_list[min(volume_list)[1]],
+                                                'optimized center': results_list[min(center_list)[1]]}
+                        else:
+                            raise Exception(f"optimize_feature={optimize_feature} is invalid")
+
+                        # restore gear parameters
+                        gear.teeth_num = original_teeth_num
+                        gear.width = original_width
+                        gear.modulus = original_modulus
+
+                        return optimized_result, results_list
+
+    def CalculateCentersDistance(self, gear_ratio):
+        """ calculate the distance between the centers of the gears
+        :keyword gear_ratio: transmissions gear ratio
+        :type gear_ratio: float
+        :return: the distance between the transmissions gears centers in [mm]
+        :rtype: float
+        """
+        centers_distance = 0.5 * self.tangent_modulus * self.teeth_num * (gear_ratio + 1)
+        return centers_distance
+
+    @staticmethod
+    def CreateNewGear(gear2_prop):
+        """ return a new instance of HelicalGear
+
+        :keyword gear2_prop: gear properties
+        :type gear2_prop: dict
+        :returns: HelicalGear object
+        :type: HelicalGear
+        """
+        gear2_prop['name'] = 'helical_gear'
+        return HelicalGear(**gear2_prop)
+
+    @staticmethod
+    def FormatProperties(properties):
+        """ remove excess attributes form properties """
+        prop_list = ['name', 'modulus', 'teeth_num', 'rpm', 'Qv', 'width', 'bearing_span', 'pinion_offset', 'enclosure',
+                     'hardness', 'work_hours', 'number_of_cycles', 'pressure_angle', 'grade', 'crowned', 'adjusted',
+                     'sensitive_use', 'nitriding', 'case_carb', 'material', 'helix_angle']
+        # remove contact ratio from dictionary so it won't interfere with the new gear instantiation
+        new_properties = {key: properties[key] for key in properties if key in prop_list}
+        return new_properties
+
+    def CheckCompatibility(self, gear):
+        """ raise error if the pressure angle, helix angle or modulus of the gears don't match
+
+            :keyword gear: gear object
+            :type gear: HelicalGear
+            :rtype: None """
+
+        # check pressure angles
+        if self.pressure_angle != gear.pressure_angle:
+            # if pressure angles are different raise error
+            raise ValueError("gear1 and gear2 have mismatch pressure_angle")
+
+        # check helix angles
+        try:
+            if self.helix_angle != gear.helix_angle:
+                # if pressure angles are different raise error
+                raise ValueError("gear1 and gear2 have mismatch Helix_angle")
+        except AttributeError:
+            raise ValueError("gear1 and gear2 are not the same type, they are no compatible")
+
+        # check modulus
+        if self.modulus != gear.modulus:
+            # if modulus are different raise error
+            raise ValueError("gear1 and gear2 have mismatch modulus")
