@@ -1,11 +1,11 @@
 from Springs import Spring
-from math import pi
+from math import pi, sqrt
 from tools import PrintAtributes
 
 
 class HelicalPushSpring(Spring):
     def __init__(self, force, wire_diameter, spring_diameter, Ap, m, shear_modulus, end_type, yield_percent,
-                 spring_constant=None, set_removed=False, shot_peened=False):
+                 z=0.15, spring_constant=None, set_removed=False, shot_peened=False):
         """
         :keyword shear_modulus: Shear modulus
         :keyword end_type: what kind of ending the spring has
@@ -23,7 +23,7 @@ class HelicalPushSpring(Spring):
         self.yield_percent = yield_percent
         self.spring_constant = spring_constant
         self.end_type = end_type.lower()
-
+        self.z = z  # overrun safety factor
         end_types = ('plain', 'plain and ground', 'squared or closed', 'squared and ground')
         if self.end_type not in end_types:
             raise ValueError(f"{end_type} not one of this: {end_types}")
@@ -55,8 +55,9 @@ class HelicalPushSpring(Spring):
         Na = ((self.shear_modulus * self.wire_diameter) / (8 * self.spring_index ** 3 * self.spring_constant)) * (
                 (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
-        if isinstance(Na, float) and not 3 <= Na <= 15:
-            print("Note: Na is not in range [3,15], this can cause non linear behavior")
+        # TODO: Fix Na check
+        # if isinstance(Na, float) and not 3 <= Na <= 15:
+        # print("Note: Na is not in range [3,15], this can cause non linear behavior")
         return Na
 
     @property
@@ -109,6 +110,16 @@ class HelicalPushSpring(Spring):
         return options.get(self.end_type)
 
     @property
+    def Fsolid(self):
+        # it is a good practice for the force that compresses the spring to solid state to be: Fs=(1+z)Fmax
+        # where z is the overrun safety factor, it's customary that z=0.15 so Fs=1.15Fmax
+        return (1 + self.z) * self.force
+
+    @property
+    def free_length(self):
+        return (self.Fsolid / self.spring_constant) + self.solid_length
+
+    @property
     def static_safety_factor(self):
         return self.Ssy / self.max_shear_stress
 
@@ -121,8 +132,40 @@ class HelicalPushSpring(Spring):
         return ((self.shear_modulus * self.wire_diameter) / (8 * self.spring_index ** 3 * Na)) * (
                 (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
-    def MinimalWireDiameter(self, safety_factor):
+    def MinWireDiameter(self, safety_factor, solid=False):
         """ The minimal wire diameter for a given safety factor in order to avoid failure,
             according to the spring parameters """
-        return ((8 * self.Kw * self.force * self.spring_index * safety_factor) / (
+        K = self.Ks if self.set_removed else self.Kw
+        force = self.Fsolid if solid else self.force
+        return ((8 * K * force * self.spring_index * safety_factor) / (
                 self.yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
+
+    # TODO: test MaxForce implementation
+    def MaxForce(self, safety_factor):
+        """ The maximum force for a given safety factor in order to avoid failure,
+            according to the spring parameters. """
+        K = self.Ks if self.set_removed else self.Kw
+        force = ((self.yield_percent * self.Ap * pi * self.wire_diameter ** (2 - self.m)) / (
+                8 * K * self.spring_index * safety_factor))
+        if force > self.Fsolid:
+            print("Fsolid exceeded")
+            return self.Fsolid / (1 + self.z)
+        else:
+            return force
+
+    def Collapse(self, alpha, E):
+        """ returns True if spring is in danger of collapse and False if not
+        :keyword E: elastic modulus
+        :keyword alpha: the spring end condition (from Table 10-2)
+        """
+        # TODO: make use of table
+        Table = {'fixed-ends': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}  # from table 10-2
+
+        L0 = self.free_length
+        try:
+            collapse_test = (pi * self.spring_diameter / alpha) * sqrt(
+                (2 * (E - self.shear_modulus)) / (2 * self.shear_modulus + E))
+        except ValueError as e:
+            print(f"{e}, make sure E and G have the same units (Mpa)")
+        else:
+            return L0 < collapse_test
