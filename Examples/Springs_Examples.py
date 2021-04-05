@@ -17,7 +17,6 @@ print(f"Fsolid = {Fs}")
 Ap = 2211
 m = 0.145
 
-# diam
 spring = HelicalPushSpring(force=Fmax, Ap=Ap, m=m, wire_diameter=d, spring_diameter=D, z=0.25,
                            shear_modulus=G, end_type='squared and ground', spring_constant=6.189,
                            set_removed=False, shot_peened=True, yield_percent=0.45)
@@ -31,4 +30,13 @@ spring.spring_diameter = C * 5.8079
 print(f"Ls = {spring.solid_length}")
 print(f"L0 = {spring.free_length}")
 collapse = spring.Collapse('fixed-hinged', 205e3)
-print(f"collapse: {collapse[0]}, max free length (L0) = {collapse[1]} ")
+print(f"collapse: {collapse[0]}, max free length (L0) = {collapse[1]} \n")
+
+spring2 = HelicalPushSpring(force=Fmax, Ap=2211, m=0.145, wire_diameter=6, spring_diameter=60,
+                            shear_modulus=G, end_type='squared and ground', spring_constant=6,
+                            set_removed=False, shot_peened=True, yield_percent=0.45)
+print()
+print(f"static safety factor = {spring2.static_safety_factor}")
+print(f"minimum wire diameter for n=2: {spring2.MinWireDiameter(2)}")
+collapse = spring2.Collapse('fixed-hinged', 205e3)
+print(f"collapse: {collapse[0]}, max free length (L0) = {collapse[1]} , L0= {spring2.free_length}")

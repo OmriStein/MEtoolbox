@@ -28,18 +28,17 @@ class HelicalPushSpring(Spring):
         if self.end_type not in end_types:
             raise ValueError(f"{end_type} not one of this: {end_types}")
 
+        self.CheckParam()  # check C and Na
+
     def getInfo(self):
         """ print all of the spring properties """
         PrintAtributes(self)
+        self.CheckParam()  # check C and Na
 
-    @property
-    def spring_index(self):
-        """ C - spring index
+    def CheckParam(self):
+        """Check if the spring index and Na in acceptable range"""
 
-            Note: C should be in range of [4,12], lower C causes surface cracks,
-                higher C causes the spring to tangle and require separate packing """
-        C = self.spring_diameter / self.wire_diameter
-
+        C = self.spring_index
         if isinstance(C, float) and not 4 <= C <= 12 and self.set_removed:
             print(f"Note: C - spring index should be in range of [4,12], lower C causes surface cracks,\n"
                   f"higher C causes the spring to tangle and requires separate packing")
@@ -47,18 +46,23 @@ class HelicalPushSpring(Spring):
             print(f"Note: C - spring index should be in range of [3,12], lower C causes surface cracks,\n"
                   f"higher C causes the spring to tangle and requires separate packing")
 
-        return C
+        Na = self.Na
+        if isinstance(Na, float) and not 3 <= Na <= 15:
+            print(f"Note: Na={Na:.2f} is not in range [3,15], this can cause non linear behavior")
+
+    @property
+    def spring_index(self):
+        """ C - spring index
+
+            Note: C should be in range of [4,12], lower C causes surface cracks,
+                higher C causes the spring to tangle and require separate packing """
+        return self.spring_diameter / self.wire_diameter
 
     @property
     def Na(self):
         """ Calculate Na which is the number of active coils (using Castigliano's theorem) """
-        Na = ((self.shear_modulus * self.wire_diameter) / (8 * self.spring_index ** 3 * self.spring_constant)) * (
+        return ((self.shear_modulus * self.wire_diameter) / (8 * self.spring_index ** 3 * self.spring_constant)) * (
                 (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
-
-        # TODO: Fix Na check
-        # if isinstance(Na, float) and not 3 <= Na <= 15:
-        # print("Note: Na is not in range [3,15], this can cause non linear behavior")
-        return Na
 
     @property
     def Ks(self):
