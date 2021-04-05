@@ -82,8 +82,11 @@ class HelicalPushSpring(Spring):
     @property
     def max_shear_stress(self):
         """ maximum shear stress """
+        return self.CalcShearStress(self.force)
+
+    def CalcShearStress(self, force):
         K = self.Ks if self.set_removed else self.Kw
-        return (K * 8 * self.force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
+        return (K * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
 
     @property
     def deflection(self):
@@ -179,3 +182,37 @@ class HelicalPushSpring(Spring):
             print(f"Ends: {key} is unknown ")
         else:
             return L0 >= collapse_test, collapse_test
+
+    def Sse(self, reliability):
+        """ Shear endurance limit according to Zimmerli
+
+            :returns: Ke - reliability factor
+            :rtype: float """
+
+        import numpy as np
+        percentage = np.array([50, 90, 95, 99, 99.9, 99.99, 99.999, 99.9999])
+        reliability_factors = np.array([1, 0.897, 0.868, 0.814, 0.753, 0.702, 0.659, 0.620])
+        Ke = np.interp(reliability, percentage, reliability_factors)
+
+        if self.shot_peened:
+            Ssa, Ssm = 398, 534
+        else:
+            Ssa, Ssm = 241, 379
+
+        return Ke * (Ssa / (1 - (Ssm / self.Ssu) ** 2))
+
+    def FatigueAnalysis(self, Fmax, Fmin, reliability):
+        # calculating mean and alternating forces
+        alternating_force = abs(Fmax - Fmin) / 2
+        mean_force = (Fmax + Fmin) / 2
+
+        # calculating mean and alternating stresses
+        alternating_shear_stress = self.CalcShearStress(alternating_force)
+        mean_shear_stress = self.CalcShearStress(mean_force)
+
+        # nf - goodman fatigue safety factor
+        nf = 1 / ((alternating_shear_stress / self.Sse(reliability)) + (mean_shear_stress / self.Ssu))
+        # ns - langer safety factor for first cycle
+        ns = self.Ssy / (mean_shear_stress + alternating_shear_stress)
+
+        return nf, ns
