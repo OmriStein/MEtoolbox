@@ -292,7 +292,7 @@ class FatigueAnalysis:
     def NumOfCycle(self, z=-3):
         """ calculate number of cycles until failure
 
-            Note: z = log(N1) - log(N2), N1 - number of cycles at Sm, N2 - Number of cycles at Se
+            Note: zeta = log(N1) - log(N2), N1 - number of cycles at Sm, N2 - Number of cycles at Se
                 for steel N1=1e3 and N2 = 1e6
             :keyword z: -3 for steel where N=1e6, -5 for a metal where N=1e8, -5.69 for a metal where N=5e8
             :returns: N - Number of cycles,
@@ -311,14 +311,14 @@ class FatigueAnalysis:
         if Sm < reversible_stress < Sy:
             # Low Cycle Fatigue
             if z != -3:
-                raise ValueError("Number of cycles calculation for low cycle fatigue is only possible for z=-3 ")
+                raise ValueError("Number of cycles calculation for low cycle fatigue is only possible for zeta=-3 ")
 
             a = Sut
             b = (1 / z) * log10(Sut / Sm)
 
         elif Se < reversible_stress < Sm:
             # High Cycle Fatigue
-            # a = Sm ** (1 - (3 / z)) / Se
+            # a = Sm ** (1 - (3 / zeta)) / Se
             a = Sm * (Sm / Se) ** (-3 / z)
             b = (1 / z) * log10(Sm / Se)
 

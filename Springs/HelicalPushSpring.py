@@ -5,7 +5,8 @@ from tools import PrintAtributes
 
 class HelicalPushSpring(Spring):
     def __init__(self, force, wire_diameter, spring_diameter, Ap, m, shear_modulus, end_type, yield_percent,
-                 z=0.15, spring_constant=None, set_removed=False, shot_peened=False):
+                 zeta=0.15, spring_constant=None, set_removed=False, shot_peened=False, ends=None,
+                 elastic_modulus=None, density=None, working_frequency=None):
         """
         :keyword shear_modulus: Shear modulus
         :keyword end_type: what kind of ending the spring has
@@ -23,10 +24,15 @@ class HelicalPushSpring(Spring):
         self.yield_percent = yield_percent
         self.spring_constant = spring_constant
         self.end_type = end_type.lower()
-        self.z = z  # overrun safety factor
+        self.zeta = zeta  # overrun safety factor
         end_types = ('plain', 'plain and ground', 'squared or closed', 'squared and ground')
         if self.end_type not in end_types:
             raise ValueError(f"{end_type} not one of this: {end_types}")
+
+        self.ends = ends
+        self.elastic_modulus = elastic_modulus
+        self.density = density
+        self.working_frequency = working_frequency
 
         self.CheckParam()  # check C and Na
 
@@ -50,6 +56,21 @@ class HelicalPushSpring(Spring):
         if isinstance(Na, float) and not 3 <= Na <= 15:
             print(f"Note: Na={Na:.2f} is not in range [3,15], this can cause non linear behavior")
 
+        zeta = self.zeta
+        if zeta < 0.15:
+            print(f"Note: zeta={zeta:.2f} is smaller then 0.15, the spring could reach its solid length")
+
+        L0 = self.free_length
+        if isinstance(L0, float) and (self.ends is not None) and (self.elastic_modulus is not None):
+            buckling = self.Buckling(self.ends, self.elastic_modulus)
+            if buckling[0]:
+                print(f"Note: buckling is accruing , max free length (L0) = {buckling[1]} , L0= {L0}")
+        if (self.density is not None) and (self.working_frequency is not None):
+            Wn = self.NaturalFrequency(self.density)
+            if Wn <= 20 * self.working_frequency:
+                print(
+                    f"Note: the natural frequency={Wn} is less than 20*working frequency={20 * self.working_frequency}")
+
     @property
     def spring_index(self):
         """ C - spring index
@@ -58,6 +79,7 @@ class HelicalPushSpring(Spring):
                 higher C causes the spring to tangle and require separate packing """
         return self.spring_diameter / self.wire_diameter
 
+    # TODO: change Na to active_coils
     @property
     def Na(self):
         """ Calculate Na which is the number of active coils (using Castigliano's theorem) """
@@ -118,9 +140,9 @@ class HelicalPushSpring(Spring):
 
     @property
     def Fsolid(self):
-        # it is a good practice for the force that compresses the spring to solid state to be: Fs=(1+z)Fmax
-        # where z is the overrun safety factor, it's customary that z=0.15 so Fs=1.15Fmax
-        return (1 + self.z) * self.force
+        # it is a good practice for the force that compresses the spring to solid state to be: Fs=(1+zeta)Fmax
+        # where zeta is the overrun safety factor, it's customary that zeta=0.15 so Fs=1.15Fmax
+        return (1 + self.zeta) * self.force
 
     @property
     def free_length(self):
@@ -156,11 +178,11 @@ class HelicalPushSpring(Spring):
                 8 * K * self.spring_index * safety_factor))
         if force > self.Fsolid:
             print("Fsolid exceeded")
-            return self.Fsolid / (1 + self.z)
+            return self.Fsolid / (1 + self.zeta)
         else:
             return force
 
-    def Collapse(self, ends, E):
+    def Buckling(self, ends, E):
         """ Absolute stability
 
         :keyword E: elastic modulus
@@ -170,7 +192,7 @@ class HelicalPushSpring(Spring):
         :returns: returns True if spring is in danger of collapse and False if not
             and the maximum free length(L0) before collapsing """
 
-        alpha = {'fixed-ends': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}  # from table 10-2
+        alpha = {'fixed-fixed': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}  # from table 10-2
 
         L0 = self.free_length
         try:
@@ -216,3 +238,7 @@ class HelicalPushSpring(Spring):
         ns = self.Ssy / (mean_shear_stress + alternating_shear_stress)
 
         return nf, ns
+
+    def NaturalFrequency(self, density):
+        return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.Na * pi)) * sqrt(
+            self.shear_modulus / (2 * density))

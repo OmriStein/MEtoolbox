@@ -19,7 +19,7 @@ def BendingStress(My, Iy, z, Mz=None, Iz=None, y=None):
         :type Mz: float
         :keyword Iy: Area moment of inertia for the y direction
         :type Iy: float
-        :keyword Iz: Area moment of inertia for the z direction
+        :keyword Iz: Area moment of inertia for the zeta direction
         :type Iz: float
         :keyword z: Coordinate
         :type z: float
