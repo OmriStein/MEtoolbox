@@ -153,19 +153,25 @@ class HelicalPushSpring(Spring):
         else:
             return force
 
-    def Collapse(self, alpha, E):
-        """ returns True if spring is in danger of collapse and False if not
+    def Collapse(self, ends, E):
+        """ Absolute stability
+
         :keyword E: elastic modulus
-        :keyword alpha: the spring end condition (from Table 10-2)
-        """
-        # TODO: make use of table
-        Table = {'fixed-ends': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}  # from table 10-2
+        :type E: float
+        :keyword ends: the spring end condition (from Table 10-2)
+        :type ends: str
+        :returns: returns True if spring is in danger of collapse and False if not
+            and the maximum free length(L0) before collapsing """
+
+        alpha = {'fixed-ends': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}  # from table 10-2
 
         L0 = self.free_length
         try:
-            collapse_test = (pi * self.spring_diameter / alpha) * sqrt(
+            collapse_test = (pi * self.spring_diameter / alpha[ends.lower()]) * sqrt(
                 (2 * (E - self.shear_modulus)) / (2 * self.shear_modulus + E))
         except ValueError as e:
             print(f"{e}, make sure E and G have the same units (Mpa)")
+        except KeyError as key:
+            print(f"Ends: {key} is unknown ")
         else:
-            return L0 < collapse_test
+            return L0 >= collapse_test, collapse_test

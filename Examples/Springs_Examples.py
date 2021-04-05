@@ -30,4 +30,5 @@ spring.wire_diameter = 5.8079
 spring.spring_diameter = C * 5.8079
 print(f"Ls = {spring.solid_length}")
 print(f"L0 = {spring.free_length}")
-print(f"collapse: {spring.Collapse(0.707, 205e3)}")
+collapse = spring.Collapse('fixed-hinged', 205e3)
+print(f"collapse: {collapse[0]}, max free length (L0) = {collapse[1]} ")
