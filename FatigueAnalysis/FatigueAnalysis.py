@@ -128,7 +128,7 @@ class FatigueAnalysis:
 
         if self.mean_equivalent_stress < 0:
             raise Exception("Not valid when the mean equivalent stress is negative,"
-                            "use GetSafetyFactor instead ")
+                            "use GetSafetyFactor method instead ")
 
         ultimate_strength = self.Sut
         if self.Kc == 0.59:
@@ -151,7 +151,7 @@ class FatigueAnalysis:
 
         if self.mean_equivalent_stress < 0:
             raise Exception("Not valid when the mean equivalent stress is negative,"
-                            "use GetSafetyFactor instead ")
+                            "use GetSafetyFactor method instead ")
 
         yield_strength = self.Sy
         if self.Kc == 0.59:
@@ -175,7 +175,7 @@ class FatigueAnalysis:
 
         if self.mean_equivalent_stress < 0:
             raise Exception("Not valid when the mean equivalent stress is negative,"
-                            "use GetSafetyFactor instead ")
+                            "use GetSafetyFactor method instead ")
 
         ultimate_strength = self.Sut
         if self.Kc == 0.59:
@@ -199,7 +199,7 @@ class FatigueAnalysis:
 
         if self.mean_equivalent_stress < 0:
             raise Exception("Not valid when the mean equivalent stress is negative,"
-                            "use GetSafetyFactor instead ")
+                            "use GetSafetyFactor method instead ")
 
         ultimate_strength = self.Sut
         if self.Kc == 0.59:

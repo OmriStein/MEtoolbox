@@ -19,4 +19,11 @@ class Spring:
     @property
     def Ssy(self):
         """ yield strength for shear (Ssy = % * Ssu)) """
-        return self.yield_percent * self.Sut
+        if 1 <= self.yield_percent <= 100:
+            # if the yield_percent is in percentage form divide by 100
+            return (self.yield_percent/100) * self.Sut
+        elif 0 < self.yield_percent < 1:
+            # if the yield_percent is in decimal form no correction needed
+            return self.yield_percent * self.Sut
+        else:
+            raise ValueError("something is wrong with the yield percentage")
