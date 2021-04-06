@@ -10,7 +10,7 @@ class GearTypeError(ValueError):
 
 
 class SpurGear:
-    """ a gear object that contains all of its design parameters (AGMA 2001-D04) """
+    """A gear object that contains all of its design parameters (AGMA 2001-D04)"""
 
     # TODO: YN - add solution for low cycle of material not in the graph
     # TODO: Qv - add a way to calculate the Qv value as in AGMA 2001-D04
@@ -18,46 +18,32 @@ class SpurGear:
     def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset, enclosure, hardness,
                  pressure_angle, grade, work_hours=0, number_of_cycles=0, crowned=False, adjusted=False,
                  sensitive_use=False, nitriding=False, case_carb=False, material='steel'):
-        """
-        :keyword modulus: modulus in [mm]
-        :keyword pressure_angle: pressure angle in [deg]
-        :keyword teeth_num: number of teeth
-        :keyword rpm: angular velocity in [RPM]
-        :keyword grade: material grade (1 or 2)
-        :keyword Qv: transmission quality [5<=Qv<=11]
-        :keyword crowned: crowned teeth shape ( True / False )
-        :keyword adjusted: Adjusted after assembly ( True / False )
-        :keyword width: gear width in [mm]
-        :keyword bearing_span: length between the middle of the bearings in [mm]
-        :keyword pinion_offset: gear offset from the middle of the bearing span in [mm]
-        :keyword enclosure: type of enclosure
+        """ Instantiating a Spurgear object
+
+        :param str name: the name of the gear
+        :param float modulus: modulus in [mm]
+        :param float pressure_angle: pressure angle in [deg]
+        :param int teeth_num: number of teeth
+        :param float rpm: angular velocity in [RPM]
+        :param int grade: material grade (1 or 2)
+        :param int Qv: transmission quality [5<=Qv<=11]
+        :param bool crowned: crowned teeth shape ( True / False )
+        :param bool adjusted: Adjusted after assembly ( True / False )
+        :param float width: gear width in [mm]
+        :param float bearing_span: length between the middle of the bearings in [mm]
+        :param float pinion_offset: gear offset from the middle of the bearing span in [mm]
+        :param strenclosure: type of enclosure
                             (open gearing / commercial enclosed / precision enclosed / extra precision enclosed)
-        :keyword hardness: gear hardness in Brinell scale [HB]
-        :keyword material: gear material (steel, malleable iron, nodular iron, cast iron, aluminum bronze, tin bronze)
-        :keyword work_hours: number of hour of operation in [hr]
-        :keyword number_of_cycles: number of cycles of operation
-        :keyword sensitive_use: if the gear is for sensitive use ( True / False )
-        :keyword nitriding: heat treating process ( True / False )
-        :type name: str
-        :type modulus: int
-        :type teeth_num: int
-        :type rpm: float
-        :type Qv: int
-        :type width: float
-        :type bearing_span: float
-        :type pinion_offset: float
-        :type enclosure: str
-        :type hardness: int
-        :type pressure_angle: int
-        :type grade: int
-        :type crowned: bool
-        :type adjusted: bool
-        :type sensitive_use: bool
-        :type nitriding: bool
-        :type material: any
+        :param float hardness: gear hardness in Brinell scale [HB]
+        :param str material: gear material (steel, malleable iron, nodular iron, cast iron, aluminum bronze, tin bronze)
+        :param float work_hours: number of hour of operation in [hr]
+        :param float number_of_cycles: number of cycles of operation
+        :param bool sensitive_use: if the gear is for sensitive use ( True / False )
+        :param bool nitriding: heat treating process ( True / False )
+
+        :returns: A SpurGear object
         :rtype: SpurGear
         """
-
         # gear properties
         self.name = name
         self.modulus = modulus
@@ -88,24 +74,39 @@ class SpurGear:
 
     @property
     def pitch_diameter(self):
-        """ calculate pitch_diameter """
+        """Calculate pitch diameter
+
+        :returns: Gear's pitch diameter
+        :rtype: float
+        """
         return self.teeth_num * self.modulus  # pitch diameter [mm]
 
     @property
     def pitch(self):
-        """ calculate circular pitch"""
+        """Calculate circular pitch
+
+        :returns: Gear's circular pitch
+        :rtype: float
+        """
         return self.modulus * pi
 
     @property
     def tangent_velocity(self):
-        """ convert tangent velocity to [m/s] from [rpm] """
+        """Convert tangent velocity to [m/s] from [rpm]
+
+        :returns: Gear's tangent velocity
+        :rtype: float
+        """
         return (pi * self.pitch_diameter * self.rpm) / 60e3
 
     @property
     def KB(self):
-        """ Rim thickness factor
-            KB is dependent on the number of teeth """
+        """Rim thickness factor, KB is dependent on the number of teeth
 
+
+        :returns: Gear's Rim thickness factor
+        :rtype: float
+        """
         mB = (0.5 * self.teeth_num - 1.25) / 2.25
         if mB < 1.2:
             K_B = 1.6 * log(2.242 / mB)
@@ -115,14 +116,16 @@ class SpurGear:
 
     @property
     def Kv(self):
-        """ Dynamic factor
-        Kv is dependent on the pitch diameter in [mm],
+        """Dynamic factor, Kv is dependent on the pitch diameter in [mm],
         the angular velocity in [rpm] and Qv (Transmission accuracy grade number)
 
         note: the equations here are from "Shigley's Mechanical Engineering Design"
                in the AGMA standard the Transmission accuracy grade number is Av instead of Qv
-               and its value is inverted, high Qv is more accurate and high Av is less accurate """
+               and its value is inverted, high Qv is more accurate and high Av is less accurate
 
+        :returns: Gear's Dynamic factor
+        :rtype: float
+        """
         B = 0.25 * (12 - self.Qv) ** (2 / 3)
         A = 50 + 56 * (1 - B)
 
@@ -142,9 +145,11 @@ class SpurGear:
 
     @property
     def Ks(self):
-        """ Size factor
-         Ks is dependent on the circular pitch (p=πm) which in turn depends on the modulus """
+        """Size factor, Ks is dependent on the circular pitch (p=πm) which in turn depends on the modulus
 
+        :returns: Gear's size factor
+        :rtype: float
+        """
         if self.pitch > 8:
             K_s = (1 / 1.189) * (self.pitch ** 0.097)
         else:
@@ -153,12 +158,14 @@ class SpurGear:
 
     @property
     def KH(self):
-        """ load distribution factor
-         KH is dependent on: the shape of teeth (crowned), if teeth are adjusted after assembly (adjusted),
-         the gear width in [mm], pitch diameter in [mm], bearing span (the distance between the bearings center lines)
-         pinion offset (the distance from the bearing span center to the pinion mid-face)
-         enclosure type (open gearing, commercial enclosed, precision enclosed, extra precision enclosed) """
+        """Load distribution factor, KH is dependent on: the shape of teeth (crowned), if teeth are adjusted after assembly (adjusted),
+        the gear width in [mm], pitch diameter in [mm], bearing span (the distance between the bearings center lines)
+        pinion offset (the distance from the bearing span center to the pinion mid-face)
+        enclosure type (open gearing, commercial enclosed, precision enclosed, extra precision enclosed)
 
+        :returns: Gear's load distribution factor
+        :rtype: float
+        """
         # K_Hmc - lead correction factor
         if self.crowned:
             K_Hmc = 0.8
@@ -200,17 +207,20 @@ class SpurGear:
                           'commercial enclosed': [1.27e-1, 0.622e-3, -1.69e-7],
                           'precision enclosed': [0.675e-1, 0.504e-3, -1.44e-7],
                           'extra precision enclosed': [0.380e-1, 0.402e-3, -1.27e-7]}
-        K_Hma = enclosure_type[self.enclosure][0] + self.width * enclosure_type[self.enclosure][1] +\
-            enclosure_type[self.enclosure][2] * self.width ** 2
+        K_Hma = enclosure_type[self.enclosure][0] + self.width * enclosure_type[self.enclosure][1] + \
+                enclosure_type[self.enclosure][2] * self.width ** 2
 
         K_H = 1.0 + K_Hmc * (K_Hpf * K_Hpm + K_Hma * K_He)
         return K_H
 
     @property
     def St(self):
-        """ bending safety factor
-         St is dependent on the gear hardness in [HBN] and the material grade
-         (material grade of the gear 1 for regular use 2 for military and sensitive uses) """
+        """Bending safety factor, St is dependent on the gear hardness in [HBN] and the material grade
+        (material grade of the gear 1 for regular use 2 for military and sensitive uses)
+
+        :returns: Gear's bending safety factor
+        :rtype: float
+        """
         if self.grade == 1:
             S_t = 0.533 * self.hardness + 88.3
         elif self.grade == 2:
@@ -222,10 +232,12 @@ class SpurGear:
 
     @property
     def Sc(self):
-        """ contact safety factor
-            Sc is dependent on the gear hardness in [HBN] and on the material grade
-            (material grade of the gear 1 for regular use 2 for military and sensitive uses) """
+        """Contact safety factor, Sc is dependent on the gear hardness in [HBN] and on the material grade
+        (material grade of the gear 1 for regular use 2 for military and sensitive uses)
 
+        :returns: Gear's contact safety factor
+        :rtype: float
+        """
         if self.grade == 1:
             S_c = 200 + 2.22 * self.hardness
         elif self.grade == 2:
@@ -237,13 +249,18 @@ class SpurGear:
 
     @property
     def ZR(self):
-        # for now ZR is 1 by the AGMA standard
+        """For now ZR is 1 according to the AGMA standard
+        :rtype: int
+        """
         return 1
 
     @property
     def YN(self):
-        """ bending strength stress cycle factor"""
+        """Bending strength stress cycle factor
 
+        :returns: Gear's bending strength stress cycle factor
+        :rtype: float
+        """
         # get the number of cycles of the gear
         N = self.CyclesOrHours()
 
@@ -282,8 +299,11 @@ class SpurGear:
 
     @property
     def ZN(self):
-        """ calculating contact strength stress cycle factor """
+        """Calculating contact strength stress cycle factor
 
+        :returns: Gear's contact strength stress cycle
+        :rtype: float
+        """
         # get the number of cycles of the gear
         N = self.CyclesOrHours()
         if N is None:
@@ -300,8 +320,11 @@ class SpurGear:
 
     @staticmethod
     def Y_j(gear1, gear2):
-        """ set Geometry factors for spur gear and pinion"""
+        """Return Geometry factors for spur gear and pinion
 
+        :returns: Gear's geometry factor
+        :rtype: float
+        """
         N1 = gear1.teeth_num
         N2 = gear2.teeth_num
         pressure_angle = gear1.pressure_angle
@@ -322,15 +345,16 @@ class SpurGear:
         # print(f"Error: Teeth number of one of the gears ({not_in_range.num}) not in range {not_in_range.range_}")
 
     def getInfo(self):
-        """ all the class fields with values """
+        """Print all the class fields with values """
         for key in self.__dict__:
             print(f"{key} : {self.__dict__[key]}")
 
     def getFactors(self, verbose=True):
-        """ print correction factors for gear strength analysis
+        """Print correction factors for gear strength analysis
 
-            :keyword verbose: print factors
-            :rtype: dict """
+        :param bool verbose: Print factors
+        :rtype: dict
+        """
 
         factors = {'KB': self.KB, 'Kv': self.Kv, 'max_vel': self.maximum_velocity, 'Ks': self.Ks, 'KH': self.KH,
                    'St': self.St, 'ZR': self.ZR, 'Sc': self.Sc, 'YN': self.YN, 'ZN': self.ZN,
@@ -347,7 +371,14 @@ class SpurGear:
         return factors
 
     def CyclesOrHours(self):
-        """ check if the gear number of cycles or work hours were input and return the number of cycle """
+        """Check if the gear number of cycles or work hours were input and return the number of cycle
+
+        :returns: Gear's Dynamic factor
+        :rtype: float or None
+
+        :raise ValueError: number of cycles and work hours entered but they're not matching
+            or no number of cycles or work hours entered
+        """
 
         if self.contact_ratio is None:
             return None
@@ -373,14 +404,14 @@ class SpurGear:
 
     @staticmethod
     def CalculateForces(gear, power):
-        """ calculate forces on the gear
+        """Calculate forces on the gear
 
-            :keyword gear: gear object
-            :type gear: SpurGear
-            :keyword power: power
-            :type power: float
-            :returns: Wt - tangent force in [N], Wr - radial force in [N]
-            :rtype: tuple """
+        :param SpurGear gear: gear object
+        :param float power: power
+
+        :returns: Wt - tangent force in [N], Wr - radial force in [N]
+        :rtype: tuple[float, float]
+        """
 
         Wt = (60e3 / pi) * (power / (gear.pitch_diameter * gear.rpm))
         Wr = Wt * tan(radians(gear.pressure_angle))
@@ -388,15 +419,14 @@ class SpurGear:
 
     @staticmethod
     def ZI(gear1, gear2):
-        """ geometric factor for contact failure
-            ZI is dependent on the gear ratio and pressure angel
+        """Geometric factor for contact failure, ZI is dependent on the gear ratio and pressure angel
 
-            :keyword gear1: gear object
-            :type gear1: HelicalGear
-            :keyword gear2: gear object
-            :type gear2: HelicalGear
-            :return: ZI - geometric factor
-            :rtype: float """
+        :param SpurGear gear1: gear object
+        :param SpurGear gear2: gear object
+
+        :return: ZI - geometric factor
+        :rtype: float
+        """
 
         mG = gear2.teeth_num / gear1.teeth_num
         phi = radians(gear1.pressure_angle)
@@ -404,15 +434,15 @@ class SpurGear:
         return Z_I
 
     def Optimization(self, transmission, optimize_feature='all', verbose=False):
-        """ perform gear optimization
-            :keyword transmission: Transmission object associated with the gear
-            :type transmission: Transmission
-            :keyword optimize_feature: property to optimize for ('width'/'volume'/'center')
-            :type optimize_feature: str
-            :keyword verbose: print optimization stages
-            :type verbose: bool
-            :return: optimized result (width in mm, volume in mm^3, center distance in mm)
-            :rtype: dict """
+        """Perform gear optimization
+
+        :param Transmission transmission: Transmission object associated with the gears
+        :param str optimize_feature: property to optimize for ('width'/'volume'/'center')
+        :param bool verbose: print optimization stages
+
+        :return: optimized result (width in mm, volume in mm^3, center distance in mm)
+        :rtype: dict
+        """
 
         gear = self
 
@@ -592,9 +622,9 @@ class SpurGear:
                         return optimized_result, results_list
 
     def CalculateCentersDistance(self, gear_ratio):
-        """ calculate the distance between the centers of the gears
-        :keyword gear_ratio: transmissions gear ratio
-        :type gear_ratio: float
+        """Calculate the distance between the centers of the gears
+        :param float gear_ratio: transmissions gear ratio
+
         :return: the distance between the transmissions gears centers  in [mm]
         :rtype: float
         """
@@ -603,10 +633,10 @@ class SpurGear:
 
     @staticmethod
     def CreateNewGear(gear2_prop):
-        """ return a new instance of SpurGear
+        """Return a new instance of SpurGear
 
-        :keyword gear2_prop: gear properties
-        :type gear2_prop: dict
+        :param dict gear2_prop: gear properties
+
         :returns: SpurGear object
         :type: SpurGear
         """
@@ -615,7 +645,13 @@ class SpurGear:
 
     @staticmethod
     def FormatProperties(properties):
-        """ remove excess attributes form properties """
+        """Remove excess attributes form properties
+
+        :param list properties: a list of gear properties
+
+        :returns: A dictionary of properties
+        :rtype: dict
+        """
         prop_list = ['name', 'modulus', 'teeth_num', 'rpm', 'Qv', 'width', 'bearing_span', 'pinion_offset', 'enclosure',
                      'hardness', 'work_hours', 'number_of_cycles', 'pressure_angle', 'grade', 'crowned', 'adjusted',
                      'sensitive_use', 'nitriding', 'case_carb', 'material']
@@ -624,12 +660,15 @@ class SpurGear:
         return new_properties
 
     def CheckCompatibility(self, gear):
-        """ raise error if the pressure angle or modulus of the gears don't match
+        """Raise error if the pressure angle, helix angle or modulus of the gears don't match
 
-            :keyword gear: gear object
-            :type gear: SpurGear
-            :rtype: None """
+        :param HelicalGear gear: gear object
 
+        :raises ValueError("gear1 and gear2 have mismatch pressure_angle"):
+        :raises ValueError("gear1 and gear2 have mismatch Helix_angle"):
+        :raises ValueError("gear1 and gear2 are not the same type, they are no compatible"):
+        :raises ValueError("gear1 and gear2 have mismatch modulus"):
+        """
         if self.pressure_angle != gear.pressure_angle:
             # if pressure angles are different raise error
             raise ValueError("gear1 and gear2 have mismatch pressure_angle")
