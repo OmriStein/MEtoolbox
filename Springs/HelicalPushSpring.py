@@ -436,8 +436,10 @@ class HelicalPushSpring(Spring):
         :rtype: float
         """
         import numpy as np
+        # data from table
         percentage = np.array([50, 90, 95, 99, 99.9, 99.99, 99.999, 99.9999])
         reliability_factors = np.array([1, 0.897, 0.868, 0.814, 0.753, 0.702, 0.659, 0.620])
+        # interpolating from data
         Ke = np.interp(reliability, percentage, reliability_factors)
 
         if self.shot_peened:

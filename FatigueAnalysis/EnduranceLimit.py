@@ -4,35 +4,27 @@ from tools import PrintAtributes
 
 
 class EnduranceLimit:
-    """ calculates Marin modification factors and return modified endurance limit """
+    """calculates Marin modification factors and return modified endurance limit"""
 
     def __init__(self, Sut, surface_finish, rotating, max_normal_stress, max_bending_stress, stress_type, temp,
                  reliability, material=None, unmodified_endurance=None, A95=None, diameter=None, height=None,
                  width=None):
-        """
-        :keyword Sut: ultimate tensile strength
-        :type Sut: float
-        :keyword surface_finish: 'ground' / 'machined' / 'cold-drawn' / 'hot-rolled' / 'as forged'
-        :type surface_finish: str
-        :keyword rotating: rotating mode (True/False)
-        :type rotating: bool
-        :keyword max_normal_stress: (for axial loading check)
-        :type max_normal_stress: float
-        :keyword max_bending_stress: (for axial loading check)
-        :type max_bending_stress: float
-        :keyword stress_type: 'bending' / 'axial' / 'torsion' / 'shear' / 'multiple'
-        :type stress_type: str
-        :keyword temp: temperature
-        :type: float
-        :keyword reliability: reliability
-        :type: float
-        :keyword material:
-        :type material: str
-        :keyword unmodified_endurance:
-        :keyword A95: Area containing over 95% of maximum periodic stress in the cross section
-        :keyword diameter:
-        :keyword height:
-        :keyword width:
+        """ Instantiating EnduranceLimit Object
+
+        :param float Sut: ultimate tensile strength
+        :param str surface_finish: 'ground' / 'machined' / 'cold-drawn' / 'hot-rolled' / 'as forged'
+        :param bool rotating: rotating mode (True/False)
+        :param float max_normal_stress: (for axial loading check)
+        :param float max_bending_stress: (for axial loading check)
+        :param str stress_type: 'bending' / 'axial' / 'torsion' / 'shear' / 'multiple'
+        :param float temp: temperature
+        :param float reliability: reliability
+        :param str material:
+        :param float unmodified_endurance:
+        :param float A95: Area containing over 95% of maximum periodic stress in the cross section
+        :param float diameter:
+        :param float height:
+        :param float width:
         """
 
         self.Sut = Sut
@@ -63,10 +55,11 @@ class EnduranceLimit:
 
     @property
     def Ka(self):
-        """ Surface condition modification factor
+        """Surface condition modification factor
 
-            :returns: Ka - surface finish factor
-            :rtype: float"""
+        :returns: Ka - surface finish factor
+        :rtype: float
+        """
 
         data = {'ground': (1.58, -0.085),
                 'machined': (4.51, -0.265),
@@ -77,11 +70,12 @@ class EnduranceLimit:
         return a * (self.Sut ** b)
 
     @property
-    def Kb(self):
-        """ Size modification factor
+    def Kb(self):  # TODO: fix Kb its badly writen
+        """Size modification factor
 
         :returns: Kb - size factor
-        :rtype: float """
+        :rtype: float
+        """
 
         if self.max_normal_stress > 0.85 * self.max_bending_stress:
             # if axial loading accrue
@@ -91,7 +85,7 @@ class EnduranceLimit:
             de = self.diameter
         else:
             # not rotating or not round
-            de = sqrt(self.A95/0.07658)
+            de = sqrt(self.A95 / 0.07658)
 
         if 2.79 <= de <= 51:
             return 1.24 * (de ** -0.107)
@@ -102,8 +96,9 @@ class EnduranceLimit:
     def Kc(self):
         """ Load modification factor
 
-            :returns Kc - stress type factor
-            :rtype: float """
+        :returns Kc - stress type factor
+        :rtype: float
+        """
 
         types = {'bending': 1, 'axial': 0.85, 'torsion': 0.59, 'shear': 0.59, 'multiple': 1}
         return types[self.stress_type]
@@ -112,8 +107,9 @@ class EnduranceLimit:
     def Kd(self):
         """ Temperature modification factor
 
-            :returns: Ks - temperature factor
-            :rtype: float """
+        :returns: Ks - temperature factor
+        :rtype: float
+        """
 
         import numpy as np
         percentage = np.array([20, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600])
@@ -124,8 +120,9 @@ class EnduranceLimit:
     def Ke(self):
         """ Reliability factor
 
-            :returns: Ke - reliability factor
-            :rtype: float """
+        :returns: Ke - reliability factor
+        :rtype: float
+        """
 
         import numpy as np
         percentage = np.array([50, 90, 95, 99, 99.9, 99.99, 99.999, 99.9999])
@@ -134,12 +131,17 @@ class EnduranceLimit:
 
     @property
     def Kf(self):
-        """ Miscellaneous effects factor """
+        """Miscellaneous effects factor"""
+        # TODO: add functionality to Kf
         return 1
 
     @property
     def unmodified(self):
-        print()
+        """Return the unmodified endurance limit based on the material and Sut
+
+        :returns: Unmodified endurance limit
+        :rtype: float
+        """
         if self.material is None and self.unmodified_endurance is None:
             raise ValueError("material and unmodified endurance can't both be None")
 
@@ -158,9 +160,14 @@ class EnduranceLimit:
 
     @property
     def modified(self):
-        """ returns the modified endurance limit """
+        """Returns the endurance limit modified by the Marin factors
+
+        :returns: Modified endurance limit
+        :type: float
+        """
         return self.Ka * self.Kb * self.Kc * self.Kd * self.Ke * self.Kf * self.unmodified
 
     def getFactors(self):
-        """ print Marine factors """
-        print(f"Ka={self.Ka:.3f}, Kb={self.Kb:.3f}, Kc={self.Kc:.3f}, Ks={self.Kd:.3f}, Ke={self.Ke:.3f}, Kf={self.Kf:.3f}")
+        """print Marine factors"""
+        print(
+            f"Ka={self.Ka:.3f}, Kb={self.Kb:.3f}, Kc={self.Kc:.3f}, Ks={self.Kd:.3f}, Ke={self.Ke:.3f}, Kf={self.Kf:.3f}")
