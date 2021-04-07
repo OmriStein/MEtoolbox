@@ -1,9 +1,11 @@
 class Spring:
-    def __init__(self, Ap, m, yield_percent, wire_diameter, spring_diameter):
+    def __init__(self, force, Ap, m, yield_percent, wire_diameter, spring_diameter, shear_modulus):
+        self.force = force
         self.Ap = Ap
         self.m = m
-        self.wire_diameter = wire_diameter
+        self.shear_modulus = shear_modulus
         self.spring_diameter = spring_diameter
+        self.wire_diameter = wire_diameter
         self.yield_percent = yield_percent
 
     @property

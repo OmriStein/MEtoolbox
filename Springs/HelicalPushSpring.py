@@ -2,12 +2,13 @@ from Springs import Spring
 from math import pi, sqrt
 from tools import PrintAtributes
 from sympy import Symbol
+import sympy
 
 
 class HelicalPushSpring(Spring):
     def __init__(self, force, wire_diameter, spring_diameter, Ap, m, shear_modulus, end_type, yield_percent,
                  spring_constant=None, Na=None, zeta=0.15, set_removed=False, shot_peened=False, ends=None,
-                 free_length=None, elastic_modulus=None, density=None, working_frequency=None,):
+                 free_length=None, elastic_modulus=None, density=None, working_frequency=None, ):
         """Instantiate a helical push spring object with the given parameters
 
         :param float or Symbol force: working force of the spring
@@ -31,16 +32,16 @@ class HelicalPushSpring(Spring):
 
         :returns: HelicalPushSpring
         """
-        super().__init__(Ap, m, yield_percent, wire_diameter, spring_diameter)
-
+        self.constructing = True
+        super().__init__(force, Ap, m, yield_percent, wire_diameter, spring_diameter, shear_modulus)
         if set_removed:
             print(f"Note: set should ONLY be removed for static loading and NOT for periodical loading")
 
-        self.force = force
         self.set_removed = set_removed
         self.shot_peened = shot_peened
-        self.shear_modulus = shear_modulus
         self.yield_percent = yield_percent
+        self.zeta = zeta  # overrun safety factor
+        self.end_type = end_type.lower()
 
         # Na and the spring constant are linked this if statement is meant to determine which one to calculate
         # based on the class input
@@ -59,8 +60,6 @@ class HelicalPushSpring(Spring):
             # if both are given
             raise ValueError("Both Na and the spring constant were given but only one is expected")
 
-        self.zeta = zeta  # overrun safety factor
-        self.end_type = end_type.lower()
         self.free_length = free_length
 
         end_types = ('plain', 'plain and ground', 'squared or closed', 'squared and ground')
@@ -73,6 +72,7 @@ class HelicalPushSpring(Spring):
         self.working_frequency = working_frequency
 
         self.CheckDesign()  # check C and Na
+        self.constructing = False
 
     def getInfo(self):
         """print all of the spring properties"""
@@ -102,6 +102,9 @@ class HelicalPushSpring(Spring):
             print(f"Note: Na={Na:.2f} is not in range [3,15], this can cause non linear behavior")
             good_design = False
 
+        if not self.L0_input_flag:
+            print(f"Note: the free length was not given so Fsolid was estimated using zeta={self.zeta}")
+
         zeta = self.zeta
         if zeta < 0.15:
             print(f"Note: zeta={zeta:.2f} is smaller then 0.15, the spring could reach its solid length")
@@ -122,6 +125,31 @@ class HelicalPushSpring(Spring):
                 good_design = False
 
         return True if good_design else False
+
+    @property
+    def wire_diameter(self):
+        return self.__wire_diameter
+
+    @wire_diameter.setter
+    def wire_diameter(self, d):
+        self.__wire_diameter = d
+        if not self.constructing:
+            # updating Na and free length with the new diameter
+            self.Na = None
+            self.free_length = None
+
+    @property
+    def spring_diameter(self):
+        return self.__spring_diameter
+
+    @spring_diameter.setter
+    def spring_diameter(self, d):
+        self.__spring_diameter = d
+        if not self.constructing:
+            # updating Na and free length with the new diameter
+            self.Na = None
+            self.free_length = None
+
 
     @property
     def spring_index(self):
@@ -156,8 +184,9 @@ class HelicalPushSpring(Spring):
         if Na is not None:
             # Na was given
             self.__Na = Na
-            # recalculate spring constant according to the new Na
+            # recalculate spring constant and free_length according to the new Na
             self.spring_constant = None
+            self.free_length = None
         else:
             # Na was not given so calculate it
             self.__Na = self.CalcNa()
@@ -191,8 +220,9 @@ class HelicalPushSpring(Spring):
         if spring_constant is not None:
             # spring_constant was given
             self.__spring_constant = spring_constant
-            # recalculate Na according to the new spring_constant
+            # recalculate Na and the free length according to the new spring_constant
             self.Na = None
+            self.free_length = None
         else:
             # spring_constant was not given so calculate it
             self.__spring_constant = self.CalcSpringConstant()
@@ -369,12 +399,14 @@ class HelicalPushSpring(Spring):
         """
         return 0.25 * density * (pi ** 2) * (self.wire_diameter ** 2) * self.spring_diameter * self.Na
 
-    def MinWireDiameter(self, safety_factor, solid=False):
+    def MinWireDiameter(self, static_safety_factor, solid=False):
         """The minimal wire diameter for a given safety factor in order to avoid failure,
-        according to the spring parameters, if solid is True the calculationg uses :attr:`Fsolid`
+        according to the spring parameters, if solid is True the calculation uses :attr:`Fsolid`
         instead of :attr:`force`
 
-        :param float safety_factor: factor of safety
+        Note: for static use only
+
+        :param float static_safety_factor: factor of safety
         :param bool solid: If true calculate to according to the solid force
 
         :returns: The minimal wire diameter
@@ -382,7 +414,7 @@ class HelicalPushSpring(Spring):
         """
         K = self.Ks if self.set_removed else self.Kw
         force = self.Fsolid if solid else self.force
-        return ((8 * K * force * self.spring_index * safety_factor) / (
+        return ((8 * K * force * self.spring_index * static_safety_factor) / (
                 self.yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
 
     def MinSpringDiameter(self, safety_factor, solid=False):
@@ -489,3 +521,26 @@ class HelicalPushSpring(Spring):
         """
         return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.Na * pi)) * sqrt(
             self.shear_modulus / (2 * density))
+
+    def CalcSpringIndex(self, solid_safety_factor):
+        """Calculate Spring index if only wire diameter was given and the spring diameter was not
+
+        :param float solid_safety_factor: Spring's safety factor for solid length
+
+        :returns: Spring's index number
+        """
+        alpha = self.Ssy / solid_safety_factor
+        beta = (8 * self.Fsolid) / (pi * self.wire_diameter ** 2)
+        if self.set_removed:
+            # for Ks
+            return (alpha / beta) + 0.5
+        else:
+            # for Kw
+            try:
+                return (alpha - 0.365 * beta) / (2 * beta) + (
+                    (0.966 * sqrt(0.268 * alpha ** 2 - alpha * beta + 0.53 * beta ** 2))) / beta
+            except TypeError:
+                print("In this method d can't be symbolic")
+            # for Kb TODO: find a way to implement Kb (Bergstrasser factor)
+            # return ((2 * alpha - beta) / (4 * beta)) + sympy.sqrt(
+            #     ((2 * alpha - beta) / (4 * beta)) ** 2 - ((3 * alpha) / (4 * beta)))
