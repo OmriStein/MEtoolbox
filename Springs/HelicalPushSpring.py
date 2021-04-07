@@ -128,10 +128,19 @@ class HelicalPushSpring(Spring):
 
     @property
     def wire_diameter(self):
+        """Getter for the wire diameter attribute
+
+        :returns: The spring's wire diameter
+        :rtype: float or Symbol
+        """
         return self.__wire_diameter
 
     @wire_diameter.setter
     def wire_diameter(self, d):
+        """Sets the wire diameter and updates relevant attributes
+
+        :param float d: Spring's wire diameter
+        """
         self.__wire_diameter = d
         if not self.constructing:
             # updating Na and free length with the new diameter
@@ -140,16 +149,24 @@ class HelicalPushSpring(Spring):
 
     @property
     def spring_diameter(self):
+        """Getter for the spring diameter attribute
+
+        :returns: The spring diameter
+        :rtype: float or Symbol
+        """
         return self.__spring_diameter
 
     @spring_diameter.setter
     def spring_diameter(self, d):
+        """Sets the spring diameter and updates relevant attributes
+
+        :param float d: Spring's diameter
+        """
         self.__spring_diameter = d
         if not self.constructing:
             # updating Na and free length with the new diameter
             self.Na = None
             self.free_length = None
-
 
     @property
     def spring_index(self):
