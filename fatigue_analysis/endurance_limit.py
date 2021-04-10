@@ -1,6 +1,6 @@
 from math import sqrt
 
-from tools import PrintAtributes
+from tools import print_atributes
 
 
 class EnduranceLimit:
@@ -40,9 +40,9 @@ class EnduranceLimit:
         self.reliability = reliability
         self.material = material
         self.unmodified_endurance = unmodified_endurance
-        self.A95 = self.CalcA95(A95)
+        self.A95 = self.calc_A95(A95)
 
-    def CalcA95(self, A95):
+    def calc_A95(self, A95):
         if A95 is not None:
             return A95
         elif self.diameter is not None:
@@ -107,7 +107,7 @@ class EnduranceLimit:
     def Kd(self):
         """ Temperature modification factor
 
-        :returns: Ks - temperature factor
+        :returns: factor_Ks - temperature factor
         :rtype: float
         """
 
@@ -137,7 +137,7 @@ class EnduranceLimit:
 
     @property
     def unmodified(self):
-        """Return the unmodified endurance limit based on the material and Sut
+        """Return the unmodified endurance limit based on the material and ultimate_tensile_strength
 
         :returns: Unmodified endurance limit
         :rtype: float
@@ -167,7 +167,7 @@ class EnduranceLimit:
         """
         return self.Ka * self.Kb * self.Kc * self.Kd * self.Ke * self.Kf * self.unmodified
 
-    def getFactors(self):
+    def get_factors(self):
         """print Marine factors"""
         print(
-            f"Ka={self.Ka:.3f}, Kb={self.Kb:.3f}, Kc={self.Kc:.3f}, Ks={self.Kd:.3f}, Ke={self.Ke:.3f}, Kf={self.Kf:.3f}")
+            f"Ka={self.Ka:.3f}, Kb={self.Kb:.3f}, Kc={self.Kc:.3f}, factor_Ks={self.Kd:.3f}, Ke={self.Ke:.3f}, Kf={self.Kf:.3f}")

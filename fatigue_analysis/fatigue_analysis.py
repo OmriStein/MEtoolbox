@@ -1,11 +1,11 @@
 from math import log10
 from sympy import sqrt
-from tools import NotInRangeError, PrintAtributes
+from tools import NotInRangeError, print_atributes
 from sympy import oo
-from FatigueAnalysis import EnduranceLimit
+from fatigue_analysis import EnduranceLimit
 
 
-def CalcKf(q, Kt):
+def calc_kf(q, Kt):
     """Kf - dynamic stress concentration factor
 
     :param float Kt: stress concentration theoretical factor
@@ -23,10 +23,10 @@ class FatigueAnalysis:
     # TODO: make endurance_limit optional and add option to input Se, Stress_type and Kc directly
     # TODO: replace Kc as a way to determine what to do in factors calculation
 
-    def __init__(self, endurance_limit, ductile, Sut=None, Sy=None, Kf_bending=0, Kf_normal=0, Kf_torsion=0,
+    def __init__(self, endurance_limit, ductile, ultimate_tensile_strength=None, Sy=None, Kf_bending=0, Kf_normal=0, Kf_torsion=0,
                  alternating_bending_stress=0, alternating_normal_stress=0, alternating_torsion_stress=0,
                  mean_bending_stress=0, mean_normal_stress=0, mean_torsion_stress=0):
-        """ Instantiating FatigueAnalysis object
+        """ Instantiating fatigue_analysis object
         Note: all stresses are in [MPa]
 
         :param EnduranceLimit endurance_limit: EnduranceLimit object containing the modified Se
@@ -56,10 +56,10 @@ class FatigueAnalysis:
         self.mean_bending_stress = mean_bending_stress
         self.mean_normal_stress = mean_normal_stress
         self.mean_torsion_stress = mean_torsion_stress
-        self.alternating_equivalent_stress = self.AlternatingEquivalentStress()
-        self.mean_equivalent_stress = self.MeanEquivalentStress()
+        self.alternating_equivalent_stress = self.alternating_equivalent_stress()
+        self.mean_equivalent_stress = self.mean_equivalent_stress()
 
-    def AlternatingEquivalentStress(self):
+    def alternating_equivalent_stress(self):
         """Returns the alternating equivalent stress according to the load type indicated by Kc
 
         :returns: Alternating equivalent stress
@@ -82,7 +82,7 @@ class FatigueAnalysis:
         elif Kc == 0.59:
             return self.Kf_torsion * self.alternating_torsion_stress
 
-    def MeanEquivalentStress(self):
+    def mean_equivalent_stress(self):
         """Returns the mean equivalent stress according to the load type indicated by Kc
 
         :returns: Mean equivalent stress
@@ -112,8 +112,8 @@ class FatigueAnalysis:
             return Kf_torsion * self.mean_torsion_stress
 
     @property
-    def Ssu(self):
-        """Returns Ssu which is the Sut correction for shear stress
+    def shear_ultimate_strength(self):
+        """Returns shear_ultimate_strength which is the ultimate_tensile_strength correction for shear stress
 
         :returns: Sst - ultimate shear tensile strength
         :type: float
@@ -121,10 +121,10 @@ class FatigueAnalysis:
         return 0.67 * self.Sut
 
     @property
-    def Ssy(self):
-        """Returns Ssy which is the Sy correction for shear stress
+    def shear_yield_stress(self):
+        """Returns shear_yield_strength which is the Sy correction for shear stress
 
-        :returns: Ssy -  Yield shear stress
+        :returns: shear_yield_strength - yield stress for shear
         :type: float
         """
         return self.Sy / sqrt(3).evalf()
@@ -137,11 +137,11 @@ class FatigueAnalysis:
         :returns: Safety factor
         :rtype: any
 
-        :raises ValueError: if Sut is not in the FatigueAnalysis call
+        :raises ValueError: if ultimate_tensile_strength is not in the fatigue_analysis call
         """
 
         if self.Sut is None:
-            raise ValueError("Sut is None")
+            raise ValueError("ultimate_tensile_strength is None")
 
         if self.mean_equivalent_stress < 0:
             raise Exception("Not valid when the mean equivalent stress is negative,"
@@ -149,8 +149,8 @@ class FatigueAnalysis:
 
         ultimate_strength = self.Sut
         if self.Kc == 0.59:
-            # Sut correction for shear stress
-            ultimate_strength = self.Ssu
+            # ultimate_tensile_strength correction for shear stress
+            ultimate_strength = self.shear_ultimate_strength
 
         return 1 / ((self.alternating_equivalent_stress / self.Se) + (self.mean_equivalent_stress / ultimate_strength))
 
@@ -162,7 +162,7 @@ class FatigueAnalysis:
         :returns: Safety factor
         :rtype: any
 
-        :raises ValueError: if Sy is not in the FatigueAnalysis call
+        :raises ValueError: if Sy is not in the fatigue_analysis call
         """
 
         if self.Sy is None:
@@ -174,8 +174,8 @@ class FatigueAnalysis:
 
         yield_strength = self.Sy
         if self.Kc == 0.59:
-            # Sut correction for shear stress
-            yield_strength = self.Ssy
+            # ultimate_tensile_strength correction for shear stress
+            yield_strength = self.shear_yield_stress
 
         return 1 / ((self.alternating_equivalent_stress / self.Se) +
                     (self.mean_equivalent_stress / yield_strength))
@@ -187,11 +187,11 @@ class FatigueAnalysis:
 
         :returns: Safety factor
         :rtype: any
-        :raises ValueError: if Sut is not in the FatigueAnalysis call
+        :raises ValueError: if ultimate_tensile_strength is not in the fatigue_analysis call
         """
 
         if self.Sut is None:
-            raise ValueError("Sut is None")
+            raise ValueError("ultimate_tensile_strength is None")
 
         if self.mean_equivalent_stress < 0:
             raise Exception("Not valid when the mean equivalent stress is negative,"
@@ -199,8 +199,8 @@ class FatigueAnalysis:
 
         ultimate_strength = self.Sut
         if self.Kc == 0.59:
-            # Sut correction for shear stress
-            ultimate_strength = self.Ssu
+            # ultimate_tensile_strength correction for shear stress
+            ultimate_strength = self.shear_ultimate_strength
 
         return 1 / ((self.alternating_equivalent_stress / self.Se) +
                     (self.mean_equivalent_stress / ultimate_strength) ** 2)
@@ -212,11 +212,11 @@ class FatigueAnalysis:
         :returns: Safety factor
         :rtype: any
 
-        :raises ValueError: if Sut is not in the FatigueAnalysis call
+        :raises ValueError: if ultimate_tensile_strength is not in the fatigue_analysis call
         """
 
         if self.Sut is None:
-            raise ValueError("Sut is None")
+            raise ValueError("ultimate_tensile_strength is None")
 
         if self.mean_equivalent_stress < 0:
             raise Exception("Not valid when the mean equivalent stress is negative,"
@@ -224,8 +224,8 @@ class FatigueAnalysis:
 
         ultimate_strength = self.Sut
         if self.Kc == 0.59:
-            # Sut correction for shear stress
-            ultimate_strength = self.Ssu
+            # ultimate_tensile_strength correction for shear stress
+            ultimate_strength = self.shear_ultimate_strength
 
         return 1 / ((self.alternating_equivalent_stress / self.Se) ** 2 +
                     (self.mean_equivalent_stress / ultimate_strength) ** 2)
@@ -238,7 +238,7 @@ class FatigueAnalysis:
         :returns: Safety factor
         :rtype: any
 
-        :raises ValueError: if Sy is not in the FatigueAnalysis call
+        :raises ValueError: if Sy is not in the fatigue_analysis call
         """
 
         if self.Sy is None:
@@ -257,7 +257,7 @@ class FatigueAnalysis:
             # stress is in the second quadrant of the alternating-mean stress plan
             return yield_strength / (self.alternating_equivalent_stress - self.mean_equivalent_stress)
 
-    def GetSafetyFactor(self, criterion, verbose=True):
+    def get_safety_factor(self, criterion, verbose=True):
         """Returns dynamic and static safety factors
         according to the quadrant in the alternating-mean stress plain where the stresses are in
 
@@ -296,42 +296,43 @@ class FatigueAnalysis:
         return nF, nl
 
     @property
-    def Sm(self):
-        """Getter for the Sm property
+    def Sm_stress(self):
+        """Getter for the Sm_stress property
 
-        :returns: The Sm corresponding for the object Sut
+        :returns: Sm - stress at 1e3 cycles
         :rtype: float
         """
-        return self.CalcSm(self.Sut)
+        return self.calc_Sm(self.Sut)
 
     @staticmethod
-    def CalcSm(Sut):
-        """Calculate Sm which is the stress dividing Low cycle fatigue and high cycle fatigue
+    def calc_Sm(ultimate_tensile_strength):
+        """Calculate Sm_stress which is the stress at 1e3 cycles, the boundary
+        dividing Low cycle fatigue and high cycle fatigue
 
         :param Sut: Ultimate tensile strength
 
-        :returns: Sm stress
+        :returns: Sm_stress stress
         :rtype: float
         """
         def f(x):
             """ f - fatigue strength fraction
                 a function constructed from curve fitting to the f graph in Shigley's
-                the range of the fit is ( 70[kPsi] < Sut < 200[kPsi] ) """
+                the range of the fit is ( 70[kPsi] < ultimate_tensile_strength < 200[kPsi] ) """
             return (-2.56710686e-16 * x ** 5 + 1.35729780e-12 * x ** 4 - 2.92474777e-09 * x ** 3 +
                     3.28990748e-06 * x ** 2 - 2.04929617e-03 * x + 1.38405394e+00)
 
-        # TODO: add a proper warning and solutions to Sut out of graph range
+        # TODO: add a proper warning and solutions to ultimate_tensile_strength out of graph range
         if Sut < 482.633:  # 482.633[Mpa] = 70[kPsi]
-            print(f"Note: Sut={Sut} < 482.633[Mpa] (70[kPsi]) so f~0.9")
+            print(f"Note: ultimate_tensile_strength={Sut} < 482.633[Mpa] (70[kPsi]) so f~0.9")
             return 0.9 * Sut
         elif Sut > 1378.95:
-            print(f"Note: Sut={Sut} > 1378.95[Mpa] (200[kPsi]) which is out of the graph range, f={f(Sut)}")
+            print(f"Note: ultimate_tensile_strength={Sut} > 1378.95[Mpa] (200[kPsi]) which is out of the graph range, f={f(Sut)}")
         return f(Sut) * Sut
 
-    def NumOfCycle(self, z=-3):
+    def num_of_cycle(self, z=-3):
         """ calculate number of cycles until failure
 
-        Note: zeta = log(N1) - log(N2), N1 - number of cycles at Sm, N2 - Number of cycles at Se
+        Note: zeta = log(N1) - log(N2), N1 - number of cycles at Sm_stress, N2 - Number of cycles at Se
             for steel N1=1e3 and N2 = 1e6
 
         :keyword z: -3 for steel where N=1e6, -5 for a metal where N=1e8, -5.69 for a metal where N=5e8
@@ -342,7 +343,7 @@ class FatigueAnalysis:
         mean_stress = self.mean_equivalent_stress
         alternating_stress = self.alternating_equivalent_stress
         Se = self.Se
-        Sut, Sy, Sm = self.Sut, self.Sy, self.Sm
+        Sut, Sy, Sm = self.Sut, self.Sy, self.Sm_stress
 
         if mean_stress >= 0:
             reversible_stress = alternating_stress / (1 - (mean_stress / Sut))
@@ -359,7 +360,7 @@ class FatigueAnalysis:
 
         elif Se < reversible_stress < Sm:
             # High Cycle Fatigue
-            # a = Sm ** (1 - (3 / zeta)) / Se
+            # a = Sm_stress ** (1 - (3 / zeta)) / Se
             a = Sm * (Sm / Se) ** (-3 / z)
             b = (1 / z) * log10(Sm / Se)
 
@@ -368,11 +369,11 @@ class FatigueAnalysis:
             return oo  # TODO: add to documentation the meaning of oo
         else:
             raise NotInRangeError("Reversible Stress", reversible_stress,
-                                  (f'Sy={Sy}', f'Sm={Sm}', f'Se={Se}'))
+                                  (f'Sy={Sy}', f'Sm_stress={Sm}', f'Se={Se}'))
         N = (reversible_stress / a) ** (1 / b)
         return N, a * N ** b
 
-    def Miner(self, stress_groups, Sut, Se, Sy=None, z=-3, verbose=False, alt_mean=False, freq=False):
+    def miner_rule(self, stress_groups, ultimate_tensile_strength, Se, Sy=None, z=-3, verbose=False, alt_mean=False, freq=False):
         """ Calculates total number of cycles for multiple periodic loads,
         the stress_groups format is as follows: [number_of_repetitions, maximum_stress, minimum_stress]
 
@@ -396,7 +397,7 @@ class FatigueAnalysis:
         :rtype: float
         """
 
-        Sm = self.CalcSm(Sut)
+        Sm = self.calc_Sm(Sut)
         for group in stress_groups:
 
             # if the stress given are minimum and maximum instead of alternating and mean
@@ -429,8 +430,8 @@ class FatigueAnalysis:
 
             else:
                 # print error but don't stop the loop
-                print(f"Reversible Stress = {reversible_stress} not in range, LCF-range=(Sm={Sm},Sy={Sy}), "
-                      f"HCF-range(Se={Se},Sm={Sm})")
+                print(f"Reversible Stress = {reversible_stress} not in range, LCF-range=(Sm_stress={Sm},Sy={Sy}), "
+                      f"HCF-range(Se={Se},Sm_stress={Sm})")
 
         result = 0
         for group in stress_groups:
@@ -449,6 +450,6 @@ class FatigueAnalysis:
                 print(f"N_total = {N_total:.2f}")
         return N_total
 
-    def getInfo(self):
+    def get_info(self):
         """print object attributes"""
-        PrintAtributes(self)
+        print_atributes(self)

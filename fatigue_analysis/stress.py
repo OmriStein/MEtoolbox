@@ -1,5 +1,5 @@
 # TODO: better stress calculation
-def UniformStress(F, A):
+def uniform_stress(F, A):
     """Returns stress assuming uniform distribution in cross section
 
     :param float F: Force
@@ -11,7 +11,7 @@ def UniformStress(F, A):
     return F / A
 
 
-def BendingStress(My, Iy, z, Mz=None, Iz=None, y=None):
+def bending_stress(My, Iy, z, Mz=None, Iz=None, y=None):
     """Bending stress in a principle system
 
     :param float My: Moment in the y direction
@@ -31,7 +31,7 @@ def BendingStress(My, Iy, z, Mz=None, Iz=None, y=None):
         return (My / Iy) * z, -(Mz / Iz) * y
 
 
-def ShearBendingStress(V, Q, I, b):
+def shear_bending_stress(V, Q, I, b):
     """ Shear stresses due to bending
 
     :param float V: Shear force in y direction
@@ -46,7 +46,7 @@ def ShearBendingStress(V, Q, I, b):
     return (V * Q) / (I * b)
 
 
-def TorsionStress(T, r, J):
+def torsion_stress(T, r, J):
     """ Torsion stresses
 
     :param float T: Cross section torque
@@ -59,7 +59,7 @@ def TorsionStress(T, r, J):
     return (T * r) / J
 
 
-def MaxShearStress(V, A, shape):
+def max_shear_stress(V, A, shape):
     """Returns The maximum shear stress for known shapes
 
     :param float V: Shear Stress

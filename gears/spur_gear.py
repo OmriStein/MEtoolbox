@@ -1,6 +1,5 @@
 from math import pi, log, sqrt, tan, radians, cos, sin
-from tools import TableInterpolation
-from Gears import Transmission
+from tools import table_interpolation
 import numpy as np
 import os
 
@@ -101,7 +100,7 @@ class SpurGear:
 
     @property
     def KB(self):
-        """Rim thickness factor, KB is dependent on the number of teeth
+        """Rim thickness factor, factor_KB is dependent on the number of teeth
 
 
         :returns: Gear's Rim thickness factor
@@ -117,10 +116,10 @@ class SpurGear:
     @property
     def Kv(self):
         """Dynamic factor, Kv is dependent on the pitch diameter in [mm],
-        the angular velocity in [rpm] and Qv (Transmission accuracy grade number)
+        the angular velocity in [rpm] and Qv (transmission accuracy grade number)
 
         note: the equations here are from "Shigley's Mechanical Engineering Design"
-               in the AGMA standard the Transmission accuracy grade number is Av instead of Qv
+               in the AGMA standard the transmission accuracy grade number is Av instead of Qv
                and its value is inverted, high Qv is more accurate and high Av is less accurate
 
         :returns: Gear's Dynamic factor
@@ -145,7 +144,7 @@ class SpurGear:
 
     @property
     def Ks(self):
-        """Size factor, Ks is dependent on the circular pitch (p=πm) which in turn depends on the modulus
+        """Size factor, factor_Ks is dependent on the circular pitch (p=πm) which in turn depends on the modulus
 
         :returns: Gear's size factor
         :rtype: float
@@ -262,7 +261,7 @@ class SpurGear:
         :rtype: float
         """
         # get the number of cycles of the gear
-        N = self.CyclesOrHours()
+        N = self.cycles_or_hours()
 
         if N is None:
             return None
@@ -305,7 +304,7 @@ class SpurGear:
         :rtype: float
         """
         # get the number of cycles of the gear
-        N = self.CyclesOrHours()
+        N = self.cycles_or_hours()
         if N is None:
             return None
 
@@ -339,30 +338,30 @@ class SpurGear:
 
         data = np.genfromtxt(path, delimiter=',')
         # try:
-        gear1.Yj = TableInterpolation(N1, N2, data)
-        gear2.Yj = TableInterpolation(N2, N1, data)
+        gear1.Yj = table_interpolation(N1, N2, data)
+        gear2.Yj = table_interpolation(N2, N1, data)
         # except NotInRangeError as not_in_range:
         # print(f"Error: Teeth number of one of the gears ({not_in_range.num}) not in range {not_in_range.range_}")
 
-    def getInfo(self):
+    def get_info(self):
         """Print all the class fields with values """
         for key in self.__dict__:
             print(f"{key} : {self.__dict__[key]}")
 
-    def getFactors(self, verbose=True):
+    def get_factors(self, verbose=True):
         """Print correction factors for gear strength analysis
 
         :param bool verbose: Print factors
         :rtype: dict
         """
 
-        factors = {'KB': self.KB, 'Kv': self.Kv, 'max_vel': self.maximum_velocity, 'Ks': self.Ks, 'KH': self.KH,
+        factors = {'factor_KB': self.KB, 'Kv': self.Kv, 'max_vel': self.maximum_velocity, 'factor_Ks': self.Ks, 'KH': self.KH,
                    'St': self.St, 'ZR': self.ZR, 'Sc': self.Sc, 'YN': self.YN, 'ZN': self.ZN,
                    'Yj': self.__dict__.get('Yj', None), 'Zw': self.__dict__.get('Zw', None)}
 
         if verbose:
-            print("KB= {KB}, Kv= {Kv}, maximum velocity= {max_vel}, \
-                  \nKs= {Ks}, KH= {KH}, St= {St}, ZR= {ZR}, Sc= {Sc}, \
+            print("factor_KB= {KB}, Kv= {Kv}, maximum velocity= {max_vel}, \
+                  \nfactor_Ks= {Ks}, KH= {KH}, St= {St}, ZR= {ZR}, Sc= {Sc}, \
                   \nYN= {YN}, ZN= {ZN}, Yj= {Yj}, Zw= {Zw}".format(**factors))
 
         if None in factors.values():
@@ -370,7 +369,7 @@ class SpurGear:
 
         return factors
 
-    def CyclesOrHours(self):
+    def cycles_or_hours(self):
         """Check if the gear number of cycles or work hours were input and return the number of cycle
 
         :returns: Gear's Dynamic factor
@@ -403,7 +402,7 @@ class SpurGear:
             raise ValueError("at YN factor: no number of cycles or work hours entered")
 
     @staticmethod
-    def CalculateForces(gear, power):
+    def calc_forces(gear, power):
         """Calculate forces on the gear
 
         :param SpurGear gear: gear object
@@ -433,10 +432,10 @@ class SpurGear:
         Z_I = 0.5 * cos(phi) * sin(phi) * (mG / (mG + 1))
         return Z_I
 
-    def Optimization(self, transmission, optimize_feature='all', verbose=False):
+    def optimization(self, transmission, optimize_feature='all', verbose=False):
         """Perform gear optimization
 
-        :param Transmission transmission: Transmission object associated with the gears
+        :param gears.transmission.Transmission transmission: Transmission object associated with the gears
         :param str optimize_feature: property to optimize for ('width'/'volume'/'center')
         :param bool verbose: print optimization stages
 
@@ -487,8 +486,8 @@ class SpurGear:
                 kh_not_converging = False
                 while True:
                     # calculate minimum gear width for bending and contact stress
-                    bending_minimum_width = transmission.MinimumWidthForBending(gear)
-                    contact_minimum_width = transmission.MinimumWidthForContact(gear)
+                    bending_minimum_width = transmission.minimum_width_for_bending(gear)
+                    contact_minimum_width = transmission.minimum_width_for_contact(gear)
 
                     # the new width is the max value of the two minimum width
                     new_width = max(bending_minimum_width, contact_minimum_width)
@@ -621,7 +620,7 @@ class SpurGear:
 
                         return optimized_result, results_list
 
-    def CalculateCentersDistance(self, gear_ratio):
+    def calc_centers_distance(self, gear_ratio):
         """Calculate the distance between the centers of the gears
         :param float gear_ratio: transmissions gear ratio
 
@@ -632,7 +631,7 @@ class SpurGear:
         return centers_distance
 
     @staticmethod
-    def CreateNewGear(gear2_prop):
+    def create_new_gear(gear2_prop):
         """Return a new instance of SpurGear
 
         :param dict gear2_prop: gear properties
@@ -644,7 +643,7 @@ class SpurGear:
         return SpurGear(**gear2_prop)
 
     @staticmethod
-    def FormatProperties(properties):
+    def format_properties(properties):
         """Remove excess attributes form properties
 
         :param list properties: a list of gear properties
@@ -659,7 +658,7 @@ class SpurGear:
         new_properties = {key: properties[key] for key in properties if key in prop_list}
         return new_properties
 
-    def CheckCompatibility(self, gear):
+    def check_compatibility(self, gear):
         """Raise error if the pressure angle, helix angle or modulus of the gears don't match
 
         :param HelicalGear gear: gear object

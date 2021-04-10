@@ -1,14 +1,12 @@
 from math import sin, cos, radians, pi, tan, atan, sqrt, degrees
-from Gears.SpurGear import SpurGear  # for inheritance
-from Gears import Transmission  # for doc string
-from tools import TableInterpolation
+from gears.spur_gear import SpurGear  # for inheritance
+from tools import table_interpolation
 import numpy as np
 import os
 
 
 class HelicalGear(SpurGear):
     """A gear object that contains all of its design parameters (AGMA 2001-D04)"""
-
     def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset, enclosure, hardness,
                  pressure_angle, helix_angle, grade, work_hours=0, number_of_cycles=0, crowned=False, adjusted=False,
                  sensitive_use=False, nitriding=False, case_carb=False, material='steel'):
@@ -105,8 +103,8 @@ class HelicalGear(SpurGear):
         jPrime_data = np.genfromtxt(jPrime_path, delimiter=',')
 
         # data interpolation
-        j75 = TableInterpolation(Np, helix_angle, j75_data)
-        jPrime = TableInterpolation(Ng, helix_angle, jPrime_data)
+        j75 = table_interpolation(Np, helix_angle, j75_data)
+        jPrime = table_interpolation(Ng, helix_angle, jPrime_data)
 
         # calculate geometric factor Yj
         Y_j = j75 * jPrime
@@ -155,7 +153,7 @@ class HelicalGear(SpurGear):
         return Z_I
 
     @staticmethod
-    def CalculateForces(gear, power):
+    def calc_forces(gear, power):
         """Calculate forces on helical gear
 
         :param HelicalGear gear: gear object
@@ -171,16 +169,16 @@ class HelicalGear(SpurGear):
         Wx = Wt * tan(radians(gear.helix_angle))
         return Wt, Wr, Wx
 
-    def Optimization(self, transmission, optimize_feature='all', verbose=False):
+    def optimization(self, transmission, optimize_feature='all', verbose=False):
         """Perform gear optimization
 
-        :param Transmission transmission: Transmission object associated with the gear
+        :param gears.transmission.Transmission transmission: Transmission object associated with the gear
         :param str optimize_feature: property to optimize for ('width'/'volume'/'center')
         :param bool verbose: print optimization stages
 
         :return: optimized result (width in mm, volume in mm^3, center distance in mm)
-        :rtype: dict """
-
+        :rtype: dict
+        """
         gear = self
 
         # saving original attribute values
@@ -219,8 +217,8 @@ class HelicalGear(SpurGear):
                 while True:
 
                     # calculate minimum gear width for bending and contact stress
-                    bending_minimum_width = transmission.MinimumWidthForBending(gear)
-                    contact_minimum_width = transmission.MinimumWidthForContact(gear)
+                    bending_minimum_width = transmission.minimum_width_for_bending(gear)
+                    contact_minimum_width = transmission.minimum_width_for_contact(gear)
                     # print(f"bending={bending_minimum_width}, contact={contact_minimum_width}")
 
                     # the new width is the max value of the two minimum width
@@ -369,7 +367,7 @@ class HelicalGear(SpurGear):
 
                         return optimized_result, results_list
 
-    def CalculateCentersDistance(self, gear_ratio):
+    def calc_centers_distance(self, gear_ratio):
         """ calculate the distance between the centers of the gears
 
         :param float gear_ratio: transmissions gear ratio
@@ -381,7 +379,7 @@ class HelicalGear(SpurGear):
         return centers_distance
 
     @staticmethod
-    def CreateNewGear(gear2_prop):
+    def create_new_gear(gear2_prop):
         """ return a new instance of HelicalGear
 
         :param dict gear2_prop: gear properties
@@ -393,7 +391,7 @@ class HelicalGear(SpurGear):
         return HelicalGear(**gear2_prop)
 
     @staticmethod
-    def FormatProperties(properties):
+    def format_properties(properties):
         """Remove excess attributes form properties
 
         :param list properties: a list of gear properties
@@ -408,7 +406,7 @@ class HelicalGear(SpurGear):
         new_properties = {key: properties[key] for key in properties if key in prop_list}
         return new_properties
 
-    def CheckCompatibility(self, gear):
+    def check_compatibility(self, gear):
         """Raise error if the pressure angle, helix angle or modulus of the gears don't match
 
         :param HelicalGear gear: gear object

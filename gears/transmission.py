@@ -1,5 +1,6 @@
 from math import cos, sin, log, sqrt, radians, pi
-from tools import PrintAtributes
+from tools import print_atributes
+
 
 class GearTypeError(ValueError):
     pass
@@ -18,8 +19,8 @@ class Transmission:
         :type gear1: SpurGear
         :keyword gear2: gear object (the driven gear by convention)
         :type gear2: SpurGear
-        :keyword driving_machine: ('uniform' - Electric Motor/Turbine, 'light shock' - multi-cylinder engine,
-                                   'medium shock' - single-cylinder engine)
+        :keyword driving_machine: ('uniform' - Electric Motor/Turbine,
+            'light shock' - multi-cylinder engine, 'medium shock' - single-cylinder engine)
         :type driving_machine: string
         :keyword driven_machine: (uniform / moderate shock / heavy shock)
         :type driven_machine: string
@@ -43,10 +44,10 @@ class Transmission:
             raise GearTypeError("gears entered to Transmission are not of the same type")
 
         self.gear1 = gear1
-        self.gear2 = self._Gear2Checkup(gear1, gear2, gear_ratio)
+        self.gear2 = self._gear2_checkup(gear1, gear2, gear_ratio)
 
         # check if the pressure angle match between gear1 and gear2
-        gear1.CheckCompatibility(self.gear2)
+        gear1.check_compatibility(self.gear2)
 
         self.driving_machine = driving_machine
         self.driven_machine = driven_machine
@@ -56,18 +57,18 @@ class Transmission:
         self.SF = SF
         self.SH = SH
         self.gear_ratio = gear_ratio
-        self._ContactRatio()
+        self._contact_ratio()
         self.gear1.Y_j(self.gear1, self.gear2)
         self.gear1.Zw = 1  # the pinion's Zw is 1 by the AGMA standard
         self.gear2.Zw = self._Zw()
         self.ZI = gear1.ZI(self.gear1, self.gear2)
 
-    def getInfo(self):
+    def get_info(self):
         """ print all the class fields with values """
         for key in self.__dict__:
             print(key, ":", self.__dict__[key])
 
-    def getFactors(self, verbose=True):
+    def get_factors(self, verbose=True):
         """ retrieve transmission analysis factors
 
             :keyword verbose: print factors
@@ -130,7 +131,8 @@ class Transmission:
         """ Elastic coefficient
             ZE is dependent on the gears material """
 
-        elastic_modulus_list = {'steel': 2e5, 'malleable iron': 1.7e5, 'nodular iron': 1.7e5, 'cast iron': 1.5e5,
+        elastic_modulus_list = {'steel': 2e5, 'malleable iron': 1.7e5,
+                                'nodular iron': 1.7e5, 'cast iron': 1.5e5,
                                 'aluminum bronze': 1.2e5, 'tin bronze': 1.1e5}
 
         material1 = self.gear1.material
@@ -146,15 +148,15 @@ class Transmission:
             print(f"error: at ZE: invalid gear material ({material1} or {material2})")
 
     @property
-    def CentersDistance(self):
+    def centers_distance(self):
         """ calculate the distance between the centers of the gears
 
             :return: the distance between the transmissions gears centers in [mm]
             :rtype: float """
-        return self.gear1.CalculateCentersDistance(self.gear_ratio)
+        return self.gear1.calc_centers_distance(self.gear_ratio)
 
     # bending stress related methods
-    def BendingStress(self, gear):
+    def bending_stress(self, gear):
         """ calculating bending stress
 
             :keyword gear: gear object
@@ -165,11 +167,11 @@ class Transmission:
         b = gear.width
         d = gear.pitch_diameter
         Yj = gear.Yj
-        Wt = gear.CalculateForces(gear, self.power)[0]
-        sigma = (Wt * N * self.Ko * gear.Kv * gear.Ks * gear.KH * gear.KB) / (Yj * b * d)
+        Wt = gear.calc_forces(gear, self.power)[0]
+        sigma = (Wt * N * self.Ko * gear.Kv * gear.factor_Ks * gear.KH * gear.factor_KB) / (Yj * b * d)
         return sigma
 
-    def AllowedBendingStress(self, gear):
+    def allowed_bending_stress(self, gear):
         """ calculating allowed bending stress
 
             :keyword gear: gear object
@@ -179,7 +181,7 @@ class Transmission:
         allowed_bending_stress = (gear.St * gear.YN) / (self.Ytheta * self.Yz * self.SF)
         return allowed_bending_stress
 
-    def MinimumWidthForBending(self, gear):
+    def minimum_width_for_bending(self, gear):
         """ calculating minimum gear width to withstand bending stress
 
             :keyword gear: gear object
@@ -190,13 +192,13 @@ class Transmission:
         N = gear.teeth_num
         d = gear.pitch_diameter
 
-        allowed_bending = self.AllowedBendingStress(gear)
-        Wt = gear.CalculateForces(gear, self.power)[0]
-        minimum_gear_width = (Wt * N * self.Ko * gear.Kv * gear.Ks * gear.KH * gear.KB) / (Yj * allowed_bending * d)
+        allowed_bending = self.allowed_bending_stress(gear)
+        Wt = gear.calc_forces(gear, self.power)[0]
+        minimum_gear_width = (Wt * N * self.Ko * gear.Kv * gear.factor_Ks * gear.KH * gear.factor_KB) / (Yj * allowed_bending * d)
         return minimum_gear_width
 
     # contact stress related methods
-    def ContactStress(self, gear):
+    def contact_stress(self, gear):
         """ calculating contact stress
 
             :keyword gear: gear object
@@ -205,12 +207,12 @@ class Transmission:
 
         b = gear.width
         d = gear.pitch_diameter
-        Wt = gear.CalculateForces(gear, self.power)[0]
+        Wt = gear.calc_forces(gear, self.power)[0]
 
-        sigma = sqrt((Wt * (self.ZE ** 2) * self.Ko * gear.Kv * gear.Ks * gear.KH * gear.ZR) / (b * d * self.ZI))
+        sigma = sqrt((Wt * (self.ZE ** 2) * self.Ko * gear.Kv * gear.factor_Ks * gear.KH * gear.ZR) / (b * d * self.ZI))
         return sigma
 
-    def AllowedContactStress(self, gear):
+    def allowed_contact_stress(self, gear):
         """ calculating allowed contact stress
 
             :keyword gear: gear object
@@ -220,18 +222,18 @@ class Transmission:
         allowed_contact_stress = (gear.Sc * gear.ZN * gear.Zw) / (self.Ytheta * self.Yz * self.SH)
         return allowed_contact_stress
 
-    def MinimumWidthForContact(self, gear):
+    def minimum_width_for_contact(self, gear):
         """ calculating minimum gear width to withstand contact stress
 
             :keyword gear: gear object
             :type gear: Union[SpurGear, HelicalGear]
             :rtype: float """
 
-        Wt = gear.CalculateForces(gear, self.power)[0]
+        Wt = gear.calc_forces(gear, self.power)[0]
         d = gear.pitch_diameter
-        allowed_contact = self.AllowedContactStress(gear)
+        allowed_contact = self.allowed_contact_stress(gear)
         Kv = gear.Kv
-        Ks = gear.Ks
+        Ks = gear.factor_Ks
         KH = gear.KH
         ZR = gear.ZR
 
@@ -239,7 +241,7 @@ class Transmission:
         return minimum_gear_width
 
     # for both bending and contact stresses
-    def LifeExpectency(self, gear, in_hours=False):
+    def life_expectency(self, gear, in_hours=False):
         """ try calculating expected life span of the gear if not possible return  stress cycle factors (YN/ZN)
 
             :example: helical = HelicalGear(gear_properties)
@@ -253,8 +255,8 @@ class Transmission:
             :returns: Number of cycles / work hours
             :rtype: float """
 
-        bending_stress = self.BendingStress(gear)
-        contact_stress = self.ContactStress(gear)
+        bending_stress = self.bending_stress(gear)
+        contact_stress = self.contact_stress(gear)
         YN = (bending_stress * self.SF * self.Ytheta * self.Yz) / gear.St
         ZN = (contact_stress * self.SH * self.Ytheta * self.Yz) / (gear.Sc * gear.Zw)
 
@@ -290,10 +292,10 @@ class Transmission:
             # and shorten float length to only 2 decimal places
             return float(f"{N / (gear.rpm * 60):.2f}") if in_hours else N
 
-    def MinimalHardness(self,gear):
+    def minimal_hardness(self,gear):
         """ return the minimum hardness of the gear to avoid failure """
         # for bending
-        St = (self.Ytheta * self.Yz * self.SF * self.BendingStress(gear)) / gear.YN
+        St = (self.Ytheta * self.Yz * self.SF * self.bending_stress(gear)) / gear.YN
         if gear.grade == 1:
             # for grade 1
             HBt = (St-88.3)/0.533
@@ -302,7 +304,7 @@ class Transmission:
             HBt = (St-113)/0.703
 
         # for contact
-        Sc = (self.Ytheta * self.Yz * self.SH * self.BendingStress(gear)) / (gear.ZN * gear.Zw)
+        Sc = (self.Ytheta * self.Yz * self.SH * self.bending_stress(gear)) / (gear.ZN * gear.Zw)
         if gear.grade == 1:
             # for grade 1
             HBc = (Sc-200)/2.22
@@ -312,7 +314,7 @@ class Transmission:
 
         return max(HBt, HBc)
 
-    def Optimize(self, gear, optimize_feature='all', verbose=False):
+    def optimize(self, gear, optimize_feature='all', verbose=False):
         """ perform gear optimization
 
             example: result, results_list = gearbox.Optimize(pinion, optimize_feature='volume', verbose=True)
@@ -328,9 +330,9 @@ class Transmission:
             :return: optimized result and list of other viable options
             :rtype: tuple """
 
-        return gear.Optimization(self, optimize_feature, verbose)
+        return gear.optimization(self, optimize_feature, verbose)
 
-    def CheckUndercut(self):
+    def check_undercut(self):
         """ Checks undercut state """
 
         phi = radians(self.gear1.pressure_angle)
@@ -367,7 +369,7 @@ class Transmission:
 
         return 1 + A * (self.gear_ratio - 1)
 
-    def _ContactRatio(self):
+    def _contact_ratio(self):
         """ calculate contact ratio between the gears and pass it to the each of the gears """
 
         rp = 0.5 * self.gear1.pitch_diameter
@@ -389,7 +391,7 @@ class Transmission:
         self.gear2.contact_ratio = contact_ratio
 
     @staticmethod
-    def _Gear2Checkup(gear1, gear2, gear_ratio):
+    def _gear2_checkup(gear1, gear2, gear_ratio):
         """ if gear2 object was entered in the class call pass it on if not instantiate it
 
             :keyword gear1: gear object
@@ -408,7 +410,7 @@ class Transmission:
             gear2_prop.update(
                 {'teeth_num': round(gear1.teeth_num * gear_ratio), 'rpm': gear1.rpm / gear_ratio})
 
-            return gear1.CreateNewGear(gear1.FormatProperties(gear2_prop))
+            return gear1.create_new_gear(gear1.format_properties(gear2_prop))
 
         elif gear2 is not None and gear_ratio == 0:
             # gear2 had been specified

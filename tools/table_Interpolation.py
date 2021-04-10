@@ -16,7 +16,7 @@ class NotInRangeError(ValueError):
         super().__init__(self.msg)
 
 
-def TableInterpolation(x_row, x_col, data):
+def table_interpolation(x_row, x_col, data):
     """ Get table in a numpy array form and two coordinates and
     Interpolate the value in the table corresponding to those coordinates
 

@@ -1,4 +1,4 @@
-from Gears import SpurGear, Transmission, HelicalGear
+from gears import SpurGear, Transmission, HelicalGear
 
 pinion = SpurGear(name='pinion', modulus=4, pressure_angle=25, teeth_num=25, rpm=1500, grade=2, Qv=11, crowned=False,
                   adjusted=True, width=25, bearing_span=10, pinion_offset=2, enclosure='extra precision enclosed',
@@ -15,4 +15,4 @@ helical = HelicalGear(name='pinion', modulus=2, pressure_angle=20, teeth_num=37,
 helical_gearbox = Transmission(gear1=helical, oil_temp=100, reliability=0.999, power=50e3, gear_ratio=2.5,
                                driving_machine='uniform', driven_machine='uniform', SF=1, SH=1)
 
-gearbox.getInfo()
+gearbox.get_info()
