@@ -1,12 +1,12 @@
 """A module containing the helical push spring class"""
 from math import pi, sqrt
-import numpy as np
 from sympy import Symbol  # pylint: disable=unused-import
-from tools import print_atributes
-from springs import Spring
+
+from fatigue import FailureCriteria
+import springs
 
 
-class HelicalPushSpring(Spring):
+class HelicalPushSpring(springs.Spring):
     """A helical push spring object"""
 
     def __init__(self, force, Ap, m, yield_percent, wire_diameter, spring_diameter,
@@ -59,7 +59,7 @@ class HelicalPushSpring(Spring):
         if self.end_type not in end_types:
             raise ValueError(f"{end_type} not one of this: {end_types}")
 
-        self._na_k_sorter(active_coils, spring_constant )
+        self._na_k_sorter(active_coils, spring_constant)
         self.free_length = free_length
 
         self.anchors = anchors
@@ -69,11 +69,6 @@ class HelicalPushSpring(Spring):
 
         self.check_design()  # check C and active_coils
         self.constructing = False
-
-    def get_info(self):
-        """print all of the spring properties"""
-        print_atributes(self)
-        self.check_design()  # check C and active_coils
 
     def check_design(self):
         """Check if the spring index,active_coils,zeta and free_length
@@ -406,7 +401,7 @@ class HelicalPushSpring(Spring):
         :param float or None free_length: The free length of the spring
         """
         self.free_length_input_flag = False if free_length is None else True
-        self._free_length = self.calc_free_length() if free_length is None else free_length  # pylint: disable=invalid-name
+        self._free_length = self.calc_free_length() if free_length is None else free_length
 
     def calc_free_length(self):
         """Calculates the free length of the spring"""
@@ -496,13 +491,15 @@ class HelicalPushSpring(Spring):
         else:
             return self.free_length >= collapse_test, collapse_test
 
-    def fatigue_analysis(self, max_force, min_force, reliability, verbose=False):
-        """ Returns safety factors for fatigue according to Goodman
-        and for first circle according to Langer
+    def fatigue_analysis(self, max_force, min_force, reliability,
+                         criterion='modified goodman', verbose=False):
+        """ Returns safety factors for fatigue and
+        for first cycle according to Langer
 
         :param float max_force: Maximal force acting on the spring
         :param float min_force: Minimal force acting on the spring
         :param float reliability: in percentage
+        :param str criterion: fatigue criterion
         :param bool verbose: print more details
 
         :returns: static and dynamic safety factor
@@ -513,22 +510,20 @@ class HelicalPushSpring(Spring):
         mean_force = (max_force + min_force) / 2
 
         # calculating mean and alternating stresses
-        alternating_shear_stress = self.calc_shear_stress(alternating_force)
+        alt_shear_stress = self.calc_shear_stress(alternating_force)
         mean_shear_stress = self.calc_shear_stress(mean_force)
 
-        # fatigue_safety_factor - goodman fatigue safety factor
         Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
-        fatigue_safety_factor = 1 / ((alternating_shear_stress / Sse) + (
-                mean_shear_stress / self.shear_ultimate_strength))
-        # static_safety_factor - langer safety factor for first cycle
-        static_safety_factor = self.shear_yield_strength / (
-                mean_shear_stress + alternating_shear_stress)
+        Ssu = self.shear_ultimate_strength
+        Ssy = self.shear_yield_strength
+        nf, nl = FailureCriteria.get_safety_factor(Ssy, Ssu, Sse, alt_shear_stress,
+                                                   mean_shear_stress, criterion)
         if verbose:
             print(f"Alternating force = {alternating_force}, Mean force = {mean_force}\n"
-                  f"Alternating shear stress = {alternating_shear_stress},"
+                  f"Alternating shear stress = {alt_shear_stress},"
                   f"Mean shear stress = {mean_shear_stress}\n"
                   f"Sse = {Sse}")
-        return fatigue_safety_factor, static_safety_factor
+        return nf, nl
 
     def natural_frequency(self, density):
         """Figures out what is the natural frequency of the spring
@@ -539,7 +534,7 @@ class HelicalPushSpring(Spring):
         :rtype: float
         """
         return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.active_coils * pi)) \
-            * sqrt(self.shear_modulus / (2 * density))
+               * sqrt(self.shear_modulus / (2 * density))
 
     def calc_spring_index(self, solid_safety_factor):
         """Calculate Spring index for a certain safety factor if only wire diameter was given

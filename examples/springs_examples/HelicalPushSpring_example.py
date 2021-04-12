@@ -45,5 +45,3 @@ buckling = spring2.buckling('fixed-hinged', 205e3)
 print(f"buckling: {buckling[0]}, max free length (L0) = {buckling[1]} , L0= {spring2.free_length}")
 
 print(f"the natural frequency = {spring2.natural_frequency(8050):.2e} [Hz]")
-
-spring.get_info()

@@ -15,6 +15,10 @@ class Spring:
         self.shear_modulus = shear_modulus
         self.shot_peened = shot_peened
 
+    def get_info(self):
+        """print all of the spring properties"""
+        print_atributes(self)
+
     @property
     def ultimate_tensile_strength(self):
         """ Sut - ultimate tensile strength """

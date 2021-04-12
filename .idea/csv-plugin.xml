@@ -94,6 +94,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\examples\springs_examples\ExtensionSpring_example.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\fatigue\failure_criteria.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\fatigue_analysis\fatigue_analysis.py">
           <value>
             <Attribute>

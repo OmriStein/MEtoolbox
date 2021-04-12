@@ -1,7 +1,8 @@
 """A module containing the extension spring class"""
 from math import pi
 from sympy import Symbol  # pylint: disable=unused-import
-from tools import print_atributes
+
+from fatigue import FailureCriteria
 import springs
 
 
@@ -30,16 +31,49 @@ class ExtensionSpring(springs.Spring):
         self.shot_peened = shot_peened
         self._na_k_sorter(active_coils, body_coils, spring_constant)
         self.free_length = free_length
-
+        self.check_design()
         self.constructing = False
 
-    def get_info(self):
-        """print all of the spring properties"""
-        print_atributes(self)
+    def check_design(self, verbose=False):
+        """Check if the spring index,active_coils,zeta and free_length
+        are in acceptable range for a good design
+
+        :returns: True if all the checks are good
+        :rtype: bool
+        """
+        good_design = True
+        C = self.spring_index  # pylint: disable=invalid-name
+        if isinstance(C, float) and not 3 <= C <= 16:
+            print("Note: C - spring index should be in range of [3,16],"
+                  "lower C causes surface cracks,\n"
+                  "higher C causes the spring to tangle and requires separate packing")
+            good_design = False
+
+        active_coils = self.active_coils
+        if isinstance(active_coils, float) and not 3 <= active_coils <= 15:
+            print(f"Note: active_coils={active_coils:.2f} is not in range [3,15],"
+                  f"this can cause non linear behavior")
+            good_design = False
+
+        if (self.density is not None) and (self.working_frequency is not None):
+            natural_freq = self.natural_frequency(self.density)
+            if natural_freq <= 20 * self.working_frequency:
+                print(
+                    f"Note: the natural frequency={natural_freq} is less than 20*working"
+                    f"frequency={20 * self.working_frequency}")
+                good_design = False
+        if verbose:
+            print(f"good_design = {good_design}")
+
+        return good_design
 
     @property
-    def Sy(self):  # pylint: disable=invalid-name
-        """ yield strength (Sy = % * ultimate_tensile_strength)) """
+    def yield_strength(self):  # pylint: disable=invalid-name
+        """getter for the yield strength attribute (Sy = % * Sut)
+
+        :returns: The yield strength
+        :rtype: float
+        """
         if 1 <= self.bending_yield_percent <= 100:
             # if the yield_percent is in percentage form divide by 100
             yield_strength = (self.bending_yield_percent / 100) * self.ultimate_tensile_strength
@@ -237,7 +271,7 @@ class ExtensionSpring(springs.Spring):
                        (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
     @property
-    def KA(self):  # pylint: disable=invalid-name
+    def hook_KA(self):  # pylint: disable=invalid-name
         """Returns The spring's bending stress correction factor
 
         :returns: Bending stress correction factor
@@ -247,7 +281,7 @@ class ExtensionSpring(springs.Spring):
         return ((4 * C1 ** 2) - C1 - 1) / (4 * C1 * (C1 - 1))
 
     @property
-    def KB(self):  # pylint: disable=invalid-name
+    def hook_KB(self):  # pylint: disable=invalid-name
         """Returns The spring's torsional stress correction factor
 
         :returns: Torsional stress correction factor
@@ -274,8 +308,9 @@ class ExtensionSpring(springs.Spring):
         :returns: normal stress
         :rtype: float or Symbol
         """
-        return force * (self.KA * ((16 * self.spring_diameter) / (pi * self.wire_diameter ** 3)) + (
-                4 / (pi * self.wire_diameter ** 2)))
+        return force * (self.hook_KA * (
+                (16 * self.spring_diameter) / (pi * self.wire_diameter ** 3)) + (
+                                4 / (pi * self.wire_diameter ** 2)))
 
     @property
     def shear_stress(self):
@@ -294,7 +329,7 @@ class ExtensionSpring(springs.Spring):
         :returns: Torsion stress
         :rtype: float or Symbol
         """
-        return (self.KB * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
+        return (self.hook_KB * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
 
     @property
     def free_length(self):
@@ -333,7 +368,7 @@ class ExtensionSpring(springs.Spring):
         :returns: static factor of safety
         :type: tuple[float, float] or tuple[Symbol, Symbol]
         """
-        return self.shear_yield_strength / self.shear_stress, self.Sy / self.normal_stress
+        return self.shear_yield_strength / self.shear_stress, self.yield_strength / self.normal_stress
 
     @property
     def deflection(self):
@@ -354,9 +389,79 @@ class ExtensionSpring(springs.Spring):
         """
         return (force - self.initial_tension) / self.spring_constant
 
-    def fatigue_analysis(self, max_force, min_force, reliability, verbose=False):
-        """place holder"""
-        raise NotImplementedError("Not implemented yet")  # TODO: implement
+    @property
+    def factor_Kw(self):  # pylint: disable=invalid-name
+        """K_W - Wahl shear stress concentration factor
+
+        :returns: Wahl shear stress concentration factor
+        :rtype: float
+        """
+        return (4 * self.spring_index - 1) / (4 * self.spring_index - 4) + \
+               (0.615 / self.spring_index)
+
+    def fatigue_analysis(self, max_force, min_force, reliability,
+                         criterion='gerber', verbose=False):
+        """Fatigue analysis of the hook section
+        for normal and shear stress,and for the
+        body section for shear and static yield.
+
+        :param float max_force: Maximal force acting on the spring
+        :param float min_force: Minimal force acting on the spring
+        :param float reliability: in percentage
+        :param str criterion: fatigue criterion
+        :param bool verbose: print more details
+
+        :returns: Normal and shear safety factors for the hook section and
+            static and dynamic safety factors for body section
+        :rtype: tuple[float, float, float, float]
+        """
+        # calculating mean and alternating forces
+        alt_force = abs(max_force - min_force) / 2
+        mean_force = (max_force + min_force) / 2
+
+        # calculating mean and alternating stresses for the hook section
+        # shear stresses:
+        alt_shear_stress = self.calc_shear_stress(alt_force)
+        mean_shear_stress = (mean_force / alt_force) * alt_shear_stress
+        # normal stresses due to bending:
+        alt_normal_stress = self.calc_normal_stress(alt_force)
+        mean_normal_stress = (mean_force / alt_force) * alt_normal_stress
+
+        Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
+        Ssu = self.shear_ultimate_strength
+        Ssy = self.shear_yield_strength
+        Sy = self.yield_strength
+        Se = Sse / 0.577  # estimation using distortion-energy theory
+        Sut = self.ultimate_tensile_strength
+
+        nf_hook_normal, _ = FailureCriteria.get_safety_factor(Sy, Sut, Se, alt_normal_stress,
+                                                              mean_normal_stress, criterion)
+
+        nf_hook_shear, _ = FailureCriteria.get_safety_factor(Ssy, Ssu, Sse, alt_shear_stress,
+                                                             mean_shear_stress, criterion)
+
+        # calculating mean and alternating stresses for the body section
+        # shear stresses:
+        factor_kw = (4 * self.spring_index - 1) / (4 * self.spring_index - 4) + (
+                0.615 / self.spring_index)
+        alt_body_shear_stress = (8 * factor_kw * alt_force * self.spring_diameter) / (
+                pi * self.wire_diameter ** 3)
+        mean_body_shear_stress = (mean_force / alt_force) * alt_shear_stress
+
+        nf_body, ns_body = FailureCriteria.get_safety_factor(Ssy, Ssu, Sse, alt_body_shear_stress,
+                                                             mean_body_shear_stress, criterion)
+
+        if verbose:
+            print(f"Alternating force = {alt_force}, Mean force = {mean_force}\n"
+                  f"Alternating shear stress = {alt_shear_stress},"
+                  f"Mean shear stress = {mean_shear_stress}\n"
+                  f"Alternating normal stress = {alt_normal_stress},"
+                  f"Mean normal stress = {mean_normal_stress}\n"
+                  f"Alternating body shear stress = {alt_body_shear_stress},"
+                  f"Mean body shear stress = {mean_body_shear_stress}\n"
+                  f"Sse = {Sse}, Se = {Se}")
+
+        return nf_hook_normal, nf_hook_shear, nf_body, ns_body
 
     def min_wire_diameter(self, static_safety_factor):
         """The minimal wire diameters (for shear and normal stresses)
@@ -385,8 +490,8 @@ class ExtensionSpring(springs.Spring):
         while abs(factor_k - temp_k) > 1e-3:
             diam = ((factor_k * self.force * (
                     16 * self.spring_index + 4) * static_safety_factor) / (
-                                       self.bending_yield_percent * self.Ap * pi)) ** (
-                                      1 / (2 - self.m))
+                            self.bending_yield_percent * self.Ap * pi)) ** (
+                           1 / (2 - self.m))
             if isinstance(diam, float):
                 min_diam_normal = diam
             else:
@@ -403,19 +508,20 @@ class ExtensionSpring(springs.Spring):
 
     def min_spring_diameter(self, static_safety_factor):
         """return the minimum spring diameter to avoid static failure
-        according to the specified safety factor, if the solid flag is True :attr:'Fsolid'
-        is used instead of :attr:`force`
+        according to the given safety factor.
 
         :param float static_safety_factor: factor of safety
 
         :returns: The minimal spring diameter
         :rtype: float or Symbol
         """
-        raise NotImplementedError("Not implemented yet")  # TODO: implement
-
-    def check_design(self):
-        """place holder"""
-        raise NotImplementedError("Not implemented yet")  # TODO: implement
+        # extracted from shear stress
+        diameter_shear = (self.shear_yield_strength * pi * self.wire_diameter ** 3) / (
+                self.hook_KB * 8 * self.force * static_safety_factor)
+        # extracted from normal stress
+        diameter_normal = (1 / (4 * self.hook_KA)) * (((self.yield_strength * pi * self.wire_diameter ** 3) / (
+                    4 * self.force * static_safety_factor)) - self.wire_diameter)
+        return min(diameter_shear, diameter_normal)
 
     def natural_frequency(self, density):
         """Figures out what is the natural frequency of the spring
@@ -425,7 +531,7 @@ class ExtensionSpring(springs.Spring):
         :returns: Natural frequency
         :rtype: float
         """
-        raise NotImplementedError("Not implemented yet")  # TODO: implement
+        springs.HelicalPushSpring.natural_frequency(self, density)
 
     def weight(self, density):
         """Return's the spring *active coils* weight according to the specified density

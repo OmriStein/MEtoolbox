@@ -238,7 +238,7 @@ class FatigueAnalysis:
 
         yield_strength = self.Sy
         if self.Kc == 0.59:
-            # Sy correction for shear stress
+            # yield_strength correction for shear stress
             Ssy = 0.67 * self.Sut
             yield_strength = Ssy
 
