@@ -1,3 +1,3 @@
-from .table_Interpolation import table_interpolation
-from .table_Interpolation import NotInRangeError
-from .helpers import *
+from tools.table_interpolation import table_interpolation
+from tools.table_interpolation import NotInRangeError
+from tools.helpers import *
