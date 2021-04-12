@@ -1,8 +1,11 @@
+"""Module containing the Transmission Class"""
+# I want the variables names to be the same as in AGMA pylint: disable=invalid-name
 from math import cos, sin, log, sqrt, radians, pi
 from tools import print_atributes
 
 
 class GearTypeError(ValueError):
+    """Error class, inherits from ValueError"""
     pass
 
 
@@ -65,8 +68,9 @@ class Transmission:
 
     def get_info(self):
         """ print all the class fields with values """
-        for key in self.__dict__:
-            print(key, ":", self.__dict__[key])
+        # for key in self.__dict__:
+        #     print(key, ":", self.__dict__[key])
+        print_atributes(self)
 
     def get_factors(self, verbose=True):
         """ retrieve transmission analysis factors
@@ -76,14 +80,16 @@ class Transmission:
             :rtype: dict """
 
         if verbose:
-            print("Ko=", self.Ko, "Yθ=", self.Ytheta, "Yz=", self.Yz, "ZE=", self.ZE, "ZI=", self.ZI)
+            print("Ko=", self.Ko, "Yθ=", self.Ytheta, "Yz=", self.Yz, "ZE=", self.ZE, "ZI=", self.ZI)  # pylint:disable=line-too-long
         return {"Ko=": self.Ko, "Yθ=": self.Ytheta, "Yz=": self.Yz, "ZE=": self.ZE, "ZI=": self.ZI}
 
     @property
     def Ytheta(self):
-        # calculating Temperature factor
-        # input: Temp - oil_temp in degree celsius
-        # output: y_theta - temperature factor
+        """calculating Temperature factor
+
+        :returns: y_theta - The temperature factor
+        :rtype: float
+        """
 
         if self.oil_temp > 71:
             y_theta = (273 + self.oil_temp) / 344
@@ -141,9 +147,9 @@ class Transmission:
         E1 = elastic_modulus_list.get(material1, material1)
         E2 = elastic_modulus_list.get(material2, material2)
 
-        Poissons_ratio = 1 / 3
+        poissons_ratio = 1 / 3
         try:
-            return sqrt((1/pi) / (((1 - Poissons_ratio ** 2) / E1) + ((1 - Poissons_ratio ** 2) / E2)))
+            return sqrt((1/pi) / (((1 - poissons_ratio ** 2) / E1) + ((1 - poissons_ratio ** 2) / E2)))  # pylint:disable=line-too-long
         except TypeError:
             print(f"error: at ZE: invalid gear material ({material1} or {material2})")
 
@@ -168,7 +174,7 @@ class Transmission:
         d = gear.pitch_diameter
         Yj = gear.Yj
         Wt = gear.calc_forces(gear, self.power)[0]
-        sigma = (Wt * N * self.Ko * gear.Kv * gear.factor_Ks * gear.KH * gear.factor_KB) / (Yj * b * d)
+        sigma = (Wt * N * self.Ko * gear.Kv * gear.factor_Ks * gear.KH * gear.factor_KB) / (Yj * b * d)  # pylint:disable=line-too-long
         return sigma
 
     def allowed_bending_stress(self, gear):
@@ -194,7 +200,8 @@ class Transmission:
 
         allowed_bending = self.allowed_bending_stress(gear)
         Wt = gear.calc_forces(gear, self.power)[0]
-        minimum_gear_width = (Wt * N * self.Ko * gear.Kv * gear.factor_Ks * gear.KH * gear.factor_KB) / (Yj * allowed_bending * d)
+        minimum_gear_width = ((Wt * N * self.Ko * gear.Kv * gear.factor_Ks * gear.KH *
+                               gear.factor_KB) / (Yj * allowed_bending * d))
         return minimum_gear_width
 
     # contact stress related methods
@@ -209,7 +216,8 @@ class Transmission:
         d = gear.pitch_diameter
         Wt = gear.calc_forces(gear, self.power)[0]
 
-        sigma = sqrt((Wt * (self.ZE ** 2) * self.Ko * gear.Kv * gear.factor_Ks * gear.KH * gear.ZR) / (b * d * self.ZI))
+        sigma = sqrt((Wt * (self.ZE ** 2) * self.Ko * gear.Kv * gear.factor_Ks * gear.KH * gear.ZR)
+                     / (b * d * self.ZI))
         return sigma
 
     def allowed_contact_stress(self, gear):
@@ -237,23 +245,26 @@ class Transmission:
         KH = gear.KH
         ZR = gear.ZR
 
-        minimum_gear_width = (Wt * self.ZE ** 2 * self.Ko * Kv * Ks * KH * ZR) / (d * self.ZI * allowed_contact ** 2)
+        minimum_gear_width = ((Wt * self.ZE ** 2 * self.Ko * Kv * Ks * KH * ZR) /
+                              (d * self.ZI * allowed_contact ** 2))
         return minimum_gear_width
 
     # for both bending and contact stresses
     def life_expectency(self, gear, in_hours=False):
-        """ try calculating expected life span of the gear if not possible return  stress cycle factors (YN/ZN)
+        """ try calculating expected life span of the gear if not
+        possible return  stress cycle factors (YN/ZN)
 
-            :example: helical = HelicalGear(gear_properties)
-                      gearbox = Transmission(transmission_properties)
-                      gearbox.LifeExpectency(helical, in_hours=True)
+        :example: helical = HelicalGear(gear_properties)
+                  gearbox = Transmission(transmission_properties)
+                  gearbox.LifeExpectency(helical, in_hours=True)
 
-            :keyword gear: gear object
-            :type gear: Gear
-            :keyword in_hours: return gears life expectency in hours
-            :type in_hours: bool
-            :returns: Number of cycles / work hours
-            :rtype: float """
+        :keyword gear: gear object
+        :type gear: Gear
+        :keyword in_hours: return gears life expectency in hours
+        :type in_hours: bool
+        :returns: Number of cycles / work hours
+        :rtype: float
+        """
 
         bending_stress = self.bending_stress(gear)
         contact_stress = self.contact_stress(gear)
@@ -381,8 +392,8 @@ class Transmission:
         phi = radians(self.gear1.pressure_angle)
         m = self.gear1.modulus
         p = self.gear1.pitch
-        contact_length = sqrt((rG + m) ** 2 - (rG * cos(phi)) ** 2) + sqrt((rp + m) ** 2 - (rp * cos(phi)) ** 2) - (
-                rp + rG) * sin(phi)
+        contact_length = (sqrt((rG + m) ** 2 - (rG * cos(phi)) ** 2) +
+                          sqrt((rp + m) ** 2 - (rp * cos(phi)) ** 2) - (rp + rG) * sin(phi))
         contact_ratio = contact_length / (p * cos(phi))
         if contact_ratio < 1.2:
             print("attention: ratio is should be higher than 1.2")

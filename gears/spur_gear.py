@@ -1,11 +1,9 @@
+"""Module containing the SpurGear class"""
+# I want the variables names to be the same as in AGMA pylint: disable=invalid-name
 from math import pi, log, sqrt, tan, radians, cos, sin
-from tools import table_interpolation
-import numpy as np
 import os
-
-
-class GearTypeError(ValueError):
-    pass
+import numpy as np
+from tools import table_interpolation
 
 
 class SpurGear:
@@ -14,9 +12,10 @@ class SpurGear:
     # TODO: YN - add solution for low cycle of material not in the graph
     # TODO: Qv - add a way to calculate the Qv value as in AGMA 2001-D04
 
-    def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset, enclosure, hardness,
-                 pressure_angle, grade, work_hours=0, number_of_cycles=0, crowned=False, adjusted=False,
-                 sensitive_use=False, nitriding=False, case_carb=False, material='steel'):
+    def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
+                 enclosure, hardness, pressure_angle, grade, work_hours=0, number_of_cycles=0,
+                 crowned=False, adjusted=False, sensitive_use=False, nitriding=False,
+                 case_carb=False, material='steel'):
         """ Instantiating a Spurgear object
 
         :param str name: the name of the gear
@@ -32,9 +31,11 @@ class SpurGear:
         :param float bearing_span: length between the middle of the bearings in [mm]
         :param float pinion_offset: gear offset from the middle of the bearing span in [mm]
         :param strenclosure: type of enclosure
-                            (open gearing / commercial enclosed / precision enclosed / extra precision enclosed)
+                            (open gearing / commercial enclosed / precision enclosed /
+                            extra precision enclosed)
         :param float hardness: gear hardness in Brinell scale [HB]
-        :param str material: gear material (steel, malleable iron, nodular iron, cast iron, aluminum bronze, tin bronze)
+        :param str material: gear material (steel, malleable iron, nodular iron, cast iron,
+            aluminum bronze, tin bronze)
         :param float work_hours: number of hour of operation in [hr]
         :param float number_of_cycles: number of cycles of operation
         :param bool sensitive_use: if the gear is for sensitive use ( True / False )
@@ -144,7 +145,8 @@ class SpurGear:
 
     @property
     def Ks(self):
-        """Size factor, factor_Ks is dependent on the circular pitch (p=πm) which in turn depends on the modulus
+        """Size factor, factor_Ks is dependent on the circular
+        pitch (p=πm) which in turn depends on the modulus
 
         :returns: Gear's size factor
         :rtype: float
@@ -157,10 +159,12 @@ class SpurGear:
 
     @property
     def KH(self):
-        """Load distribution factor, KH is dependent on: the shape of teeth (crowned), if teeth are adjusted after assembly (adjusted),
-        the gear width in [mm], pitch diameter in [mm], bearing span (the distance between the bearings center lines)
+        """Load distribution factor, KH is dependent on: the shape of teeth (crowned),
+        if teeth are adjusted after assembly (adjusted), the gear width in [mm],
+        pitch diameter in [mm], bearing span (the distance between the bearings center lines)
         pinion offset (the distance from the bearing span center to the pinion mid-face)
-        enclosure type (open gearing, commercial enclosed, precision enclosed, extra precision enclosed)
+        enclosure type (open gearing, commercial enclosed, precision enclosed,
+        extra precision enclosed)
 
         :returns: Gear's load distribution factor
         :rtype: float
@@ -206,16 +210,17 @@ class SpurGear:
                           'commercial enclosed': [1.27e-1, 0.622e-3, -1.69e-7],
                           'precision enclosed': [0.675e-1, 0.504e-3, -1.44e-7],
                           'extra precision enclosed': [0.380e-1, 0.402e-3, -1.27e-7]}
-        K_Hma = enclosure_type[self.enclosure][0] + self.width * enclosure_type[self.enclosure][1] + \
-                enclosure_type[self.enclosure][2] * self.width ** 2
+        K_Hma = (enclosure_type[self.enclosure][0] + self.width * enclosure_type[self.enclosure][1]
+                 + enclosure_type[self.enclosure][2] * self.width ** 2)
 
         K_H = 1.0 + K_Hmc * (K_Hpf * K_Hpm + K_Hma * K_He)
         return K_H
 
     @property
     def St(self):
-        """Bending safety factor, St is dependent on the gear hardness in [HBN] and the material grade
-        (material grade of the gear 1 for regular use 2 for military and sensitive uses)
+        """Bending safety factor, St is dependent on the gear's
+         hardness in [HBN] and the material grade
+         (material grade of the gear 1 for regular use 2 for military and sensitive uses)
 
         :returns: Gear's bending safety factor
         :rtype: float
@@ -231,7 +236,8 @@ class SpurGear:
 
     @property
     def Sc(self):
-        """Contact safety factor, Sc is dependent on the gear hardness in [HBN] and on the material grade
+        """Contact safety factor, Sc is dependent on the gear
+        hardness in [HBN] and on the material grade
         (material grade of the gear 1 for regular use 2 for military and sensitive uses)
 
         :returns: Gear's contact safety factor
@@ -290,7 +296,8 @@ class SpurGear:
             elif N >= 2e6:
                 Y_N = high_cycle[self.sensitive_use]
             else:
-                raise ValueError(f" at YN: the number of cycles is {N} but the minimum number is {1e2} ")
+                raise ValueError(f" at YN: the number of cycles is {N} "
+                                 f"but the minimum number is {1e2} ")
             return Y_N
         except KeyError as bad_key:
             print(f"at YN: not a valid hardness {bad_key}")
@@ -341,7 +348,8 @@ class SpurGear:
         gear1.Yj = table_interpolation(N1, N2, data)
         gear2.Yj = table_interpolation(N2, N1, data)
         # except NotInRangeError as not_in_range:
-        # print(f"Error: Teeth number of one of the gears ({not_in_range.num}) not in range {not_in_range.range_}")
+        # print(f"Error: Teeth number of one of the gears ({not_in_range.num})
+        # not in range {not_in_range.range_}")
 
     def get_info(self):
         """Print all the class fields with values """
@@ -355,9 +363,10 @@ class SpurGear:
         :rtype: dict
         """
 
-        factors = {'factor_KB': self.KB, 'Kv': self.Kv, 'max_vel': self.maximum_velocity, 'factor_Ks': self.Ks, 'KH': self.KH,
-                   'St': self.St, 'ZR': self.ZR, 'Sc': self.Sc, 'YN': self.YN, 'ZN': self.ZN,
-                   'Yj': self.__dict__.get('Yj', None), 'Zw': self.__dict__.get('Zw', None)}
+        factors = {'factor_KB': self.KB, 'Kv': self.Kv, 'max_vel': self.maximum_velocity,
+                   'factor_Ks': self.Ks, 'KH': self.KH, 'St': self.St, 'ZR': self.ZR, 'Sc': self.Sc,
+                   'YN': self.YN, 'ZN': self.ZN, 'Yj': self.__dict__.get('Yj', None),
+                   'Zw': self.__dict__.get('Zw', None)}
 
         if verbose:
             print("factor_KB= {KB}, Kv= {Kv}, maximum velocity= {max_vel}, \
@@ -365,12 +374,13 @@ class SpurGear:
                   \nYN= {YN}, ZN= {ZN}, Yj= {Yj}, Zw= {Zw}".format(**factors))
 
         if None in factors.values():
-            print(f"None value caused by Transmission not been instantiated")
+            print("None value caused by Transmission not been instantiated")
 
         return factors
 
     def cycles_or_hours(self):
-        """Check if the gear number of cycles or work hours were input and return the number of cycle
+        """Check if the gear number of cycles or work hours
+        were input and return the number of cycle
 
         :returns: Gear's Dynamic factor
         :rtype: float or None
@@ -397,7 +407,8 @@ class SpurGear:
             if cycles_number == 60 * working_hours * self.rpm * self.contact_ratio:
                 return cycles_number
             else:
-                raise ValueError("at YN factor: number of cycles and work hours entered but they're not matching")
+                raise ValueError("at YN factor: number of cycles and work"
+                                 "hours entered but they're not matching")
         else:
             raise ValueError("at YN factor: no number of cycles or work hours entered")
 
@@ -418,7 +429,8 @@ class SpurGear:
 
     @staticmethod
     def ZI(gear1, gear2):
-        """Geometric factor for contact failure, ZI is dependent on the gear ratio and pressure angel
+        """Geometric factor for contact failure,
+        ZI is dependent on the gear ratio and pressure angel
 
         :param SpurGear gear1: gear object
         :param SpurGear gear2: gear object
@@ -435,7 +447,8 @@ class SpurGear:
     def optimization(self, transmission, optimize_feature='all', verbose=False):
         """Perform gear optimization
 
-        :param gears.transmission.Transmission transmission: Transmission object associated with the gears
+        :param gears.transmission.Transmission transmission: Transmission object
+            associated with the gears
         :param str optimize_feature: property to optimize for ('width'/'volume'/'center')
         :param bool verbose: print optimization stages
 
@@ -461,7 +474,8 @@ class SpurGear:
         # elif gear.pressure_angle == 14.5:
         #     initial_teeth_num = 32
         else:
-            raise ValueError(f"pressure_angle={gear.pressure_angle} degrees but it can only be 20/25 degrees")
+            raise ValueError(f"pressure_angle={gear.pressure_angle} "
+                             f"degrees but it can only be 20/25 degrees")
 
         modulus_list = [0.3, 0.4, 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25]
         modulus_list.sort(reverse=True)
@@ -481,7 +495,8 @@ class SpurGear:
                 # update Yj factors after attribute changed
                 transmission.gear1.Y_j(transmission.gear1, transmission.gear2)
 
-                # KH is a function of the gear width, we assumed an initial width of 4πm to calculate KH,
+                # KH is a function of the gear width,
+                # we assumed an initial width of 4πm to calculate KH,
                 # we recalculate KH and the width until KH converges
                 kh_not_converging = False
                 while True:
@@ -515,7 +530,8 @@ class SpurGear:
                     break
 
                 alpha = contact_minimum_width / bending_minimum_width
-                centers_distance = 0.5 * gear.modulus * gear.teeth_num * (transmission.gear_ratio + 1)
+                centers_distance = 0.5 * gear.modulus * gear.teeth_num * (
+                        transmission.gear_ratio + 1)
                 volume = 0.25 * pi * (gear.pitch_diameter ** 2) * gear.width
                 f_string = f"m={gear.modulus}, N={gear.teeth_num}, b={gear.width:.2f}," \
                            f"spring_index={centers_distance:.2f}, V={volume:.2f}, α={alpha:.4f}"
@@ -524,16 +540,18 @@ class SpurGear:
                     # gear width is less than 3πm (b<3πm), gear width should be increased
                     # because the initial teeth number is minimal decrease modulus
 
-                    modulus_list = [0.3, 0.4, 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25]
+                    modulus_list = [0.3, 0.4, 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12,
+                                    16, 20, 25]
                     # get previous modulus on the list
                     if gear.modulus > 0.3:
                         new_modulus = modulus_list[modulus_list.index(gear.modulus) - 1]
                     else:
-                        raise ValueError(f"at Optimize: b<3πm but the modulus is the lowest possible")
+                        raise ValueError(
+                            "at Optimize: b<3πm but the modulus is the lowest possible")
 
                     if verbose:
                         # printing step result
-                        msg = "b<3πm" if gear.tangent_velocity < gear.maximum_velocity else f"b<3πm, v>v_max"
+                        msg = "b<3πm" if gear.tangent_velocity < gear.maximum_velocity else "b<3πm, v>v_max"  # pylint:disable=line-too-long
                         print(f_string, ',', msg)
 
                     # setting changes
@@ -545,11 +563,12 @@ class SpurGear:
 
                     if verbose:
                         # print step result
-                        msg = "b>5πm" if gear.tangent_velocity < gear.maximum_velocity else f"b>5πm, v>v_max"
+                        msg = "b>5πm" if gear.tangent_velocity < gear.maximum_velocity else "b>5πm, v>v_max"  # pylint:disable=line-too-long
                         print(f_string, ',', msg)
 
                     # increasing teeth number by one
-                    # (note: the gear teeth number can't exceed the biggest number specified in the Yj factor tables
+                    # (note: the gear teeth number can't exceed the
+                    # biggest number specified in the Yj factor tables
                     # and for a pinion a number that will make its gear pass this number.
                     # this error is handled at the Yj function)
                     gear.teeth_num += 1
@@ -560,11 +579,12 @@ class SpurGear:
                         if verbose:
                             # print step result
                             print(f"{f_string}, 3πm<b<5πm, α>1"
-                                  if gear.tangent_velocity < gear.maximum_velocity else f"3πm<b<5πm, α>1, v>v_max")
+                                  if gear.tangent_velocity < gear.maximum_velocity else "3πm<b<5πm, α>1, v>v_max")  # pylint:disable=line-too-long
 
                         # add result to least of viable results
-                        results_list.append({'m': gear.modulus, 'N': gear.teeth_num, 'b': gear.width,
-                                             'spring_index': centers_distance, 'V': volume, 'alpha': alpha})
+                        results_list.append(
+                            {'m': gear.modulus, 'N': gear.teeth_num, 'b': gear.width,
+                             'spring_index': centers_distance, 'V': volume, 'alpha': alpha})
                         # increase teeth number
                         gear.teeth_num += 1
                     else:
@@ -575,13 +595,14 @@ class SpurGear:
                         if verbose:
                             # print step result
                             print(f"{f_string}, 3πm<b<5πm, α<=1"
-                                  if gear.tangent_velocity < gear.maximum_velocity else f"3πm<b<5πm, α<=1, v>v_max")
+                                  if gear.tangent_velocity < gear.maximum_velocity else "3πm<b<5πm, α<=1, v>v_max")  # pylint:disable=line-too-long
 
                         # find optimize feature
                         # optimize by width
                         if optimize_feature == 'width':
                             # create list of widths
-                            width_list = [(dic['b'], index) for index, dic in enumerate(results_list)]
+                            width_list = [(dic['b'], index) for index, dic in
+                                          enumerate(results_list)]
                             # get minimum width index
                             result_index = min(width_list)[1]
                             optimized_result = results_list[result_index]
@@ -589,7 +610,8 @@ class SpurGear:
                         # optimize by volume
                         elif optimize_feature == 'volume':
                             # create list of volumes
-                            volume_list = [(dic['V'], index) for index, dic in enumerate(results_list)]
+                            volume_list = [(dic['V'], index) for index, dic in
+                                           enumerate(results_list)]
                             # get minimum volume index
                             result_index = min(volume_list)[1]
                             optimized_result = results_list[result_index]
@@ -597,19 +619,25 @@ class SpurGear:
                         # optimize by center distance
                         elif optimize_feature == 'center':
                             # create list of center distances
-                            center_list = [(dic['spring_index'], index) for index, dic in enumerate(results_list)]
+                            center_list = [(dic['spring_index'], index) for index, dic in
+                                           enumerate(results_list)]
                             # get minimum center distance index
                             result_index = min(center_list)[1]
                             optimized_result = results_list[result_index]
 
                         elif optimize_feature == 'all':
-                            width_list = [(dic['b'], index) for index, dic in enumerate(results_list)]
-                            volume_list = [(dic['V'], index) for index, dic in enumerate(results_list)]
-                            center_list = [(dic['spring_index'], index) for index, dic in enumerate(results_list)]
+                            width_list = [(dic['b'], index) for index, dic in
+                                          enumerate(results_list)]
+                            volume_list = [(dic['V'], index) for index, dic in
+                                           enumerate(results_list)]
+                            center_list = [(dic['spring_index'], index) for index, dic in
+                                           enumerate(results_list)]
 
                             optimized_result = {'optimized width': results_list[min(width_list)[1]],
-                                                'optimized volume': results_list[min(volume_list)[1]],
-                                                'optimized center': results_list[min(center_list)[1]]}
+                                                'optimized volume': results_list[
+                                                    min(volume_list)[1]],
+                                                'optimized center': results_list[
+                                                    min(center_list)[1]]}
                         else:
                             raise Exception(f"optimize_feature={optimize_feature} is invalid")
 
@@ -651,8 +679,10 @@ class SpurGear:
         :returns: A dictionary of properties
         :rtype: dict
         """
-        prop_list = ['name', 'modulus', 'teeth_num', 'rpm', 'Qv', 'width', 'bearing_span', 'pinion_offset', 'enclosure',
-                     'hardness', 'work_hours', 'number_of_cycles', 'pressure_angle', 'grade', 'crowned', 'adjusted',
+        prop_list = ['name', 'modulus', 'teeth_num', 'rpm', 'Qv', 'width', 'bearing_span',
+                     'pinion_offset', 'enclosure',
+                     'hardness', 'work_hours', 'number_of_cycles', 'pressure_angle', 'grade',
+                     'crowned', 'adjusted',
                      'sensitive_use', 'nitriding', 'case_carb', 'material']
         # remove contact ratio from dictionary so it won't interfere with the new gear instantiation
         new_properties = {key: properties[key] for key in properties if key in prop_list}

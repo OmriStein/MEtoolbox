@@ -1,25 +1,28 @@
+"""Module containing the HelicalGear class"""
+# I want the variables names to be the same as in AGMA pylint: disable=invalid-name
 from math import sin, cos, radians, pi, tan, atan, sqrt, degrees
+import os
+import numpy as np
 from gears.spur_gear import SpurGear  # for inheritance
 from tools import table_interpolation
-import numpy as np
-import os
 
 
 class HelicalGear(SpurGear):
     """A gear object that contains all of its design parameters (AGMA 2001-D04)"""
-    def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset, enclosure, hardness,
-                 pressure_angle, helix_angle, grade, work_hours=0, number_of_cycles=0, crowned=False, adjusted=False,
-                 sensitive_use=False, nitriding=False, case_carb=False, material='steel'):
-        super().__init__(name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset, enclosure, hardness,
-                         pressure_angle, grade, work_hours, number_of_cycles, crowned, adjusted,
-                         sensitive_use, nitriding, case_carb, material)
+    def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
+                 enclosure, hardness, pressure_angle, helix_angle, grade, work_hours=0,
+                 number_of_cycles=0, crowned=False, adjusted=False, sensitive_use=False,
+                 nitriding=False, case_carb=False, material='steel'):
         """Instantiating a HelicalGear object which inherits from SpurGear
-        
+
         :param float helix_angle: The gear helix angle (20 or 25)
-        
+
         :returns: HelicalGear object
         :rtype: HelicalGear
         """
+        super().__init__(name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
+                         enclosure, hardness, pressure_angle, grade, work_hours, number_of_cycles,
+                         crowned, adjusted, sensitive_use, nitriding, case_carb, material)
 
         self.helix_angle = helix_angle
 
@@ -146,7 +149,7 @@ class HelicalGear(SpurGear):
         if gear1.width >= 2 * gear1.axial_pitch:
             mN = (gear1.pitch * cos(phi_n)) / (0.95 * z)
         else:
-            raise ValueError(f"at ZI factor: gear width should be at least two times the axial pitch "
+            raise ValueError(f"@ ZI factor: gear width should be at least two times the axial pitch"
                              f"2Px={2 * gear1.axial_pitch:.2f}")
         Z_I = (cos(phi_t) * sin(phi_t) * mG) / (2 * mN * (mG + 1))
         # print(f"ZI={Z_I}, mG={mG}, modulus={modulus}, Np={Np}, Ng={Ng}, Px={gear1.axial_pitch}")
@@ -172,7 +175,8 @@ class HelicalGear(SpurGear):
     def optimization(self, transmission, optimize_feature='all', verbose=False):
         """Perform gear optimization
 
-        :param gears.transmission.Transmission transmission: Transmission object associated with the gear
+        :param gears.transmission.Transmission transmission: Transmission object
+            associated with the gear
         :param str optimize_feature: property to optimize for ('width'/'volume'/'center')
         :param bool verbose: print optimization stages
 
@@ -211,7 +215,8 @@ class HelicalGear(SpurGear):
                 except ValueError:
                     pass
 
-                # KH is a function of the gear width, we assumed an initial width of 4πm to calculate KH,
+                # KH is a function of the gear width,
+                # we assumed an initial width of 4πm to calculate KH,
                 # we recalculate KH and the width until KH converges
                 kh_not_converging = False
                 while True:
@@ -260,17 +265,18 @@ class HelicalGear(SpurGear):
                     # gear width is less than 2Px (b<Px), gear width should be increased
                     # because the initial teeth number is minimal decrease modulus
 
-                    modulus_list = [0.3, 0.4, 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25]
+                    modulus_list = [0.3, 0.4, 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12,
+                                    16, 20, 25]
                     # get previous modulus on the list
                     if gear.modulus > 0.3:
                         new_modulus = modulus_list[modulus_list.index(gear.modulus) - 1]
                     else:
-                        raise ValueError(f"at Optimize: b<2Px but the modulus is the lowest possible")
+                        raise ValueError("@ Optimize: b<2Px but the modulus is the lowest possible")
 
                     if verbose:
                         # printing step result
                         if not isinstance(gear.maximum_velocity, str):
-                            msg = "b<2Px" if gear.tangent_velocity < gear.maximum_velocity else f"b<2Px, v>v_max"
+                            msg = "b<2Px" if gear.tangent_velocity < gear.maximum_velocity else "b<2Px, v>v_max"
                         else:
                             msg = "b<2Px"
                         print(f_string, ',', msg)
@@ -285,7 +291,7 @@ class HelicalGear(SpurGear):
                     if verbose:
                         # print step result
                         if not isinstance(gear.maximum_velocity, str):
-                            msg = "b>Pd" if gear.tangent_velocity < gear.maximum_velocity else f"b>Pd, v>v_max"
+                            msg = "b>Pd" if gear.tangent_velocity < gear.maximum_velocity else "b>Pd, v>v_max"
                         else:
                             msg = "b>Pd"
                         print(f_string, ',', msg)
@@ -303,12 +309,13 @@ class HelicalGear(SpurGear):
                             # print step result
                             if not isinstance(gear.maximum_velocity, str):
                                 print(f"{f_string}, 2Px<b<Pd, α>1"
-                                      if gear.tangent_velocity < gear.maximum_velocity else f"2Px<b<Pd, α>1, v>v_max")
+                                      if gear.tangent_velocity < gear.maximum_velocity else "2Px<b<Pd, α>1, v>v_max")
                             else:
                                 print(f"{f_string}, 2Px<b<Pd, α>1")
                         # add result to least of viable results
-                        results_list.append({'m': gear.modulus, 'N': gear.teeth_num, 'b': gear.width,
-                                             'spring_index': centers_distance, 'V': volume, 'alpha': alpha})
+                        results_list.append({'m': gear.modulus, 'N': gear.teeth_num,
+                                             'b': gear.width, 'spring_index': centers_distance,
+                                             'V': volume, 'alpha': alpha})
                         # increase teeth number
                         gear.teeth_num += 1
                     else:
@@ -320,7 +327,7 @@ class HelicalGear(SpurGear):
                             # print step result
                             if not isinstance(gear.maximum_velocity, str):
                                 print(f"{f_string}, 2Px<b<Pd, α<=1"
-                                      if gear.tangent_velocity < gear.maximum_velocity else f"2Px<b<Pd, α<=1, v>v_max")
+                                      if gear.tangent_velocity < gear.maximum_velocity else "2Px<b<Pd, α<=1, v>v_max")
                             else:
                                 print(f"{f_string}, 2Px<b<Pd, α<=1")
 
@@ -399,9 +406,10 @@ class HelicalGear(SpurGear):
         :returns: A dictionary of properties
         :rtype: dict
         """
-        prop_list = ['name', 'modulus', 'teeth_num', 'rpm', 'Qv', 'width', 'bearing_span', 'pinion_offset', 'enclosure',
-                     'hardness', 'work_hours', 'number_of_cycles', 'pressure_angle', 'grade', 'crowned', 'adjusted',
-                     'sensitive_use', 'nitriding', 'case_carb', 'material', 'helix_angle']
+        prop_list = ['name', 'modulus', 'teeth_num', 'rpm', 'Qv', 'width', 'bearing_span',
+                     'pinion_offset', 'enclosure', 'hardness', 'work_hours', 'number_of_cycles',
+                     'pressure_angle', 'grade', 'crowned', 'adjusted', 'sensitive_use', 'nitriding',
+                     'case_carb', 'material', 'helix_angle']
         # remove contact ratio from dictionary so it won't interfere with the new gear instantiation
         new_properties = {key: properties[key] for key in properties if key in prop_list}
         return new_properties
@@ -427,8 +435,9 @@ class HelicalGear(SpurGear):
             if self.helix_angle != gear.helix_angle:
                 # if pressure angles are different raise error
                 raise ValueError("gear1 and gear2 have mismatch Helix_angle")
-        except AttributeError:
-            raise ValueError("gear1 and gear2 are not the same type, they are no compatible")
+        except AttributeError as err:
+            raise ValueError("gear1 and gear2 are not the same type, they are no compatible")\
+                from err
 
         # check modulus
         if self.modulus != gear.modulus:
