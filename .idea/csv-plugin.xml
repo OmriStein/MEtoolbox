@@ -94,6 +94,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\fatigue_analysis\fatigue_analysis.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\gears\helical_gear.py">
           <value>
             <Attribute>
@@ -130,6 +137,20 @@
           </value>
         </entry>
         <entry key="\springs\HelicalPushSpring.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\springs\extension_spring.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\springs\helical_push_spring.py">
           <value>
             <Attribute>
               <option name="separator" value=":" />
