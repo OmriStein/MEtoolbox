@@ -28,7 +28,7 @@ class HelicalGear(SpurGear):
 
     @property
     def pitch_diameter(self):
-        """Calculate pitchdiameter
+        """Calculate pitch diameter
 
         :returns: Gear's pitch diameter
         :rtype: float
