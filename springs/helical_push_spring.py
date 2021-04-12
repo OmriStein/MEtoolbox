@@ -1,25 +1,26 @@
-from springs import Spring
+"""A module containing the helical push spring class"""
 from math import pi, sqrt
+import numpy as np
+from sympy import Symbol  # pylint: disable=unused-import
 from tools import print_atributes
-from tools import parse_input
-from sympy import Symbol
+from springs import Spring
 
 
 class HelicalPushSpring(Spring):
-    def __init__(self, max_force, Ap, m, yield_percent, wire_diameter, spring_diameter, shear_modulus,
-                 end_type, spring_constant=None, active_coils=None, zeta=0.15, set_removed=False,
-                 shot_peened=False, anchor=None, free_length=None, elastic_modulus=None, density=None,
-                 working_frequency=None):
+    """A helical push spring object"""
+
+    def __init__(self, force, Ap, m, yield_percent, wire_diameter, spring_diameter,
+                 shear_modulus, end_type, spring_constant=None, active_coils=None,
+                 free_length=None, elastic_modulus=None, density=None, working_frequency=None,
+                 set_removed=False, shot_peened=False, anchors=None, zeta=0.15):
         """Instantiate a helical push spring object with the given parameters
 
-        :param float or Symbol max_force: The maximum load on the spring
+        :param float or Symbol force: The maximum load on the spring
         :param float or Symbol wire_diameter: spring wire diameter
         :param float or Symbol spring_diameter: spring diameter measured from
             the center point of the wire diameter
-        :param float Ap: Constants Ap of ultimate_tensile_strength = Ap/d**m for Estimating Minimum
-            Tensile Strength of Common Spring Wires
-        :param float m: Constants m of ultimate_tensile_strength = Ap/d**m for Estimating Minimum
-            Tensile Strength of Common Spring Wires
+        :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
+        :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
         :param float shear_modulus: Shear modulus
         :param str end_type: what kind of ending the spring has
         :param float yield_percent: yield percent used to estimate shear_yield_stress
@@ -30,7 +31,7 @@ class HelicalPushSpring(Spring):
             (must NOT use for fatigue application)
         :param bool shot_peened: if True adds to fatigue strength
         :param float or None free_length: the spring length when no force is applied
-        :param str or None anchor: How the spring is anchored
+        :param str or None anchors: How the spring is anchored
             (used for buckling calculations)
         :param float or None elastic_modulus: elastic modulus
             (used for buckling calculations)
@@ -41,26 +42,27 @@ class HelicalPushSpring(Spring):
 
         :returns: HelicalPushSpring
         """
-        self.constructing = True  # a flag to tall methods that they are being called from within __init__
-        super().__init__(max_force, Ap, m, yield_percent, wire_diameter, spring_diameter, shear_modulus)
+        self.constructing = True  # flag so methods know they are being called from within __init__
+        super().__init__(force, Ap, m, yield_percent, wire_diameter, spring_diameter,
+                         shear_modulus, shot_peened)
         if set_removed:
-            print(f"Note: set should ONLY be removed for static loading and NOT for periodical loading")
+            print("Note: set should ONLY be removed for static loading"
+                  "and NOT for periodical loading")
 
         self.set_removed = set_removed
         self.shot_peened = shot_peened
         self.yield_percent = yield_percent
         self.zeta = zeta  # overrun safety factor
+
         self.end_type = end_type.lower()
-
-        self._na_k_sorter(active_coils, spring_constant)
-
-        self.free_length = free_length
-
         end_types = ('plain', 'plain and ground', 'squared or closed', 'squared and ground')
         if self.end_type not in end_types:
             raise ValueError(f"{end_type} not one of this: {end_types}")
 
-        self.anchor = anchor
+        self._na_k_sorter(active_coils, spring_constant )
+        self.free_length = free_length
+
+        self.anchors = anchors
         self.elastic_modulus = elastic_modulus
         self.density = density
         self.working_frequency = working_frequency
@@ -73,52 +75,60 @@ class HelicalPushSpring(Spring):
         print_atributes(self)
         self.check_design()  # check C and active_coils
 
-    # TODO break CheckDesign to smaller pieces
     def check_design(self):
-        """Check if the spring index,active_coils,zeta and L0 are in acceptable range for a good design
+        """Check if the spring index,active_coils,zeta and free_length
+        are in acceptable range for a good design
 
         :returns: True if all the checks are good
         :rtype: bool
         """
         good_design = True
-        C = self.spring_index
+        C = self.spring_index  # pylint: disable=invalid-name
         if isinstance(C, float) and not 4 <= C <= 12 and self.set_removed:
-            print(f"Note: C - spring index should be in range of [4,12], lower C causes surface cracks,\n"
-                  f"higher C causes the spring to tangle and requires separate packing")
+            print("Note: C - spring index should be in range of [4,12],"
+                  "lower C causes surface cracks,\n"
+                  "higher C causes the spring to tangle and requires separate packing")
             good_design = False
         elif isinstance(C, float) and not 3 <= C <= 12:
-            print(f"Note: C - spring index should be in range of [3,12], lower C causes surface cracks,\n"
-                  f"higher C causes the spring to tangle and requires separate packing")
+            print("Note: C - spring index should be in range of [3,12],"
+                  "lower C causes surface cracks,\n"
+                  "higher C causes the spring to tangle and requires separate packing")
             good_design = False
 
-        Na = self.active_coils
-        if isinstance(Na, float) and not 3 <= Na <= 15:
-            print(f"Note: active_coils={Na:.2f} is not in range [3,15], this can cause non linear behavior")
+        active_coils = self.active_coils
+        if isinstance(active_coils, float) and not 3 <= active_coils <= 15:
+            print(f"Note: active_coils={active_coils:.2f} is not in range [3,15],"
+                  f"this can cause non linear behavior")
             good_design = False
 
-        if not self.L0_input_flag:
-            print(f"Note: the free length was not given so Fsolid was estimated using zeta={self.zeta}")
+        if not self.free_length_input_flag:
+            print(f"Note: the free length was not given so Fsolid"
+                  f"was estimated using zeta={self.zeta}")
 
         zeta = self.zeta
         if zeta < 0.15:
-            print(f"Note: zeta={zeta:.2f} is smaller then 0.15, the spring could reach its solid length")
+            print(f"Note: zeta={zeta:.2f} is smaller then 0.15,"
+                  f"the spring could reach its solid length")
             good_design = False
 
-        L0 = self.free_length
-        if isinstance(L0, float) and (self.anchor is not None) and (self.elastic_modulus is not None):
-            buckling = self.buckling(self.anchor, self.elastic_modulus)
+        free_length = self.free_length
+        if isinstance(free_length, float) and (self.anchors is not None) \
+                and (self.elastic_modulus is not None):
+            buckling = self.buckling(self.anchors, self.elastic_modulus)
             if buckling[0]:
-                print(f"Note: buckling is accruing , max free length (L0) = {buckling[1]} , L0= {L0}")
+                print(f"Note: buckling is accruing, max free length (free_length)= {buckling[1]}, "
+                      f"free_length= {free_length}")
                 good_design = False
 
         if (self.density is not None) and (self.working_frequency is not None):
-            Wn = self.natural_frequency(self.density)
-            if Wn <= 20 * self.working_frequency:
+            natural_freq = self.natural_frequency(self.density)
+            if natural_freq <= 20 * self.working_frequency:
                 print(
-                    f"Note: the natural frequency={Wn} is less than 20*working frequency={20 * self.working_frequency}")
+                    f"Note: the natural frequency={natural_freq} is less than 20*working"
+                    f"frequency={20 * self.working_frequency}")
                 good_design = False
 
-        return True if good_design else False
+        return good_design
 
     @property
     def wire_diameter(self):
@@ -130,12 +140,12 @@ class HelicalPushSpring(Spring):
         return self._wire_diameter
 
     @wire_diameter.setter
-    def wire_diameter(self, d):
+    def wire_diameter(self, diameter):
         """Sets the wire diameter and updates relevant attributes
 
-        :param float d: Spring's wire diameter
+        :param float diameter: Spring's wire diameter
         """
-        self._wire_diameter = d
+        self._wire_diameter = diameter
         if not self.constructing:
             # updating active_coils and free length with the new diameter
             self.active_coils = None
@@ -151,12 +161,12 @@ class HelicalPushSpring(Spring):
         return self._spring_diameter
 
     @spring_diameter.setter
-    def spring_diameter(self, d):
+    def spring_diameter(self, diameter):
         """Sets the spring diameter and updates relevant attributes
 
-        :param float d: Spring's diameter
+        :param float diameter: Spring's diameter
         """
-        self._spring_diameter = d
+        self._spring_diameter = diameter
         if not self.constructing:
             # updating active_coils and free length with the new diameter
             self.active_coils = None
@@ -181,34 +191,36 @@ class HelicalPushSpring(Spring):
         :returns: The spring active coils
         :rtype: float
         """
-        return self._Na
+        return self._active_coils
 
     @active_coils.setter
     def active_coils(self, active_coils):
         """getter for the :attr:`active_coils` attribute
-        the method checks if active_coils was given and if not it calculates it form the other known parameters
-        and then update the :attr:`spring_constant` attribute to match
+        the method checks if active_coils was given and if not
+        it calculates it form the other known parameters and then
+        update the :attr:`spring_constant` attribute to match
 
         :param float or None active_coils: Spring active coils
         """
         if active_coils is not None:
             # active_coils was given
-            self._Na = active_coils
+            self._active_coils = active_coils
             # recalculate spring constant and free_length according to the new active_coils
             self.spring_constant = None
             self.free_length = None
         else:
             # active_coils was not given so calculate it
-            self._Na = self.calc_Na()
+            self._active_coils = self.calc_active_coils()
 
-    def calc_Na(self):
+    def calc_active_coils(self):
         """Calculate active_coils which is the number of active coils (using Castigliano's theorem)
 
         :returns: number of active coils
         :rtype: float
         """
-        return ((self.shear_modulus * self.wire_diameter) / (8 * self.spring_index ** 3 * self.spring_constant)) * (
-                (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
+        return ((self.shear_modulus * self.wire_diameter) /
+                (8 * self.spring_index ** 3 * self.spring_constant)) * (
+                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
     @property
     def spring_constant(self):
@@ -222,8 +234,9 @@ class HelicalPushSpring(Spring):
     @spring_constant.setter
     def spring_constant(self, spring_constant):
         """getter for the :attr:`spring_constant` attribute
-        the method checks if the spring constant was given and if not it calculates it form the other known parameters
-        and then update the :attr:`active_coils` attribute to match
+        the method checks if the spring constant was given and if not
+        it calculates it form the other known parameters and then
+        update the :attr:`active_coils` attribute to match
 
         :param float or None spring_constant: K - The spring constant
         """
@@ -243,11 +256,12 @@ class HelicalPushSpring(Spring):
         :returns: The spring constant
         :rtype: float
         """
-        return ((self.shear_modulus * self.wire_diameter) / (8 * self.spring_index ** 3 * self.active_coils)) * (
-                (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
+        return ((self.shear_modulus * self.wire_diameter) /
+                (8 * self.spring_index ** 3 * self.active_coils)) * (
+                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
     @property
-    def factor_Ks(self):
+    def factor_Ks(self):  # pylint: disable=invalid-name
         """factor_Ks - Static shear stress concentration factor
 
         :returns: Static shear stress concentration factor
@@ -256,16 +270,18 @@ class HelicalPushSpring(Spring):
         return (2 * self.spring_index + 1) / (2 * self.spring_index)
 
     @property
-    def factor_Kw(self):
+    def factor_Kw(self):  # pylint: disable=invalid-name
         """K_W - Wahl shear stress concentration factor
 
         :returns: Wahl shear stress concentration factor
         :rtype: float
         """
-        return (4 * self.spring_index - 1) / (4 * self.spring_index - 4) + (0.615 / self.spring_index)
+        return (4 * self.spring_index - 1) / (4 * self.spring_index - 4) + \
+               (0.615 / self.spring_index)
 
     @property
-    def factor_KB(self):  # NOT IMPLEMENTED!!! TODO: check when to use and implement
+    def factor_KB(self):  # pylint: disable=invalid-name
+        # NOT IMPLEMENTED!!! TODO: check when to use and implement
         """K_B - Bergstrasser shear stress concentration factor (very close to factor_Kw)
 
         :returns: Bergstrasser shear stress concentration factor
@@ -290,8 +306,8 @@ class HelicalPushSpring(Spring):
         :returns: Shear stress
         :rtype: float or Symbol
         """
-        K = self.factor_Ks if self.set_removed else self.factor_Kw
-        return (K * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
+        factor_k = self.factor_Ks if self.set_removed else self.factor_Kw
+        return (factor_k * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
 
     @property
     def deflection(self):
@@ -321,7 +337,10 @@ class HelicalPushSpring(Spring):
         :returns: Number of the spring end coils
         :rtype: float or Symbol
         """
-        options = {'plain': 0, 'plain and ground': 1, 'squared or closed': 2, 'squared and ground': 2}
+        options = {'plain': 0,
+                   'plain and ground': 1,
+                   'squared or closed': 2,
+                   'squared and ground': 2}
         return options.get(self.end_type)
 
     @property
@@ -341,28 +360,31 @@ class HelicalPushSpring(Spring):
         :returns: Spring solid length (when all the coils are touching)
         :rtype: float or Symbol
         """
-        d = self.wire_diameter
-        Nt = self.total_coils
-        options = {'plain': d * (Nt + 1), 'plain and ground': d * Nt, 'squared or closed': d * (Nt + 1),
-                   'squared and ground': d * Nt}
+        diameter = self.wire_diameter
+        total_coils = self.total_coils
+        options = {'plain': diameter * (total_coils + 1),
+                   'plain and ground': diameter * total_coils,
+                   'squared or closed': diameter * (total_coils + 1),
+                   'squared and ground': diameter * total_coils}
         return options.get(self.end_type)
 
     @property
-    def Fsolid(self):
+    def Fsolid(self):  # pylint: disable=invalid-name
         """calculate the force necessary to bring the spring to solid length
-        it is a good practice for the force that compresses the spring to solid state to be greater than the
-        maximum force anticipated so we use this calculation: Fs=(1+zeta)Fmax in case the free length is unknown
+        it is a good practice for the force that compresses the spring to
+        solid state to be greater than the maximum force anticipated so we
+        use this calculation: Fs=(1+zeta)Fmax in case the free length is unknown
 
         Note: zeta is the overrun safety factor, it's customary that zeta=0.15 so Fs=1.15Fmax
 
         :returns: The force it takes to get the spring to solid length
         :rtype: float
         """
-        if self.L0_input_flag:
-            # if L0 is given
+        if self.free_length_input_flag:
+            # if free_length is given
             return self.spring_constant * (self.free_length - self.solid_length)
         else:
-            # if L0 is unknown make an estimation
+            # if free_length is unknown make an estimation
             return (1 + self.zeta) * self.force
 
     @property
@@ -375,17 +397,18 @@ class HelicalPushSpring(Spring):
         return self._free_length
 
     @free_length.setter
-    def free_length(self, L0):
+    def free_length(self, free_length):
         """free_length setter methods
-        if L0 is specified assignee it and set the L0_input_flag for the :attr:`Fsolid` method
-        if L0 is not specified calculate it using :meth:`CalcL0`
+        if free length is specified assignee it and set the
+        free_length_input_flag for the :attr:`Fsolid` method
+        if free length is not specified calculate it using :meth:`CalcL0`
 
-        :param float or None L0: The free length of the spring
+        :param float or None free_length: The free length of the spring
         """
-        self.L0_input_flag = False if L0 is None else True
-        self._free_length = self.calc_L0() if L0 is None else L0
+        self.free_length_input_flag = False if free_length is None else True
+        self._free_length = self.calc_free_length() if free_length is None else free_length  # pylint: disable=invalid-name
 
-    def calc_L0(self):
+    def calc_free_length(self):
         """Calculates the free length of the spring"""
         return (self.Fsolid / self.spring_constant) + self.solid_length
 
@@ -408,8 +431,8 @@ class HelicalPushSpring(Spring):
         """
         area = 0.25 * pi * self.wire_diameter ** 2  # cross section area
         length = pi * self.spring_diameter  # the circumference of the spring
-        volume = area*length
-        return volume*self.active_coils*self.density
+        volume = area * length
+        return volume * self.active_coils * density
 
     def min_wire_diameter(self, static_safety_factor, solid=False):
         """The minimal wire diameter for a given safety factor in order to avoid failure,
@@ -424,9 +447,9 @@ class HelicalPushSpring(Spring):
         :returns: The minimal wire diameter
         :rtype: float or Symbol
         """
-        K = self.factor_Ks if self.set_removed else self.factor_Kw
+        factor_k = self.factor_Ks if self.set_removed else self.factor_Kw
         force = self.Fsolid if solid else self.force
-        return ((8 * K * force * self.spring_index * static_safety_factor) / (
+        return ((8 * factor_k * force * self.spring_index * static_safety_factor) / (
                 self.yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
 
     def min_spring_diameter(self, static_safety_factor, solid=False):
@@ -447,57 +470,38 @@ class HelicalPushSpring(Spring):
         else:
             # TODO: add a solution for factor_Kw (before set removed)
             print("MinSpringDiameter Not valid if set not removed")
+            return None
 
-    def buckling(self, ends, E):
+    def buckling(self, anchors, elastic_modulus):
         """ Checks if the spring will buckle and find the maximum free length to avoid buckling
 
-        :param float E: elastic modulus
-        :param str ends: the spring end condition (from Table 10-2)
+        :param float elastic_modulus: elastic modulus
+        :param str anchors: the spring end condition (from Table 10-2)
 
         :returns: True if spring is in danger of collapse and False if not,
-            and the maximum free length(L0) to avoid collapsing
+            and the maximum free length(free_length) to avoid collapsing
         :rtype: tuple[bool, float]
         """
-        alpha = {'fixed-fixed': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}  # from table 10-2
+        # alpha values from from table 10-2
+        alpha = {'fixed-fixed': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}
 
-        L0 = self.free_length
         try:
-            collapse_test = (pi * self.spring_diameter / alpha[ends.lower()]) * sqrt(
-                (2 * (E - self.shear_modulus)) / (2 * self.shear_modulus + E))
-        except ValueError as e:
-            print(f"{e}, make sure E and G have the same units (Mpa)")
+            collapse_test = (pi * self.spring_diameter / alpha[anchors.lower()]) * \
+                            sqrt((2 * (elastic_modulus - self.shear_modulus)) /
+                                 (2 * self.shear_modulus + elastic_modulus))
+        except ValueError as err:
+            print(f"{err}, make sure E and G have the same units (Mpa)")
         except KeyError as key:
             print(f"Ends: {key} is unknown ")
         else:
-            return L0 >= collapse_test, collapse_test
+            return self.free_length >= collapse_test, collapse_test
 
-    def shear_endurance_limit(self, reliability):
-        """Sse - Shear endurance limit according to Zimmerli
+    def fatigue_analysis(self, max_force, min_force, reliability, verbose=False):
+        """ Returns safety factors for fatigue according to Goodman
+        and for first circle according to Langer
 
-        :param float reliability: reliability in percentage
-
-        :returns: Sse - Shear endurance limit
-        :rtype: float
-        """
-        import numpy as np
-        # data from table
-        percentage = np.array([50, 90, 95, 99, 99.9, 99.99, 99.999, 99.9999])
-        reliability_factors = np.array([1, 0.897, 0.868, 0.814, 0.753, 0.702, 0.659, 0.620])
-        # interpolating from data
-        Ke = np.interp(reliability, percentage, reliability_factors)
-
-        if self.shot_peened:
-            Ssa, Ssm = 398, 534
-        else:
-            Ssa, Ssm = 241, 379
-
-        return Ke * (Ssa / (1 - (Ssm / self.shear_ultimate_strength) ** 2))
-
-    def fatigue_analysis(self, Fmax, Fmin, reliability, verbose=False):
-        """ Returns safety factors for fatigue according to Goodman and for first circle according to Langer
-
-        :param float Fmax: Maximal force acting on the spring
-        :param float Fmin: Minimal force acting on the spring
+        :param float max_force: Maximal force acting on the spring
+        :param float min_force: Minimal force acting on the spring
         :param float reliability: in percentage
         :param bool verbose: print more details
 
@@ -505,23 +509,26 @@ class HelicalPushSpring(Spring):
         :rtype: tuple[float, float]
         """
         # calculating mean and alternating forces
-        alternating_force = abs(Fmax - Fmin) / 2
-        mean_force = (Fmax + Fmin) / 2
+        alternating_force = abs(max_force - min_force) / 2
+        mean_force = (max_force + min_force) / 2
 
         # calculating mean and alternating stresses
         alternating_shear_stress = self.calc_shear_stress(alternating_force)
         mean_shear_stress = self.calc_shear_stress(mean_force)
 
-        # nf - goodman fatigue safety factor
-        Sse = self.shear_endurance_limit(reliability)
-        nf = 1 / ((alternating_shear_stress / Sse) + (mean_shear_stress / self.shear_ultimate_strength))
-        # ns - langer safety factor for first cycle
-        ns = self.shear_yield_strength / (mean_shear_stress + alternating_shear_stress)
+        # fatigue_safety_factor - goodman fatigue safety factor
+        Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
+        fatigue_safety_factor = 1 / ((alternating_shear_stress / Sse) + (
+                mean_shear_stress / self.shear_ultimate_strength))
+        # static_safety_factor - langer safety factor for first cycle
+        static_safety_factor = self.shear_yield_strength / (
+                mean_shear_stress + alternating_shear_stress)
         if verbose:
             print(f"Alternating force = {alternating_force}, Mean force = {mean_force}\n"
-                  f"Alternating shear stress = {alternating_shear_stress}, Mean shear stress = {mean_shear_stress}\n"
+                  f"Alternating shear stress = {alternating_shear_stress},"
+                  f"Mean shear stress = {mean_shear_stress}\n"
                   f"Sse = {Sse}")
-        return nf, ns
+        return fatigue_safety_factor, static_safety_factor
 
     def natural_frequency(self, density):
         """Figures out what is the natural frequency of the spring
@@ -531,8 +538,8 @@ class HelicalPushSpring(Spring):
         :returns: Natural frequency
         :rtype: float
         """
-        return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.active_coils * pi)) * sqrt(
-            self.shear_modulus / (2 * density))
+        return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.active_coils * pi)) \
+            * sqrt(self.shear_modulus / (2 * density))
 
     def calc_spring_index(self, solid_safety_factor):
         """Calculate Spring index for a certain safety factor if only wire diameter was given
@@ -552,8 +559,8 @@ class HelicalPushSpring(Spring):
             try:
                 return (alpha - 0.365 * beta) / (2 * beta) + (
                     (0.966 * sqrt(0.268 * alpha ** 2 - alpha * beta + 0.53 * beta ** 2))) / beta
-            except TypeError:
-                print("In this method d can't be symbolic")
+            except TypeError as type_error:
+                raise ValueError("In this method diameter can't be symbolic") from type_error
             # for Kb TODO: find a way to implement Kb (Bergstrasser factor)
             # return ((2 * alpha - beta) / (4 * beta)) + sympy.sqrt(
             #     ((2 * alpha - beta) / (4 * beta)) ** 2 - ((3 * alpha) / (4 * beta)))
@@ -564,9 +571,11 @@ class HelicalPushSpring(Spring):
         """
         active_coils = args[0]
         spring_constant = args[1]
+
         if (active_coils is None) and (spring_constant is None):
             # if None were given
-            raise ValueError("active_coils and the spring_constant can't both be None, Tip: Find the spring constant")
+            raise ValueError("active_coils and the spring_constant can't both be None,"
+                             "Tip: Find the spring constant")
         elif active_coils is None:
             # calculating active_coils based on the spring constant
             self.spring_constant = spring_constant
@@ -577,4 +586,5 @@ class HelicalPushSpring(Spring):
             self.spring_constant = spring_constant
         else:
             # if both are given
-            raise ValueError("Both active_coils and the spring constant were given but only one is expected")
+            raise ValueError("Both active_coils and the spring constant"
+                             "were given but only one is expected")

@@ -1,4 +1,4 @@
-from fatigue_analysis import *
+from fatigue import *
 from math import pi
 from sympy import symbols, solveset, Eq
 from sympy.sets import Reals
@@ -51,16 +51,16 @@ Kfs = calc_kf(0.75, 1.73)
 
 print(f"Kf={Kf:.3f}, Kfs={Kfs:.3f}")
 
-# creating fatigue_analysis object
-fatigue_analysis = FatigueAnalysis(Sut=700, Sy=525, ductile=True, Kf_normal=Kf, Kf_torsion=Kfs,
-                                   endurance_limit=endurance_limit,
-                                   alternating_normal_stress=alternating_normal_stress,
-                                   alternating_torsion_stress=alternating_shear_stress,
+# creating fatigue object
+fatigue_analysis = FatigueAnalysis(endurance_limit=endurance_limit, ductile=True, Sy=525,
+                                   Kf_normal=Kf, Kf_torsion=Kfs,
+                                   alt_normal_stress=alternating_normal_stress,
+                                   alt_torsion_stress=alternating_shear_stress,
                                    mean_normal_stress=mean_normal_stress,
                                    mean_torsion_stress=mean_shear_stress)
 
-print(f"Mean Equivalent Stress={fatigue_analysis.mean_equivalent_stress}\n"
-      f"Alternating Equivalent Stress={fatigue_analysis.alternating_equivalent_stress}")
+print(f"Mean Equivalent Stress={fatigue_analysis.mean_eq_stress}\n"
+      f"Alternating Equivalent Stress={fatigue_analysis.alt_eq_stress}")
 
 # safety factor
 nF_modified_goodman = fatigue_analysis.modified_goodman
@@ -86,12 +86,12 @@ nF, nl = fatigue_analysis.get_safety_factor('modified Goodman')
 print(f"Safety factors for infinite cycles: nF={nF.subs(F, 6e3)}, nl={nl.subs(F, 6e3)}")
 
 # calculating the number of cycles until failure for F=6000
-# assigning F=6000 in the mean and alternating stress attributes in the existing fatigue_analysis
-fatigue_analysis.mean_equivalent_stress = fatigue_analysis.mean_equivalent_stress.subs(F, 6000)
-fatigue_analysis.alternating_equivalent_stress = fatigue_analysis.alternating_equivalent_stress.subs(F, 6000)
+# assigning F=6000 in the mean and alternating stress attributes in the existing fatigue
+fatigue_analysis.mean_eq_stress = fatigue_analysis.mean_eq_stress.subs(F, 6000)
+fatigue_analysis.alt_eq_stress = fatigue_analysis.alt_eq_stress.subs(F, 6000)
 
-print("Mean Equivalent Stress:", fatigue_analysis.mean_equivalent_stress,
-      "\nAlternating Equivalent Stress:", fatigue_analysis.alternating_equivalent_stress)
+print("Mean Equivalent Stress:", fatigue_analysis.mean_eq_stress,
+      "\nAlternating Equivalent Stress:", fatigue_analysis.alt_eq_stress)
 
 # number of cycles until failure
 print(f"N={fatigue_analysis.num_of_cycle()[0]:,.2e}, Sf={fatigue_analysis.num_of_cycle()[1]:,.2f}")

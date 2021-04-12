@@ -2,8 +2,8 @@ from springs import HelicalPushSpring
 from sympy import symbols
 
 G = 75e3  # [Mpa]
-d = symbols('d', real=True, positive=True, rational=True)
-C = 8  # the spring index C is defined as D/d
+d = symbols('diameter', real=True, positive=True, rational=True)
+C = 8  # the spring index C is defined as D/diameter
 D = C * d
 
 Fmax = 575
@@ -17,9 +17,9 @@ print(f"Fsolid = {Fs}")
 Ap = 2211
 m = 0.145
 
-spring = HelicalPushSpring(max_force=Fmax, Ap=Ap, m=m, yield_percent=0.4, wire_diameter=d, spring_diameter=D,
-                           shear_modulus=G, end_type='squared and ground', spring_constant=6.189, zeta=0.25,
-                           set_removed=False, shot_peened=True)
+spring = HelicalPushSpring(force=Fmax, Ap=Ap, m=m, yield_percent=0.4, wire_diameter=d,
+                           spring_diameter=D, shear_modulus=G, end_type='squared and ground',
+                           spring_constant=6.189, set_removed=False, shot_peened=True, zeta=0.25)
 
 # spring diameter for solid state safety factor of 1.5
 print(f"minimum wire diameter for Fsolid = {spring.min_wire_diameter(1.5, solid=True)}")
@@ -34,9 +34,10 @@ print(f"collapse: {buckling[0]}, max free length (L0) = {buckling[1]}")
 nf, ns = spring.fatigue_analysis(575, 185, 99.999)
 print(f"fatigue safety factor={nf}, safety factor for first cycle={ns}\n")
 
-spring2 = HelicalPushSpring(max_force=Fmax, Ap=2211, m=0.145, yield_percent=0.45, wire_diameter=6, spring_diameter=60,
-                            shear_modulus=G, end_type='squared and ground', spring_constant=6, set_removed=False,
-                            shot_peened=True, anchor='fixed-hinged', elastic_modulus=205e3)
+spring2 = HelicalPushSpring(force=Fmax, Ap=2211, m=0.145, yield_percent=0.45, wire_diameter=6,
+                            spring_diameter=60, shear_modulus=G, end_type='squared and ground',
+                            spring_constant=6, elastic_modulus=205e3, set_removed=False,
+                            shot_peened=True, anchors='fixed-hinged')
 print()
 print(f"static safety factor = {spring2.static_safety_factor}")
 print(f"minimum wire diameter for n=2: {spring2.min_wire_diameter(2)}")

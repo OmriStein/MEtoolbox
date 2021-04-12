@@ -10,9 +10,9 @@ d = 1.8
 G, Ap, m, yield_percent = 82.7e3, 2211, 0.145, 0.6
 K = force / (L0 - Lw)
 print(f"K={K}")
-spring = HelicalPushSpring(max_force=force, Ap=Ap, m=m, yield_percent=yield_percent, wire_diameter=d, spring_diameter=D,
-                           shear_modulus=G, end_type='squared and ground', spring_constant=K, set_removed=True,
-                           shot_peened=False)
+spring = HelicalPushSpring(force=force, Ap=Ap, m=m, yield_percent=yield_percent, wire_diameter=d,
+                           spring_diameter=D, shear_modulus=G, end_type='squared and ground',
+                           spring_constant=K, set_removed=True, shot_peened=False)
 
 # finding D with sympy
 n_static = spring.static_safety_factor()

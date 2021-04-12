@@ -1,4 +1,4 @@
-from fatigue_analysis import stress, EnduranceLimit, calc_kf, FatigueAnalysis
+from fatigue import stress, EnduranceLimit, calc_kf, FatigueAnalysis
 from math import pi, sqrt
 
 Sut = 900  # [Mpa]
@@ -40,16 +40,18 @@ Kfs = calc_kf(0.95, 1.12)
 
 print(f"Kf={Kf:.3f}, Kfs={Kfs:.3f}")
 
-fatigue_analysis = FatigueAnalysis(Sut=Sut, Sy=Sy, ductile=True, Kf_bending=Kf, Kf_torsion=Kfs,
-                                   endurance_limit=endurance_limit,
-                                   alternating_bending_stress=bending_stress,
+fatigue_analysis = FatigueAnalysis(endurance_limit=endurance_limit, ductile=True, Sy=Sy,
+                                   Kf_bending=Kf, Kf_torsion=Kfs, alt_bending_stress=bending_stress,
                                    mean_torsion_stress=torsion_stress)
 
-print(f"Mean Equivalent Stress={fatigue_analysis.mean_equivalent_stress}\n"
-      f"Alternating Equivalent Stress={fatigue_analysis.alternating_equivalent_stress}\n")
+print(f"Mean Equivalent Stress={fatigue_analysis.mean_eq_stress}\n"
+      f"Alternating Equivalent Stress={fatigue_analysis.alt_eq_stress}\n")
 
 nF, nl = fatigue_analysis.get_safety_factor('Modified Goodman', verbose=True)
-print()
+soderberg_nF, _ = fatigue_analysis.get_safety_factor('Soderberg')
+gerber_nF, _ = fatigue_analysis.get_safety_factor('gerber')
+asme_nF, _ = fatigue_analysis.get_safety_factor('asme-elliptic')
+print(f"soderberg={soderberg_nF} \ngerber={gerber_nF} \nasme={asme_nF}\n")
 
 # miner for time to failure every group is of the following structure:
 # [freq[Hz], alternating stresses, mean stresses]
