@@ -1,7 +1,9 @@
-# MEtoolbox
+# me_toolbox
 
 me_toolbox is a Python library meant to simplify the tedious
-calculations of mechanical design. This library contains general fatigue analysis tools and tools to help design gears, springs and more to come
+calculations of mechanical design and help speed up the design
+process. This library contains general fatigue analysis tools
+and gears and springs design tools.
 
 ## Installation
 
@@ -16,9 +18,9 @@ pip install me_toolbox
 ```python
 import me_toolbox.springs as springs 
 import me_toolbox.gears as gears
-springs.HelicalSpring(...)
-gears.SpurGear(...)
-gears.Transmission(...)
+spring_obj = springs.HelicalSpring(...)
+gear_obj = gears.SpurGear(...)
+trasmission_obj = gears.Transmission(...)
 ```
 
 ## Contributing

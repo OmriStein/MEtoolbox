@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/MEtoolbox.iml" filepath="$PROJECT_DIR$/.idea/MEtoolbox.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/me_toolbox.iml" filepath="$PROJECT_DIR$/.idea/me_toolbox.iml" />
     </modules>
   </component>
 </project>

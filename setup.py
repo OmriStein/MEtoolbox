@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="me_toolbox",
-    version="0.0.2",
+    version="0.0.6",
     author="Omri Stein",
     author_email="omri.stein@gmail.com",
     description="Mechanical engineering design tools",
@@ -16,11 +16,15 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/OmriStein/MEtoolbox/issues",
     },
     classifiers=[
-        "Programming Language :: Python :: 3",
+        'Development Status :: 1 - Planning',
+        'Intended Audience :: Engineers',
+        'Topic :: Scientific/Engineering :: Mechanical Engineering',
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "me_toolbox"},
-    packages=setuptools.find_packages(where="me_toolbox"),
-    python_requires=">=3.6",
+    package_dir={"me_toolbox": "me_toolbox"},
+    packages=setuptools.find_packages(),
+    install_requires=['sympy', 'numpy'],
+    python_requires=">=3.9",
 )
