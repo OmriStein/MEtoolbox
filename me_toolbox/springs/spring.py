@@ -1,8 +1,11 @@
+# third party
 import numpy as np
 
+# internal package
 from me_toolbox.tools import print_atributes
 
 
+# TODO: add optimization based on cost and other needs
 class Spring:
     def __init__(self, force, Ap, m, yield_percent, wire_diameter, spring_diameter, shear_modulus,
                  shot_peened):
