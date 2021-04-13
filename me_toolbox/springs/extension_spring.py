@@ -4,27 +4,30 @@ from sympy import Symbol  # pylint: disable=unused-import
 
 from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import Spring, HelicalPushSpring
+from me_toolbox.tools import percent_to_decimal
 
 
 class ExtensionSpring(Spring):
     """An extension spring object"""
 
-    def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter,
-                 Ap, m, hook_r1, hook_r2, shear_modulus, elastic_modulus, yield_percent,
-                 bending_yield_percent, spring_constant=None, active_coils=None, shot_peened=False,
-                 body_coils=None, free_length=None, density=None, working_frequency=None):
+    def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, Ap, m,
+                 hook_r1, hook_r2, shear_modulus, elastic_modulus, body_torsion_yield_percent,
+                 end_bending_yield_percent, end_torsion_yield_percent, spring_constant=None,
+                 active_coils=None, shot_peened=False, body_coils=None, free_length=None,
+                 density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
         :param float hook_r1: hook internal radius
         :param float hook_r2: hook bend radius
         """
         self.constructing = True
-        super().__init__(max_force, Ap, m, yield_percent, wire_diameter, spring_diameter,
-                         shear_modulus, shot_peened)
+        super().__init__(max_force, Ap, m, body_torsion_yield_percent, wire_diameter,
+                         spring_diameter, shear_modulus, shot_peened)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1
         self.hook_r2 = hook_r2
-        self.bending_yield_percent = bending_yield_percent
+        self.end_bending_yield_percent = end_bending_yield_percent
+        self.end_torsion_yield_percent = end_torsion_yield_percent
         self.elastic_modulus = elastic_modulus
         self.density = density
         self.working_frequency = working_frequency
@@ -68,21 +71,22 @@ class ExtensionSpring(Spring):
         return good_design
 
     @property
-    def yield_strength(self):  # pylint: disable=invalid-name
+    def end_bending_yield_strength(self):  # pylint: disable=invalid-name
         """getter for the yield strength attribute (Sy = % * Sut)
 
-        :returns: The yield strength
+        :returns: end bending yield strength
         :rtype: float
         """
-        if 1 <= self.bending_yield_percent <= 100:
-            # if the yield_percent is in percentage form divide by 100
-            yield_strength = (self.bending_yield_percent / 100) * self.ultimate_tensile_strength
-        elif 0 < self.bending_yield_percent < 1:
-            # if the yield_percent is in decimal form no correction needed
-            yield_strength = self.bending_yield_percent * self.ultimate_tensile_strength
-        else:
-            raise ValueError("something is wrong with the bending yield percentage")
-        return yield_strength
+        return percent_to_decimal(self.end_bending_yield_percent) * self.ultimate_tensile_strength
+
+    @property
+    def end_torsion_yield_strength(self):  # pylint: disable=invalid-name
+        """getter for the yield strength attribute (Sy = % * Sut)
+
+        :returns: end bending yield strength
+        :rtype: float
+        """
+        return percent_to_decimal(self.end_torsion_yield_percent) * self.ultimate_tensile_strength
 
     @property
     def wire_diameter(self):
@@ -362,15 +366,20 @@ class ExtensionSpring(Spring):
                 self.body_coils + 1) * self.wire_diameter
 
     def static_safety_factor(self):  # pylint: disable=unused-argument
-        """ Returns the static safety factors for torsion and
-        for bending, according to the object attributes
+        """ Returns the static safety factors for the hook (torsion and
+        bending), and for the spring's body (torsion)
 
-        :returns: static factor of safety
-        :type: tuple[float, float] or tuple[Symbol, Symbol]
+        :returns: Spring's body (torsion) safety factor, Spring's hook bending safety factor,
+            Spring's hook torsion safety factor
+        :type: tuple[float, float, float] or tuple[Symbol, Symbol, Symbol]
         """
-        nb = self.shear_yield_strength / self.shear_stress
-        na = self.yield_strength / self.normal_stress
-        return nb, na
+        n_body = self.shear_yield_strength / (
+                    (8 * self.factor_Kw * self.force * self.spring_diameter) / (
+                    pi * self.wire_diameter ** 3))
+        n_hook_normal = self.end_bending_yield_strength / self.normal_stress
+        n_hook_torsion = self.end_torsion_yield_strength / self.shear_stress
+
+        return n_body, n_hook_normal, n_hook_torsion
 
     @property
     def deflection(self):
@@ -431,15 +440,16 @@ class ExtensionSpring(Spring):
 
         Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
         Ssu = self.shear_ultimate_strength
-        Ssy = self.shear_yield_strength
-        Sy = self.yield_strength
+        Ssy_body = self.shear_yield_strength
+        Ssy_end = self.end_torsion_yield_strength
+        Sy_end = self.end_bending_yield_strength
         Se = Sse / 0.577  # estimation using distortion-energy theory
         Sut = self.ultimate_tensile_strength
 
-        nf_hook_normal, _ = FailureCriteria.get_safety_factor(Sy, Sut, Se, alt_normal_stress,
+        nf_hook_normal, _ = FailureCriteria.get_safety_factor(Sy_end, Sut, Se, alt_normal_stress,
                                                               mean_normal_stress, criterion)
 
-        nf_hook_shear, _ = FailureCriteria.get_safety_factor(Ssy, Ssu, Sse, alt_shear_stress,
+        nf_hook_shear, _ = FailureCriteria.get_safety_factor(Ssy_end, Ssu, Sse, alt_shear_stress,
                                                              mean_shear_stress, criterion)
 
         # calculating mean and alternating stresses for the body section
@@ -450,7 +460,8 @@ class ExtensionSpring(Spring):
                 pi * self.wire_diameter ** 3)
         mean_body_shear_stress = (mean_force / alt_force) * alt_shear_stress
 
-        nf_body, ns_body = FailureCriteria.get_safety_factor(Ssy, Ssu, Sse, alt_body_shear_stress,
+        nf_body, ns_body = FailureCriteria.get_safety_factor(Ssy_body, Ssu, Sse,
+                                                             alt_body_shear_stress,
                                                              mean_body_shear_stress, criterion)
 
         if verbose:
@@ -463,7 +474,7 @@ class ExtensionSpring(Spring):
                   f"Mean body shear stress = {mean_body_shear_stress}\n"
                   f"Sse = {Sse}, Se = {Se}")
 
-        return nf_hook_normal, nf_hook_shear, nf_body, ns_body
+        return nf_body, ns_body, nf_hook_normal, nf_hook_shear
 
     def min_wire_diameter(self, static_safety_factor):
         """The minimal wire diameters (for shear and normal stresses)
@@ -484,7 +495,7 @@ class ExtensionSpring(Spring):
         min_diam_shear = 0
         while abs(factor_k - temp_k) > 1e-3:
             diam = ((8 * factor_k * self.force * self.spring_index * static_safety_factor)
-                    / (self.yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
+                    / (self.end_torsion_yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
             if isinstance(diam, float):
                 min_diam_shear = diam
             else:
@@ -497,23 +508,20 @@ class ExtensionSpring(Spring):
         while abs(factor_k - temp_k) > 1e-3:
             diam = ((factor_k * self.force * (
                     16 * self.spring_index + 4) * static_safety_factor) / (
-                            self.bending_yield_percent * self.Ap * pi)) ** (
+                            self.end_bending_yield_percent * self.Ap * pi)) ** (
                            1 / (2 - self.m))
             if isinstance(diam, float):
                 min_diam_normal = diam
             else:
                 break
             temp_k = factor_k
-            # try:
-            #     c1 = (2 * self.hook_r1) / min_diam_normal
-            # except ZeroDivisionError:  # fixme: find another way to solve
-            #     print("Failed to calculate minimum diameter for normal forces")
-            #     min_diam_normal = None
 
-            # factor_k = (4 * c1 ** 2 - c1 - 1) / 4 * c1 * (c1 - 1)
             factor_k = (16 * self.hook_r1 ** 2 - 2 * self.hook_r1 * diam - diam ** 2) / (
-                        16 * self.hook_r1 ** 2 - 8 * self.hook_r1 * diam)
-        return min_diam_shear, min_diam_normal
+                    16 * self.hook_r1 ** 2 - 8 * self.hook_r1 * diam)
+            if isinstance(min_diam_shear, float) and isinstance(min_diam_normal, float):
+                return max(min_diam_shear, min_diam_normal)
+            else:
+                return min_diam_shear, min_diam_normal
 
     def min_spring_diameter(self, static_safety_factor):
         """return the minimum spring diameter to avoid static failure
@@ -525,13 +533,13 @@ class ExtensionSpring(Spring):
         :rtype: float or Symbol
         """
         # extracted from shear stress
-        diameter_shear = (self.shear_yield_strength * pi * self.wire_diameter ** 3) / (
+        diameter_shear = (self.end_torsion_yield_strength * pi * self.wire_diameter ** 3) / (
                 self.hook_KB * 8 * self.force * static_safety_factor)
         # extracted from normal stress
         diameter_normal = (1 / (4 * self.hook_KA)) * \
-                          (((self.yield_strength * pi * self.wire_diameter ** 3) /
+                          (((self.end_bending_yield_strength * pi * self.wire_diameter ** 3) /
                             (4 * self.force * static_safety_factor)) - self.wire_diameter)
-        return min(diameter_shear, diameter_normal)
+        return max(diameter_shear, diameter_normal)
 
     def natural_frequency(self, density):
         """Figures out what is the natural frequency of the spring
