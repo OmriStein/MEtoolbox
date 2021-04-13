@@ -296,15 +296,15 @@ class ExtensionSpring(Spring):
         return (4 * C2 - 1) / (4 * C2 - 4)
 
     @property
-    def normal_stress(self):
+    def max_hook_normal_stress(self):
         """The normal stress due to bending and axial loads
 
         :returns: Normal stress
         :rtype: float or Symbol
         """
-        return self.calc_normal_stress(self.force)
+        return self.calc_max_normal_stress(self.force)
 
-    def calc_normal_stress(self, force):
+    def calc_max_normal_stress(self, force):
         """Calculates the normal stress based on the force given
 
         :param float of Symbol force: Working force of the spring
@@ -317,23 +317,34 @@ class ExtensionSpring(Spring):
                                 4 / (pi * self.wire_diameter ** 2)))
 
     @property
-    def shear_stress(self):
-        """The spring's torsion stress
+    def max_hook_shear_stress(self):
+        """The spring's hook torsion stress
 
-        :returns: Torsion stress
+        :returns: Hook torsion stress
         :rtype: float
         """
-        return self.calc_shear_stress(self.force)
+        return self.calc_max_shear_stress(self.force)
 
-    def calc_shear_stress(self, force):
+    @property
+    def max_body_shear_stress(self):
+        """The spring's body torsion stress
+
+        :returns: Body torsion stress
+        :rtype: float
+        """
+        return self.calc_max_shear_stress(self.force, hook=False)
+
+    def calc_max_shear_stress(self, force, hook=True):
         """Calculates the torsion stress based on the force given
 
         :param float of Symbol force: Working force of the spring
-
+        :param bool hook: True when calculating for spring's hook,
+            False when calculating for spring's body
         :returns: Torsion stress
         :rtype: float or Symbol
         """
-        return (self.hook_KB * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
+        k_factor = self.hook_KB if hook else self.factor_Kw
+        return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
 
     @property
     def free_length(self):
@@ -373,11 +384,10 @@ class ExtensionSpring(Spring):
             Spring's hook torsion safety factor
         :type: tuple[float, float, float] or tuple[Symbol, Symbol, Symbol]
         """
-        n_body = self.shear_yield_strength / (
-                    (8 * self.factor_Kw * self.force * self.spring_diameter) / (
-                        pi * self.wire_diameter ** 3))
-        n_hook_normal = self.end_bending_yield_strength / self.normal_stress
-        n_hook_torsion = self.end_torsion_yield_strength / self.shear_stress
+
+        n_body = self.shear_yield_strength / self.max_body_shear_stress
+        n_hook_normal = self.end_bending_yield_strength / self.max_hook_normal_stress
+        n_hook_torsion = self.end_torsion_yield_strength / self.max_hook_shear_stress
 
         return n_body, n_hook_normal, n_hook_torsion
 
@@ -432,10 +442,10 @@ class ExtensionSpring(Spring):
 
         # calculating mean and alternating stresses for the hook section
         # shear stresses:
-        alt_shear_stress = self.calc_shear_stress(alt_force)
+        alt_shear_stress = self.calc_max_shear_stress(alt_force)
         mean_shear_stress = (mean_force / alt_force) * alt_shear_stress
         # normal stresses due to bending:
-        alt_normal_stress = self.calc_normal_stress(alt_force)
+        alt_normal_stress = self.calc_max_normal_stress(alt_force)
         mean_normal_stress = (mean_force / alt_force) * alt_normal_stress
 
         Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
@@ -454,10 +464,7 @@ class ExtensionSpring(Spring):
 
         # calculating mean and alternating stresses for the body section
         # shear stresses:
-        factor_kw = (4 * self.spring_index - 1) / (4 * self.spring_index - 4) + (
-                0.615 / self.spring_index)
-        alt_body_shear_stress = (8 * factor_kw * alt_force * self.spring_diameter) / (
-                pi * self.wire_diameter ** 3)
+        alt_body_shear_stress = self.calc_max_shear_stress(alt_force, hook=False)
         mean_body_shear_stress = (mean_force / alt_force) * alt_shear_stress
 
         nf_body, ns_body = FailureCriteria.get_safety_factor(Ssy_body, Ssu, Sse,
