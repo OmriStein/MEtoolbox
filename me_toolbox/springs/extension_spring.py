@@ -3,7 +3,7 @@ from math import pi
 from sympy import Symbol  # pylint: disable=unused-import
 
 from me_toolbox.fatigue import FailureCriteria
-from me_toolbox.springs import Spring
+from me_toolbox.springs import Spring, HelicalPushSpring
 
 
 class ExtensionSpring(Spring):
@@ -368,7 +368,9 @@ class ExtensionSpring(Spring):
         :returns: static factor of safety
         :type: tuple[float, float] or tuple[Symbol, Symbol]
         """
-        return self.shear_yield_strength / self.shear_stress, self.yield_strength / self.normal_stress
+        nb = self.shear_yield_strength / self.shear_stress
+        na = self.yield_strength / self.normal_stress
+        return nb, na
 
     @property
     def deflection(self):
@@ -466,9 +468,12 @@ class ExtensionSpring(Spring):
     def min_wire_diameter(self, static_safety_factor):
         """The minimal wire diameters (for shear and normal stresses)
         for a given safety factor in order to avoid failure,
-        according to the spring parameters
 
-        Note: for static use only
+        NOTE: Because KA and KB contains d no simple solution is available as in the
+            HelicalPushSpring, so we assume an initial K and iterate until convergence,
+            be aware that for some static_safety_factor a convergence my not occur.
+
+        NOTE: for static use only
 
         :param float static_safety_factor: factor of safety
 
@@ -476,6 +481,7 @@ class ExtensionSpring(Spring):
         :rtype: float or Symbol
         """
         factor_k, temp_k = 1.1, 0
+        min_diam_shear = 0
         while abs(factor_k - temp_k) > 1e-3:
             diam = ((8 * factor_k * self.force * self.spring_index * static_safety_factor)
                     / (self.yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
@@ -487,6 +493,7 @@ class ExtensionSpring(Spring):
             factor_k = (8 * self.hook_r2 - min_diam_shear) / (8 * self.hook_r2 - 4 * min_diam_shear)
 
         factor_k, temp_k = 1.1, 0
+        min_diam_normal = 0
         while abs(factor_k - temp_k) > 1e-3:
             diam = ((factor_k * self.force * (
                     16 * self.spring_index + 4) * static_safety_factor) / (
@@ -497,13 +504,15 @@ class ExtensionSpring(Spring):
             else:
                 break
             temp_k = factor_k
-            try:
-                c1 = self.hook_r1 / min_diam_normal
-            except ZeroDivisionError:  # fixme: find another way to solve
-                print("Failed to calculate minimum diameter for normal forces")
-                min_diam_normal = None
-            factor_k = (4 * c1 ** 2 - c1 - 1) / 4 * c1 * (c1 - 1)
+            # try:
+            #     c1 = (2 * self.hook_r1) / min_diam_normal
+            # except ZeroDivisionError:  # fixme: find another way to solve
+            #     print("Failed to calculate minimum diameter for normal forces")
+            #     min_diam_normal = None
 
+            # factor_k = (4 * c1 ** 2 - c1 - 1) / 4 * c1 * (c1 - 1)
+            factor_k = (16 * self.hook_r1 ** 2 - 2 * self.hook_r1 * diam - diam ** 2) / (
+                        16 * self.hook_r1 ** 2 - 8 * self.hook_r1 * diam)
         return min_diam_shear, min_diam_normal
 
     def min_spring_diameter(self, static_safety_factor):
@@ -519,8 +528,9 @@ class ExtensionSpring(Spring):
         diameter_shear = (self.shear_yield_strength * pi * self.wire_diameter ** 3) / (
                 self.hook_KB * 8 * self.force * static_safety_factor)
         # extracted from normal stress
-        diameter_normal = (1 / (4 * self.hook_KA)) * (((self.yield_strength * pi * self.wire_diameter ** 3) / (
-                    4 * self.force * static_safety_factor)) - self.wire_diameter)
+        diameter_normal = (1 / (4 * self.hook_KA)) * \
+                          (((self.yield_strength * pi * self.wire_diameter ** 3) /
+                            (4 * self.force * static_safety_factor)) - self.wire_diameter)
         return min(diameter_shear, diameter_normal)
 
     def natural_frequency(self, density):
@@ -531,7 +541,7 @@ class ExtensionSpring(Spring):
         :returns: Natural frequency
         :rtype: float
         """
-        springs.HelicalPushSpring.natural_frequency(self, density)
+        HelicalPushSpring.natural_frequency(self, density)
 
     def weight(self, density):
         """Return's the spring *active coils* weight according to the specified density
@@ -541,7 +551,7 @@ class ExtensionSpring(Spring):
         :returns: Spring weight
         :type: float or Symbol
         """
-        springs.HelicalPushSpring.weight(self, density)
+        HelicalPushSpring.weight(self, density)
 
     def _na_k_sorter(self, *args):
         """The active coils, body coils and the spring

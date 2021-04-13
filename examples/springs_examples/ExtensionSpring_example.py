@@ -1,5 +1,6 @@
 from me_toolbox.springs import ExtensionSpring
 from me_toolbox.tools import inch_to_millimetre as im
+from me_toolbox.tools import millimetre_to_inch as mi
 from me_toolbox.tools import pound_force_to_newtons as pn
 
 outer_diameter = im(0.248)
@@ -23,4 +24,5 @@ spring = ExtensionSpring(max_force=Fmax, initial_tension=Fi, wire_diameter=d, sp
 
 nf_hook_a, nf_hook_b, nf_body, ns_body = spring.fatigue_analysis(Fmax, Fmin, 50, verbose=False)
 print(f"nf_hook_a={nf_hook_a}, nf_hook_b={nf_hook_b}, nf_body={nf_body}, ns_body={ns_body}")
-print(spring.min_spring_diameter(1.5))
+print(mi(spring.min_spring_diameter(1.5)))
+print(mi(spring.min_wire_diameter(1.5)))

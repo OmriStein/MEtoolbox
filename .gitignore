@@ -1,3 +1,5 @@
 /venv/
 /me_toolbox/me_toolbox.egg-info/
-/.idea
+/.idea/
+/build/
+/dist/
