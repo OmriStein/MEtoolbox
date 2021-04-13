@@ -1,6 +1,6 @@
 import numpy as np
 
-from tools import print_atributes
+from me_toolbox.tools import print_atributes
 
 
 class Spring:

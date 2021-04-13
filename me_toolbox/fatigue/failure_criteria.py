@@ -1,6 +1,6 @@
-"""Fatigue Failure criteria as described in Shigley's Mechanical Engineering design"""
-from logging import critical
-
+"""a module containing the FatigueCriteria class
+containing the Failure criteria as described in
+Shigley's Mechanical Engineering design"""
 from sympy import sqrt
 
 

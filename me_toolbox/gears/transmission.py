@@ -1,7 +1,7 @@
 """Module containing the Transmission Class"""
 # I want the variables names to be the same as in AGMA pylint: disable=invalid-name
 from math import cos, sin, log, sqrt, radians, pi
-from tools import print_atributes
+from me_toolbox.tools import print_atributes
 
 
 class GearTypeError(ValueError):

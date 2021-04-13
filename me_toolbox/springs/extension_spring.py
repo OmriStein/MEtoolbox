@@ -2,11 +2,11 @@
 from math import pi
 from sympy import Symbol  # pylint: disable=unused-import
 
-from fatigue import FailureCriteria
-import springs
+from me_toolbox.fatigue import FailureCriteria
+from me_toolbox.springs import Spring
 
 
-class ExtensionSpring(springs.Spring):
+class ExtensionSpring(Spring):
     """An extension spring object"""
 
     def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter,

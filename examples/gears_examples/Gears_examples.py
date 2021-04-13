@@ -1,4 +1,4 @@
-from gears import SpurGear, Transmission, HelicalGear
+from me_toolbox.gears import SpurGear, Transmission, HelicalGear
 
 pinion = SpurGear(name='pinion', modulus=4, pressure_angle=25, teeth_num=25, rpm=1500, grade=2, Qv=11, crowned=False,
                   adjusted=True, width=25, bearing_span=10, pinion_offset=2, enclosure='extra precision enclosed',

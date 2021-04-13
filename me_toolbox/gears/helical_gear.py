@@ -3,8 +3,8 @@
 from math import sin, cos, radians, pi, tan, atan, sqrt, degrees
 import os
 import numpy as np
-from gears.spur_gear import SpurGear  # for inheritance
-from tools import table_interpolation
+from me_toolbox.gears import SpurGear  # for inheritance
+from me_toolbox.tools import table_interpolation
 
 
 class HelicalGear(SpurGear):

@@ -2,11 +2,11 @@
 from math import pi, sqrt
 from sympy import Symbol  # pylint: disable=unused-import
 
-from fatigue import FailureCriteria
-import springs
+from me_toolbox.fatigue import FailureCriteria
+from me_toolbox.springs import Spring
 
 
-class HelicalPushSpring(springs.Spring):
+class HelicalPushSpring(Spring):
     """A helical push spring object"""
 
     def __init__(self, force, Ap, m, yield_percent, wire_diameter, spring_diameter,

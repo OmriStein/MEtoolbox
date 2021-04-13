@@ -1,14 +1,15 @@
+"""module containing the table interpolation function"""
 import numpy as np
 
 
 class NotInRangeError(ValueError):
     def __init__(self, var, num, range_):
-        """ :keyword var: var assigned to
-            :type var: str
-            :keyword num: num to assign
-            :type num: float
-            :keyword range_: permitted range
-            :type range_: tuple """
+        """Error for when value is not in the specified range
+
+        :param str var: var assigned to
+        :param float num: num to assign
+        :param tuple range_: permitted range
+        """
 
         self.num = num
         self.range_ = range_

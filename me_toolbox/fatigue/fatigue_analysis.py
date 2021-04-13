@@ -1,8 +1,8 @@
 from math import log10
 from sympy import sqrt
-from tools import NotInRangeError, print_atributes
+from me_toolbox.tools import NotInRangeError, print_atributes
 from sympy import oo
-from fatigue import FailureCriteria
+from me_toolbox.fatigue import FailureCriteria
 
 
 def calc_kf(q, Kt):

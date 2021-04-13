@@ -1,6 +1,6 @@
-from springs import ExtensionSpring
-from tools import inch_to_millimetre as im
-from tools import pound_force_to_newtons as pn
+from me_toolbox.springs import ExtensionSpring
+from me_toolbox.tools import inch_to_millimetre as im
+from me_toolbox.tools import pound_force_to_newtons as pn
 
 outer_diameter = im(0.248)
 d = im(0.035)

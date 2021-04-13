@@ -1,4 +1,4 @@
-from springs import HelicalPushSpring
+from me_toolbox.springs import HelicalPushSpring
 from sympy import symbols, Eq, solveset
 
 outer_diameter = 14.29

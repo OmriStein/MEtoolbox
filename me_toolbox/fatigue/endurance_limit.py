@@ -1,6 +1,5 @@
+"""a module containing the EnduranceLimit class"""
 from math import sqrt
-
-from tools import print_atributes
 
 
 class EnduranceLimit:

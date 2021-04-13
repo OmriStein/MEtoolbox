@@ -3,7 +3,7 @@
 from math import pi, log, sqrt, tan, radians, cos, sin
 import os
 import numpy as np
-from tools import table_interpolation
+from me_toolbox.tools import table_interpolation
 
 
 class SpurGear:

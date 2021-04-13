@@ -1,5 +1,4 @@
-__all__ = ['uniform_stress', 'bending_stress', 'shear_bending_stress', 'torsion_stress',
-           'max_shear_stress']
+"""A module containing stress calculation functions"""
 
 
 # TODO: better stress calculation
