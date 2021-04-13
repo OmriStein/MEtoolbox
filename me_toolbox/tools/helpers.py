@@ -115,3 +115,19 @@ def millimetre_to_inch(val):
         return val / 25.4
     except TypeError:
         return [x / 25.4 for x in val]
+
+
+def percent_to_decimal(var):
+    """if input in percent (>=1) convert to decimal"""
+    if not isinstance(var, list) and not isinstance(var, tuple):
+        dec = var / 100 if var >= 1 else var
+    else:
+        dec = []
+        for val in var:
+            if val >= 1:
+                # if var is in percentage form divide by 100
+                dec.append(val / 100)
+            else:
+                # if var is in decimal form no correction needed
+                dec.append(val)
+    return dec
