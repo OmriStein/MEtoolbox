@@ -25,6 +25,7 @@ setuptools.setup(
     ],
     package_dir={"me_toolbox": "me_toolbox"},
     packages=setuptools.find_packages(),
+    include_package_data=True,
     install_requires=['sympy', 'numpy'],
     python_requires=">=3.9",
 )
