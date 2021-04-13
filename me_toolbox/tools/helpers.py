@@ -2,6 +2,12 @@
 
 
 def print_atributes(obj):
+    """prints all of the attributes of an object
+    excluding the dunder attributes and attributes
+     with a single leading underscore
+
+    :param obj: any object
+    """
     attribute_list = [attribute for attribute in dir(obj) if
                       not callable(getattr(obj, attribute)) and attribute.startswith(
                           '__') is False and attribute.startswith('_') is False]
@@ -56,16 +62,56 @@ def parse_input(obj, fields, kwargs):
 
 # unit conversions
 def pound_force_to_newtons(val):
-    return val * 4.448
+    """convert pound force to newtons
+
+    :param float or list or tuple val: value to convert
+
+    :returns: converted value
+    :rtype: float or tuple
+    """
+    try:
+        return val * 4.448
+    except TypeError:
+        return [x * 4.448 for x in val]
 
 
 def newtons_to_pound_force(val):
-    return val / 4.448
+    """convert newtons to pound force
+
+    :param float or list or tuple val: value to convert
+
+    :returns: converted value
+    :rtype: float or tuple
+    """
+    try:
+        return val / 4.448
+    except TypeError:
+        return [x / 4.448 for x in val]
 
 
-def inch_to_millimetre(var):
-    return var * 25.4
+def inch_to_millimetre(val):
+    """convert inches in to millimeters
+
+    :param float or list or tuple val: value to convert
+
+    :returns: converted value
+    :rtype: float or tuple
+    """
+    try:
+        return val * 25.4
+    except TypeError:
+        return [x * 25.4 for x in val]
 
 
 def millimetre_to_inch(val):
-    return val / 25.4
+    """convert millimetres to inches
+
+    :param float or list or tuple val: value to convert
+
+    :returns: converted value
+    :rtype: float or tuple
+    """
+    try:
+        return val / 25.4
+    except TypeError:
+        return [x / 25.4 for x in val]
