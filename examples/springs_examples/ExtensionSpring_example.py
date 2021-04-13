@@ -12,17 +12,20 @@ Fi = pn(1.19)
 Nb = 12.17
 Fmax = pn(5)
 Fmin = pn(1.5)
-# Chrome-vanadium wire
-Ap, m, yield_percent, bending_yield_percent = 2005, 0.168, 0.45, 0.75
+# Hard drawn wire
+Ap, m = 1783, 0.190
 G, E = 77.2e3, 203.4e3  # in [Mpa]
-
 spring = ExtensionSpring(max_force=Fmax, initial_tension=Fi, wire_diameter=d, spring_diameter=D,
                          Ap=Ap, m=m, hook_r1=r1, hook_r2=r2, shear_modulus=G, elastic_modulus=E,
-                         yield_percent=yield_percent, bending_yield_percent=bending_yield_percent,
+                         end_torsion_yield_percent=0.4, end_bending_yield_percent=0.75,
+                         body_torsion_yield_percent=0.45,
                          spring_constant=None, active_coils=None, body_coils=12.17,
                          free_length=None, density=None, working_frequency=None)
 
-nf_hook_a, nf_hook_b, nf_body, ns_body = spring.fatigue_analysis(Fmax, Fmin, 50, verbose=False)
-print(f"nf_hook_a={nf_hook_a}, nf_hook_b={nf_hook_b}, nf_body={nf_body}, ns_body={ns_body}")
-print(mi(spring.min_spring_diameter(1.5)))
-print(mi(spring.min_wire_diameter(1.5)))
+n_body, n_hook_normal, n_hook_torsion = spring.static_safety_factor()
+print(f"ns_body={n_body}, ns_hook_normal={n_hook_normal}, ns_hook_torsion={n_hook_torsion}")
+nf_body, ns_body, nf_hook_bending, nf_hook_torsion = spring.fatigue_analysis(Fmax, Fmin, 50,)
+print(f"nf_body={nf_body}, ns_body={ns_body}, nf_hook_bending={nf_hook_bending},"
+      f"nf_hook_torsion={nf_hook_torsion}")
+print(f"minimum spring diameter = {mi(spring.min_spring_diameter(1.5))}")
+print(f"minimum wire diameter = {mi(spring.min_wire_diameter(1.5))}")
