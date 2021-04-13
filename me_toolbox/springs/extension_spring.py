@@ -375,7 +375,7 @@ class ExtensionSpring(Spring):
         """
         n_body = self.shear_yield_strength / (
                     (8 * self.factor_Kw * self.force * self.spring_diameter) / (
-                    pi * self.wire_diameter ** 3))
+                        pi * self.wire_diameter ** 3))
         n_hook_normal = self.end_bending_yield_strength / self.normal_stress
         n_hook_torsion = self.end_torsion_yield_strength / self.shear_stress
 
@@ -518,6 +518,7 @@ class ExtensionSpring(Spring):
 
             factor_k = (16 * self.hook_r1 ** 2 - 2 * self.hook_r1 * diam - diam ** 2) / (
                     16 * self.hook_r1 ** 2 - 8 * self.hook_r1 * diam)
+
             if isinstance(min_diam_shear, float) and isinstance(min_diam_normal, float):
                 return max(min_diam_shear, min_diam_normal)
             else:
