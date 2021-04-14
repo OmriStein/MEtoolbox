@@ -11,8 +11,8 @@ class ExtensionSpring(Spring):
     """An extension spring object"""
 
     def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, Ap, m,
-                 hook_r1, hook_r2, shear_modulus, elastic_modulus, body_torsion_yield_percent,
-                 end_bending_yield_percent, end_torsion_yield_percent, spring_constant=None,
+                 hook_r1, hook_r2, shear_modulus, elastic_modulus, body_shear_yield_percent,
+                 end_normal_yield_percent, end_shear_yield_percent, spring_constant=None,
                  active_coils=None, shot_peened=False, body_coils=None, free_length=None,
                  density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
@@ -20,14 +20,14 @@ class ExtensionSpring(Spring):
         :param float hook_r2: hook bend radius
         """
         self.constructing = True
-        super().__init__(max_force, Ap, m, body_torsion_yield_percent, wire_diameter,
+        super().__init__(max_force, Ap, m, body_shear_yield_percent, wire_diameter,
                          spring_diameter, shear_modulus, shot_peened)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1
         self.hook_r2 = hook_r2
-        self.end_bending_yield_percent = end_bending_yield_percent
-        self.end_torsion_yield_percent = end_torsion_yield_percent
+        self.end_normal_yield_percent = end_normal_yield_percent
+        self.end_shear_yield_percent = end_shear_yield_percent
         self.elastic_modulus = elastic_modulus
         self.density = density
         self.working_frequency = working_frequency
@@ -71,22 +71,22 @@ class ExtensionSpring(Spring):
         return good_design
 
     @property
-    def end_bending_yield_strength(self):  # pylint: disable=invalid-name
+    def end_normal_yield_strength(self):  # pylint: disable=invalid-name
         """getter for the yield strength attribute (Sy = % * Sut)
 
         :returns: end bending yield strength
         :rtype: float
         """
-        return percent_to_decimal(self.end_bending_yield_percent) * self.ultimate_tensile_strength
+        return percent_to_decimal(self.end_normal_yield_percent) * self.ultimate_tensile_strength
 
     @property
-    def end_torsion_yield_strength(self):  # pylint: disable=invalid-name
+    def end_shear_yield_strength(self):  # pylint: disable=invalid-name
         """getter for the yield strength attribute (Sy = % * Sut)
 
         :returns: end bending yield strength
         :rtype: float
         """
-        return percent_to_decimal(self.end_torsion_yield_percent) * self.ultimate_tensile_strength
+        return percent_to_decimal(self.end_shear_yield_percent) * self.ultimate_tensile_strength
 
     @property
     def wire_diameter(self):
@@ -343,6 +343,7 @@ class ExtensionSpring(Spring):
         :returns: Torsion stress
         :rtype: float or Symbol
         """
+        # TODO: check if a similar method in HelicalPushSpring can be used
         k_factor = self.hook_KB if hook else self.factor_Kw
         return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
 
@@ -386,10 +387,10 @@ class ExtensionSpring(Spring):
         """
 
         n_body = self.shear_yield_strength / self.max_body_shear_stress
-        n_hook_normal = self.end_bending_yield_strength / self.max_hook_normal_stress
-        n_hook_torsion = self.end_torsion_yield_strength / self.max_hook_shear_stress
+        n_hook_normal = self.end_normal_yield_strength / self.max_hook_normal_stress
+        n_hook_shear = self.end_shear_yield_strength / self.max_hook_shear_stress
 
-        return n_body, n_hook_normal, n_hook_torsion
+        return n_body, n_hook_normal, n_hook_shear
 
     @property
     def deflection(self):
@@ -451,8 +452,8 @@ class ExtensionSpring(Spring):
         Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
         Ssu = self.shear_ultimate_strength
         Ssy_body = self.shear_yield_strength
-        Ssy_end = self.end_torsion_yield_strength
-        Sy_end = self.end_bending_yield_strength
+        Ssy_end = self.end_shear_yield_strength
+        Sy_end = self.end_normal_yield_strength
         Se = Sse / 0.577  # estimation using distortion-energy theory
         Sut = self.ultimate_tensile_strength
 
@@ -502,7 +503,7 @@ class ExtensionSpring(Spring):
         min_diam_shear = 0
         while abs(factor_k - temp_k) > 1e-3:
             diam = ((8 * factor_k * self.force * self.spring_index * static_safety_factor)
-                    / (self.end_torsion_yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
+                    / (self.end_shear_yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
             if isinstance(diam, float):
                 min_diam_shear = diam
             else:
@@ -515,7 +516,7 @@ class ExtensionSpring(Spring):
         while abs(factor_k - temp_k) > 1e-3:
             diam = ((factor_k * self.force * (
                     16 * self.spring_index + 4) * static_safety_factor) / (
-                            self.end_bending_yield_percent * self.Ap * pi)) ** (
+                            self.end_normal_yield_percent * self.Ap * pi)) ** (
                            1 / (2 - self.m))
             if isinstance(diam, float):
                 min_diam_normal = diam
@@ -541,11 +542,11 @@ class ExtensionSpring(Spring):
         :rtype: float or Symbol
         """
         # extracted from shear stress
-        diameter_shear = (self.end_torsion_yield_strength * pi * self.wire_diameter ** 3) / (
+        diameter_shear = (self.end_shear_yield_strength * pi * self.wire_diameter ** 3) / (
                 self.hook_KB * 8 * self.force * static_safety_factor)
         # extracted from normal stress
         diameter_normal = (1 / (4 * self.hook_KA)) * \
-                          (((self.end_bending_yield_strength * pi * self.wire_diameter ** 3) /
+                          (((self.end_normal_yield_strength * pi * self.wire_diameter ** 3) /
                             (4 * self.force * static_safety_factor)) - self.wire_diameter)
         return max(diameter_shear, diameter_normal)
 
