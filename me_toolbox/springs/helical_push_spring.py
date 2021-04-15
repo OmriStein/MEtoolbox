@@ -9,9 +9,9 @@ from me_toolbox.springs import Spring
 class HelicalPushSpring(Spring):
     """A helical push spring object"""
 
-    def __init__(self, force, Ap, m, yield_percent, wire_diameter, spring_diameter,
-                 shear_modulus, end_type, spring_constant=None, active_coils=None,
-                 free_length=None, elastic_modulus=None, density=None, working_frequency=None,
+    def __init__(self, force, wire_diameter, spring_diameter, Ap, m, yield_percent,
+                 end_type, shear_modulus, elastic_modulus=None, spring_constant=None,
+                 active_coils=None, free_length=None, density=None, working_frequency=None,
                  set_removed=False, shot_peened=False, anchors=None, zeta=0.15):
         """Instantiate a helical push spring object with the given parameters
 
@@ -44,7 +44,7 @@ class HelicalPushSpring(Spring):
         """
         self.constructing = True  # flag so methods know they are being called from within __init__
         super().__init__(force, Ap, m, yield_percent, wire_diameter, spring_diameter,
-                         shear_modulus, shot_peened)
+                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency)
         if set_removed:
             print("Note: set should ONLY be removed for static loading"
                   "and NOT for periodical loading")
@@ -61,13 +61,9 @@ class HelicalPushSpring(Spring):
 
         self._na_k_sorter(active_coils, spring_constant)
         self.free_length = free_length
-
         self.anchors = anchors
-        self.elastic_modulus = elastic_modulus
-        self.density = density
-        self.working_frequency = working_frequency
 
-        self.check_design()  # check C and active_coils
+        self.check_design()
         self.constructing = False
 
     def check_design(self):
@@ -109,7 +105,7 @@ class HelicalPushSpring(Spring):
         free_length = self.free_length
         if isinstance(free_length, float) and (self.anchors is not None) \
                 and (self.elastic_modulus is not None):
-            buckling = self.buckling(self.anchors, self.elastic_modulus)
+            buckling = self.buckling
             if buckling[0]:
                 print(f"Note: buckling is accruing, max free length (free_length)= {buckling[1]}, "
                       f"free_length= {free_length}")
@@ -417,11 +413,10 @@ class HelicalPushSpring(Spring):
             return 0.25 * ((2 * alpha - self.wire_diameter) + sqrt(
                 (self.wire_diameter - 2 * alpha) ** 2 - 24 * alpha * self.wire_diameter))
 
-    def buckling(self, anchors, elastic_modulus):
-        """ Checks if the spring will buckle and find the maximum free length to avoid buckling
-
-        :param float elastic_modulus: elastic modulus
-        :param str anchors: the spring end condition (from Table 10-2)
+    @property
+    def buckling(self):
+        """ Checks if the spring will buckle and find the
+        maximum free length to avoid buckling
 
         :returns: True if spring is in danger of collapse and False if not,
             and the maximum free length(free_length) to avoid collapsing
@@ -431,9 +426,9 @@ class HelicalPushSpring(Spring):
         alpha = {'fixed-fixed': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}
 
         try:
-            collapse_test = (pi * self.spring_diameter / alpha[anchors.lower()]) * \
-                            sqrt((2 * (elastic_modulus - self.shear_modulus)) /
-                                 (2 * self.shear_modulus + elastic_modulus))
+            collapse_test = (pi * self.spring_diameter / alpha[self.anchors.lower()]) * \
+                            sqrt((2 * (self.elastic_modulus - self.shear_modulus)) /
+                                 (2 * self.shear_modulus + self.elastic_modulus))
         except ValueError as err:
             print(f"{err}, make sure E and G have the same units (Mpa)")
         except KeyError as key:

@@ -16,21 +16,44 @@ class ExtensionSpring(Spring):
                  active_coils=None, shot_peened=False, body_coils=None, free_length=None,
                  density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
+
+        :param float or Symbol max_force: The maximum load on the spring
+        :param float or Symbol initial_tension: The initial tension in the spring
+        :param float or Symbol wire_diameter: spring wire diameter
+        :param float or Symbol spring_diameter: spring diameter measured from
+            the center point of the wire diameter
+        :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
+        :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
         :param float hook_r1: hook internal radius
         :param float hook_r2: hook bend radius
+        :param float shear_modulus: Spring's material shear modulus
+        :param float elastic_modulus: Spring's material elastic modulus
+        :param float body_shear_yield_percent: Used to estimate the spring's body shear yield stress
+        :param float end_normal_yield_percent: Used to estimate the spring's hook yield stress
+        :param float end_shear_yield_percent: Used to estimate the spring's hook shear yield stress
+        :param float or None spring_constant: K - spring constant
+        :param float or None active_coils: active_coils - number of active coils
+        :param bool shot_peened: if True adds to fatigue strength
+        :param float or None body_coils: Spring's number of body coils
+        :param float or None free_length: the spring length when no force is applied
+        :param float or None density: Spring's material density
+            (used for buckling and weight calculations)
+        :param float or None working_frequency: the spring working frequency
+            (used for fatigue calculations)
+
+        :returns: HelicalPushSpring
+
         """
         self.constructing = True
-        super().__init__(max_force, Ap, m, body_shear_yield_percent, wire_diameter,
-                         spring_diameter, shear_modulus, shot_peened)
+        super().__init__(max_force, Ap, m, body_shear_yield_percent, wire_diameter, spring_diameter,
+                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1
         self.hook_r2 = hook_r2
         self.end_normal_yield_percent = end_normal_yield_percent
         self.end_shear_yield_percent = end_shear_yield_percent
-        self.elastic_modulus = elastic_modulus
-        self.density = density
-        self.working_frequency = working_frequency
+
         self.shot_peened = shot_peened
         self._na_k_sorter(active_coils, body_coils, spring_constant)
         self.free_length = free_length

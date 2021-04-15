@@ -11,7 +11,7 @@ from me_toolbox.tools import percent_to_decimal
 # TODO: add optimization based on cost and other needs
 class Spring:
     def __init__(self, force, Ap, m, torsion_yield_percent, wire_diameter, spring_diameter,
-                 shear_modulus, shot_peened):
+                 shear_modulus, elastic_modulus, shot_peened, density, working_frequency):
         self.force = force
         self.Ap = Ap
         self.m = m
@@ -19,7 +19,10 @@ class Spring:
         self.wire_diameter = wire_diameter
         self.spring_diameter = spring_diameter
         self.shear_modulus = shear_modulus
+        self.elastic_modulus = elastic_modulus
         self.shot_peened = shot_peened
+        self.density = density
+        self.working_frequency = working_frequency
 
     def get_info(self):
         """print all of the spring properties"""
