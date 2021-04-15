@@ -16,7 +16,7 @@ class SpurGear:
                  enclosure, hardness, pressure_angle, grade, work_hours=0, number_of_cycles=0,
                  crowned=False, adjusted=False, sensitive_use=False, nitriding=False,
                  case_carb=False, material='steel'):
-        """ Instantiating a Spurgear object
+        """ Instantiating a SpurGear object
 
         :param str name: the name of the gear
         :param float modulus: modulus in [mm]

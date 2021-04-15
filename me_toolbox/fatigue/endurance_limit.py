@@ -69,7 +69,7 @@ class EnduranceLimit:
         return a * (self.Sut ** b)
 
     @property
-    def Kb(self):  # TODO: fix Kb its badly writen
+    def Kb(self):  # FIXME: fix Kb its badly writen
         """Size modification factor
 
         :returns: Kb - size factor
@@ -131,7 +131,6 @@ class EnduranceLimit:
     @property
     def Kf(self):
         """Miscellaneous effects factor"""
-        # TODO: add functionality to Kf
         return 1
 
     @property
