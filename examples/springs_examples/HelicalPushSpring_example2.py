@@ -33,4 +33,4 @@ print(f"active_coils = {spring.active_coils}")  # finite number
 # check design
 print(f"Good design = {spring.check_design()}")
 
-spring.get_info()
+# spring.get_info()

@@ -168,18 +168,6 @@ class HelicalPushSpring(Spring):
             self.free_length = None
 
     @property
-    def spring_index(self):
-        """C - spring index
-
-        Note: C should be in range of [4,12], lower C causes surface cracks,
-            higher C causes the spring to tangle and require separate packing
-
-        :returns: The spring index
-        :type: float or Symbol
-        """
-        return self.spring_diameter / self.wire_diameter
-
-    @property
     def active_coils(self):
         """getter for the :attr:`active_coils` attribute
 
@@ -206,16 +194,6 @@ class HelicalPushSpring(Spring):
         else:
             # active_coils was not given so calculate it
             self._active_coils = self.calc_active_coils()
-
-    def calc_active_coils(self):
-        """Calculate active_coils which is the number of active coils (using Castigliano's theorem)
-
-        :returns: number of active coils
-        :rtype: float
-        """
-        return ((self.shear_modulus * self.wire_diameter) /
-                (8 * self.spring_index ** 3 * self.spring_constant)) * (
-                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
     @property
     def spring_constant(self):
@@ -245,16 +223,6 @@ class HelicalPushSpring(Spring):
             # spring_constant was not given so calculate it
             self._spring_constant = self.calc_spring_constant()
 
-    def calc_spring_constant(self):
-        """Calculate spring constant (using Castigliano's theorem)
-
-        :returns: The spring constant
-        :rtype: float
-        """
-        return ((self.shear_modulus * self.wire_diameter) /
-                (8 * self.spring_index ** 3 * self.active_coils)) * (
-                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
-
     @property
     def factor_Ks(self):  # pylint: disable=invalid-name
         """factor_Ks - Static shear stress concentration factor
@@ -276,8 +244,9 @@ class HelicalPushSpring(Spring):
 
     @property
     def factor_KB(self):  # pylint: disable=invalid-name
-        # NOT IMPLEMENTED!!! TODO: check when to use and implement
         """K_B - Bergstrasser shear stress concentration factor (very close to factor_Kw)
+
+        NOT IMPLEMENTED!!!
 
         :returns: Bergstrasser shear stress concentration factor
         :rtype: float
@@ -285,24 +254,14 @@ class HelicalPushSpring(Spring):
         return (4 * self.spring_index + 2) / (4 * self.spring_index - 3)
 
     @property
-    def shear_stress(self):
+    def max_shear_stress(self):
         """ Return's the shear stress
 
         :returns: Shear stress
         :rtype: float
         """
-        return self.calc_shear_stress(self.force)
-
-    def calc_shear_stress(self, force):
-        """Calculates the shear stress based on the force given
-
-        :param float of Symbol force: Working force of the spring
-
-        :returns: Shear stress
-        :rtype: float or Symbol
-        """
-        factor_k = self.factor_Ks if self.set_removed else self.factor_Kw
-        return (factor_k * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
+        k_factor = self.factor_Ks if self.set_removed else self.factor_Kw
+        return self.calc_max_shear_stress(self.force, k_factor)
 
     @property
     def deflection(self):
@@ -413,21 +372,10 @@ class HelicalPushSpring(Spring):
         :returns: static factor of safety
         :type: float or Symbol
         """
-        shear_stress = self.calc_shear_stress(self.Fsolid) if solid else self.shear_stress
+        k_factor = self.factor_Ks if self.set_removed else self.factor_Kw
+        shear_stress = self.calc_max_shear_stress(self.Fsolid,
+                                                  k_factor) if solid else self.max_shear_stress
         return self.shear_yield_strength / shear_stress
-
-    def weight(self, density):
-        """Return's the spring *active coils* weight according to the specified density
-
-        :param float density: The material density
-
-        :returns: Spring weight
-        :type: float or Symbol
-        """
-        area = 0.25 * pi * self.wire_diameter ** 2  # cross section area
-        length = pi * self.spring_diameter  # the circumference of the spring
-        volume = area * length
-        return volume * self.active_coils * density
 
     def min_wire_diameter(self, static_safety_factor, solid=False):
         """The minimal wire diameter for a given safety factor in order to avoid failure,
@@ -463,9 +411,11 @@ class HelicalPushSpring(Spring):
             return 0.5 * ((self.shear_yield_strength / static_safety_factor) * (
                     (pi * self.wire_diameter ** 3) / (4 * force)) - self.wire_diameter)
         else:
-            # TODO: add a solution for factor_Kw (before set removed)
-            print("MinSpringDiameter Not valid if set not removed")
-            return None
+            # derived using the KB factor
+            Sut = self.ultimate_tensile_strength
+            alpha = (Sut * pi * self.wire_diameter ** 3) / (8 * self.force * static_safety_factor)
+            return 0.25 * ((2 * alpha - self.wire_diameter) + sqrt(
+                (self.wire_diameter - 2 * alpha) ** 2 - 24 * alpha * self.wire_diameter))
 
     def buckling(self, anchors, elastic_modulus):
         """ Checks if the spring will buckle and find the maximum free length to avoid buckling
@@ -510,8 +460,9 @@ class HelicalPushSpring(Spring):
         mean_force = (max_force + min_force) / 2
 
         # calculating mean and alternating stresses
-        alt_shear_stress = self.calc_shear_stress(alternating_force)
-        mean_shear_stress = self.calc_shear_stress(mean_force)
+        k_factor = self.factor_Ks if self.set_removed else self.factor_Kw
+        alt_shear_stress = self.calc_max_shear_stress(alternating_force, k_factor)
+        mean_shear_stress = self.calc_max_shear_stress(mean_force, k_factor)
 
         Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
         Ssu = self.shear_ultimate_strength
@@ -524,17 +475,6 @@ class HelicalPushSpring(Spring):
                   f"Mean shear stress = {mean_shear_stress}\n"
                   f"Sse = {Sse}")
         return nf, nl
-
-    def natural_frequency(self, density):
-        """Figures out what is the natural frequency of the spring
-
-        :param float density: spring material density
-
-        :returns: Natural frequency
-        :rtype: float
-        """
-        return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.active_coils * pi)) \
-               * sqrt(self.shear_modulus / (2 * density))
 
     def calc_spring_index(self, solid_safety_factor):
         """Calculate Spring index for a certain safety factor if only wire diameter was given
@@ -556,7 +496,7 @@ class HelicalPushSpring(Spring):
                     (0.966 * sqrt(0.268 * alpha ** 2 - alpha * beta + 0.53 * beta ** 2))) / beta
             except TypeError as type_error:
                 raise ValueError("In this method diameter can't be symbolic") from type_error
-            # for Kb TODO: find a way to implement Kb (Bergstrasser factor)
+            # for Kb NOT IMPLEMENTED!!!
             # return ((2 * alpha - beta) / (4 * beta)) + sympy.sqrt(
             #     ((2 * alpha - beta) / (4 * beta)) ** 2 - ((3 * alpha) / (4 * beta)))
 

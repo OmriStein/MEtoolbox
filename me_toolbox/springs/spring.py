@@ -1,5 +1,7 @@
 # third party
+from math import pi, sqrt
 import numpy as np
+
 
 # internal package
 from me_toolbox.tools import print_atributes
@@ -22,6 +24,18 @@ class Spring:
     def get_info(self):
         """print all of the spring properties"""
         print_atributes(self)
+
+    @property
+    def spring_index(self):
+        """C - spring index
+
+        Note: C should be in range of [4,12], lower C causes surface cracks,
+            higher C causes the spring to tangle and require separate packing
+
+        :returns: The spring index
+        :type: float or Symbol
+        """
+        return self.spring_diameter / self.wire_diameter
 
     @property
     def ultimate_tensile_strength(self):
@@ -60,3 +74,58 @@ class Spring:
             Ssa, Ssm = 241, 379  # pylint: disable=invalid-name
 
         return Ke * (Ssa / (1 - (Ssm / self.shear_ultimate_strength) ** 2))
+
+    def calc_max_shear_stress(self, force, k_factor):
+        """Calculates the max shear stress based on the force applied
+
+        :param float of Symbol force: Working force of the spring
+        :param float k_factor: the appropriate k factor for the calculation
+
+        :returns: Shear stress
+        :rtype: float or Symbol
+        """
+        return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
+
+    def natural_frequency(self, density):
+        """Figures out what is the natural frequency of the spring
+
+        :param float density: spring material density
+
+        :returns: Natural frequency
+        :rtype: float
+        """
+        return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.active_coils * pi)) \
+            * sqrt(self.shear_modulus / (2 * density))
+
+    def weight(self, density):
+        """Return's the spring *active coils* weight according to the specified density
+
+        :param float density: The material density
+
+        :returns: Spring weight
+        :type: float or Symbol
+        """
+        area = 0.25 * pi * self.wire_diameter ** 2  # cross section area
+        length = pi * self.spring_diameter  # the circumference of the spring
+        volume = area * length
+        return volume * self.active_coils * density
+
+    def calc_spring_constant(self):
+        """Calculate spring constant (using Castigliano's theorem)
+
+        :returns: The spring constant
+        :rtype: float
+        """
+        return ((self.shear_modulus * self.wire_diameter) /
+                (8 * self.spring_index ** 3 * self.active_coils)) * (
+                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
+
+    def calc_active_coils(self):
+        """Calculate active_coils which is the number of active coils (using Castigliano's theorem)
+
+        :returns: number of active coils
+        :rtype: float
+        """
+        return ((self.shear_modulus * self.wire_diameter) /
+                (8 * self.spring_index ** 3 * self.spring_constant)) * (
+                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))

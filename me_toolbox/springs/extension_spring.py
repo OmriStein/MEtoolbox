@@ -133,18 +133,6 @@ class ExtensionSpring(Spring):
             self.free_length = None
 
     @property
-    def spring_index(self):
-        """C - spring index
-
-        Note: C should be in range of [4,12], lower C causes surface cracks,
-            higher C causes the spring to tangle and require separate packing
-
-        :returns: The spring index
-        :type: float or Symbol
-        """
-        return self.spring_diameter / self.wire_diameter
-
-    @property
     def active_coils(self):
         """getter for the :attr:`active_coils` attribute
 
@@ -264,16 +252,6 @@ class ExtensionSpring(Spring):
             # spring_constant was not given so calculate it
             self._spring_constant = self.calc_spring_constant()
 
-    def calc_spring_constant(self):
-        """Calculate spring constant (using Castigliano's theorem)
-
-        :returns: The spring constant
-        :rtype: float
-        """
-        return ((self.shear_modulus * self.wire_diameter) /
-                (8 * self.spring_index ** 3 * self.active_coils)) * (
-                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
-
     @property
     def hook_KA(self):  # pylint: disable=invalid-name
         """Returns The spring's bending stress correction factor
@@ -323,7 +301,8 @@ class ExtensionSpring(Spring):
         :returns: Hook torsion stress
         :rtype: float
         """
-        return self.calc_max_shear_stress(self.force)
+        # return self.calc_max_shear_stress(self.force)
+        return HelicalPushSpring.calc_max_shear_stress(self, self.force, self.hook_KB)
 
     @property
     def max_body_shear_stress(self):
@@ -332,20 +311,8 @@ class ExtensionSpring(Spring):
         :returns: Body torsion stress
         :rtype: float
         """
-        return self.calc_max_shear_stress(self.force, hook=False)
-
-    def calc_max_shear_stress(self, force, hook=True):
-        """Calculates the torsion stress based on the force given
-
-        :param float of Symbol force: Working force of the spring
-        :param bool hook: True when calculating for spring's hook,
-            False when calculating for spring's body
-        :returns: Torsion stress
-        :rtype: float or Symbol
-        """
-        # TODO: check if a similar method in HelicalPushSpring can be used
-        k_factor = self.hook_KB if hook else self.factor_Kw
-        return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
+        # return self.calc_max_shear_stress(self.force, hook=False)
+        return self.calc_max_shear_stress(self.force, self.factor_Kw)
 
     @property
     def free_length(self):
@@ -443,7 +410,7 @@ class ExtensionSpring(Spring):
 
         # calculating mean and alternating stresses for the hook section
         # shear stresses:
-        alt_shear_stress = self.calc_max_shear_stress(alt_force)
+        alt_shear_stress = self.calc_max_shear_stress(alt_force, self.hook_KB)
         mean_shear_stress = (mean_force / alt_force) * alt_shear_stress
         # normal stresses due to bending:
         alt_normal_stress = self.calc_max_normal_stress(alt_force)
@@ -465,7 +432,7 @@ class ExtensionSpring(Spring):
 
         # calculating mean and alternating stresses for the body section
         # shear stresses:
-        alt_body_shear_stress = self.calc_max_shear_stress(alt_force, hook=False)
+        alt_body_shear_stress = self.calc_max_shear_stress(alt_force, self.hook_KB)
         mean_body_shear_stress = (mean_force / alt_force) * alt_shear_stress
 
         nf_body, ns_body = FailureCriteria.get_safety_factor(Ssy_body, Ssu, Sse,
@@ -549,26 +516,6 @@ class ExtensionSpring(Spring):
                           (((self.end_normal_yield_strength * pi * self.wire_diameter ** 3) /
                             (4 * self.force * static_safety_factor)) - self.wire_diameter)
         return max(diameter_shear, diameter_normal)
-
-    def natural_frequency(self, density):
-        """Figures out what is the natural frequency of the spring
-
-        :param float density: spring material density
-
-        :returns: Natural frequency
-        :rtype: float
-        """
-        HelicalPushSpring.natural_frequency(self, density)
-
-    def weight(self, density):
-        """Return's the spring *active coils* weight according to the specified density
-
-        :param float density: The material density
-
-        :returns: Spring weight
-        :type: float or Symbol
-        """
-        HelicalPushSpring.weight(self, density)
 
     def _na_k_sorter(self, *args):
         """The active coils, body coils and the spring
