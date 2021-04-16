@@ -139,7 +139,7 @@ class Spring:
 
     @staticmethod
     def material_prop(material, diameter, metric=True):
-        """Reads table 10-4 from file and returns the
+        """Reads table A_and_m.csv from file and returns the
         material properties Ap and m for Sut estimation
 
         :param str material: The spring's material
