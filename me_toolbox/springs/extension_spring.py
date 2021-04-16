@@ -455,7 +455,7 @@ class ExtensionSpring(Spring):
                (0.615 / self.spring_index)
 
     def fatigue_analysis(self, max_force, min_force, reliability,
-                         criterion='gerber', verbose=False):
+                         criterion='gerber', verbose=False, metric=True):
         """Fatigue analysis of the hook section
         for normal and shear stress,and for the
         body section for shear and static yield.
@@ -465,6 +465,7 @@ class ExtensionSpring(Spring):
         :param float reliability: in percentage
         :param str criterion: fatigue criterion
         :param bool verbose: print more details
+        :param bool metric: Metric or imperial
 
         :returns: Normal and shear safety factors for the hook section and
             static and dynamic safety factors for body section
@@ -506,7 +507,7 @@ class ExtensionSpring(Spring):
                                                              mean_body_shear_stress, criterion)
 
         if verbose:
-            print(f"Alternating max_force = {alt_force}, Mean max_force = {mean_force}\n"
+            print(f"Alternating force = {alt_force}, Mean force = {mean_force}\n"
                   f"Alternating shear stress = {alt_shear_stress},"
                   f"Mean shear stress = {mean_shear_stress}\n"
                   f"Alternating normal stress = {alt_normal_stress},"

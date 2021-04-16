@@ -1,7 +1,8 @@
 """A module containing the helical torsion spring class"""
-from math import pi
+from math import pi, sqrt
 from sympy import Symbol  # pylint: disable=unused-import
 
+from fatigue import FailureCriteria
 from me_toolbox.springs import Spring
 from tools import percent_to_decimal
 
@@ -339,3 +340,36 @@ class HelicalTorsionSpring(Spring):
         :type: float or Symbol
         """
         return self.yield_strength / self.max_stress
+
+    def fatigue_analysis(self, max_moment, min_moment, reliability,
+                         criterion='gerber', verbose=False, metric=True):
+        """ Returns safety factors for fatigue and
+        for first cycle according to Langer
+
+        :param float max_moment: Maximal max_force acting on the spring
+        :param float min_moment: Minimal max_force acting on the spring
+        :param float reliability: in percentage
+        :param str criterion: fatigue criterion
+        :param bool verbose: print more details
+
+        :returns: static and dynamic safety factor
+        :rtype: tuple[float, float]
+        """
+        # calculating mean and alternating forces
+        alt_moment = abs(max_moment - min_moment) / 2
+        mean_moment = (max_moment + min_moment) / 2
+
+        # calculating mean and alternating stresses
+        alt_stress = self.calc_max_stress(alt_moment)
+        mean_stress = self.calc_max_stress(mean_moment)
+
+        Sse = self.shear_endurance_limit(reliability, metric)
+        Se = Sse/0.577  # based on the distortion energy method
+        Sut = self.ultimate_tensile_strength
+        Sy = self.yield_strength
+        nf, nl = FailureCriteria.get_safety_factor(Sy, Sut, Se, alt_stress, mean_stress, criterion)
+        if verbose:
+            print(f"Alternating moment = {alt_moment}, Mean moment = {mean_moment}\n"
+                  f"Alternating stress = {alt_stress}, Mean stress = {mean_stress}\n"
+                  f"Sse = {Sse}, Se= {Se}")
+        return nf, nl

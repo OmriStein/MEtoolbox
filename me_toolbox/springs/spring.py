@@ -69,10 +69,11 @@ class Spring:
         """
         return percent_to_decimal(self.torsion_yield_percent) * self.ultimate_tensile_strength
 
-    def shear_endurance_limit(self, reliability):
+    def shear_endurance_limit(self, reliability, metric=True):
         """Sse - Shear endurance limit according to Zimmerli
 
         :param float reliability: reliability in percentage
+        :param bool metric: metric or imperial
 
         :returns: Sse - Shear endurance limit
         :rtype: float
@@ -81,12 +82,12 @@ class Spring:
         percentage = np.array([50, 90, 95, 99, 99.9, 99.99, 99.999, 99.9999])
         reliability_factors = np.array([1, 0.897, 0.868, 0.814, 0.753, 0.702, 0.659, 0.620])
         # interpolating from data
-        Ke = np.interp(reliability, percentage, reliability_factors)  # pylint: disable=invalid-name
+        Ke = np.interp(reliability, percentage, reliability_factors)
 
         if self.shot_peened:
-            Ssa, Ssm = 398, 534  # pylint: disable=invalid-name
+            Ssa, Ssm = (398, 534) if metric else (57.5e3, 77.5e3)
         else:
-            Ssa, Ssm = 241, 379  # pylint: disable=invalid-name
+            Ssa, Ssm = (241, 379) if metric else (35e3, 55e3)
 
         return Ke * (Ssa / (1 - (Ssm / self.shear_ultimate_strength) ** 2))
 
@@ -149,6 +150,7 @@ class Spring:
         :returns: Ap and m for Sut estimation
         :rtype: (float, float)
         """
+        # TODO: Find a way to work with symbolic diameter
         if isinstance(diameter, Symbol):
             raise ValueError(f"the material keyword can't be used if the diameter is symbolic "
                              f"specify Ap and m manually")

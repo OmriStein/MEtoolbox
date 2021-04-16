@@ -23,8 +23,5 @@ print(f"F = {Fsol}")
 print(spring.max_angular_deflection.subs(F, Fsol))
 print(spring.max_total_angular_deflection.subs(F, Fsol))
 spring.max_moment = Fsol * 1
-spring.get_info()
 
-Sse = spring.shear_endurance_limit(50)
-Se = Sse / 0.577
-print(Se)
+print(spring.fatigue_analysis(5, 1, 50, verbose=True, metric=False))

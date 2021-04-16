@@ -478,7 +478,7 @@ class HelicalPushSpring(Spring):
             return self.free_length >= collapse_test, collapse_test
 
     def fatigue_analysis(self, max_force, min_force, reliability,
-                         criterion='modified goodman', verbose=False):
+                         criterion='modified goodman', verbose=False, metric=True):
         """ Returns safety factors for fatigue and
         for first cycle according to Langer
 
@@ -487,6 +487,7 @@ class HelicalPushSpring(Spring):
         :param float reliability: in percentage
         :param str criterion: fatigue criterion
         :param bool verbose: print more details
+        :param bool metric: Metric or imperial
 
         :returns: static and dynamic safety factor
         :rtype: tuple[float, float]
@@ -506,7 +507,7 @@ class HelicalPushSpring(Spring):
         nf, nl = FailureCriteria.get_safety_factor(Ssy, Ssu, Sse, alt_shear_stress,
                                                    mean_shear_stress, criterion)
         if verbose:
-            print(f"Alternating max_force = {alternating_force}, Mean max_force = {mean_force}\n"
+            print(f"Alternating force = {alternating_force}, Mean force = {mean_force}\n"
                   f"Alternating shear stress = {alt_shear_stress},"
                   f"Mean shear stress = {mean_shear_stress}\n"
                   f"Sse = {Sse}")
