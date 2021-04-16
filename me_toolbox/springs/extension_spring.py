@@ -42,7 +42,6 @@ class ExtensionSpring(Spring):
             (used for fatigue calculations)
 
         :returns: HelicalPushSpring
-
         """
         self.constructing = True
         super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus, elastic_modulus,

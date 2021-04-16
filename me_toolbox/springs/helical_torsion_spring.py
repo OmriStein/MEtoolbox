@@ -14,6 +14,33 @@ class HelicalTorsionSpring(Spring):
                  shear_modulus, elastic_modulus, yield_percent, material=None, Ap=None, m=None,
                  spring_constant=None, active_coils=None, body_coils=None, shot_peened=False,
                  density=None, working_frequency=None, radius=None, pin_diameter=None):
+        """Instantiate a helical torsion spring object with the given parameters
+
+        :param float or Symbol max_moment: The maximum load on the spring
+        :param float or Symbol wire_diameter: spring wire diameter
+        :param float or Symbol spring_diameter: spring diameter measured from
+            the center point of the wire diameter
+        :param float leg1: spring leg
+        :param float leg2: spring leg
+        :param float shear_modulus: Spring's material shear modulus
+        :param float elastic_modulus: Spring's material elastic modulus
+        :param float yield_percent: Used to estimate the spring's yield stress
+        :param str material: Spring's material (instead of Ap and m)
+        :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
+        :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
+        :param float or None spring_constant: K - spring constant
+        :param float or None active_coils: active_coils - number of active coils
+        :param float or None body_coils: Spring's number of body coils
+        :param bool shot_peened: if True adds to fatigue strength
+        :param float or None density: Spring's material density
+            (used for buckling and weight calculations)
+        :param float or None working_frequency: the spring working frequency
+            (used for fatigue calculations)
+        :param float radius: The distance of applied force from the center
+        :param float pin_diameter: the diameter of the pin going through the spring
+
+        :returns: HelicalTorsionSpring
+        """
         self.constructing = True
         max_force = max_moment / radius if radius is not None else None
 
