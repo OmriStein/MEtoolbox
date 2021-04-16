@@ -7,12 +7,11 @@ from sympy import Symbol
 
 # internal package
 from me_toolbox.tools import print_atributes
-from me_toolbox.tools import percent_to_decimal
 
 
 # TODO: add optimization based on cost and other needs
 class Spring:
-    def __init__(self, max_force, torsion_yield_percent, wire_diameter, spring_diameter,
+    def __init__(self, max_force, wire_diameter, spring_diameter,
                  shear_modulus, elastic_modulus, shot_peened, density, working_frequency, material,
                  Ap, m):
         self.max_force = max_force
@@ -21,9 +20,9 @@ class Spring:
             raise ValueError("Ap, m and material keywords can't all be None")
 
         self.Ap, self.m = self.material_prop(material, wire_diameter) if (
-                    Ap is None or m is None) else (Ap, m)
+                Ap is None or m is None) else (Ap, m)
 
-        self.torsion_yield_percent = torsion_yield_percent
+        # self.torsion_yield_percent = torsion_yield_percent
         self.wire_diameter = wire_diameter
         self.spring_diameter = spring_diameter
         self.shear_modulus = shear_modulus
@@ -61,13 +60,6 @@ class Spring:
     def shear_ultimate_strength(self):
         """ Ssu - ultimate tensile strength for shear """
         return 0.67 * self.ultimate_tensile_strength
-
-    @property
-    def shear_yield_strength(self):
-        """ Ssy - yield strength for shear
-        (shear_yield_stress = % * ultimate_tensile_strength))
-        """
-        return percent_to_decimal(self.torsion_yield_percent) * self.ultimate_tensile_strength
 
     def shear_endurance_limit(self, reliability, metric=True):
         """Sse - Shear endurance limit according to Zimmerli

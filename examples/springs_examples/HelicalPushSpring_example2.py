@@ -7,12 +7,13 @@ L0 = 39.15
 Lw = 25
 d = 1.8
 # music wire
-G, Ap, m, yield_percent = 82.7e3, 2211, 0.145, 0.6
+G, E, Ap, m, yield_percent = 82.7e3, 203.4, 2211, 0.145, 0.6
 K = force / (L0 - Lw)
 print(f"K={K}")
-spring = HelicalPushSpring(force=force, Ap=Ap, m=m, yield_percent=yield_percent, wire_diameter=d,
-                           spring_diameter=D, shear_modulus=G, end_type='squared and ground',
-                           spring_constant=K, set_removed=True, shot_peened=False)
+spring = HelicalPushSpring(max_force=force, wire_diameter=d, spring_diameter=D,
+                           shear_yield_percent=0.45, end_type='squared and ground',
+                           shear_modulus=G, elastic_modulus=E,
+                           Ap=Ap, m=m, spring_constant=K, set_removed=True, shot_peened=False)
 
 # finding D with sympy
 n_static = spring.static_safety_factor()

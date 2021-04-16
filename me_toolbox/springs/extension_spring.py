@@ -45,13 +45,13 @@ class ExtensionSpring(Spring):
 
         """
         self.constructing = True
-        super().__init__(max_force, body_shear_yield_percent, wire_diameter, spring_diameter,
-                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency,
-                         material, Ap, m)
+        super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus, elastic_modulus,
+                         shot_peened, density, working_frequency, material, Ap, m)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1
         self.hook_r2 = hook_r2
+        self.body_shear_yield_percent = body_shear_yield_percent
         self.end_normal_yield_percent = end_normal_yield_percent
         self.end_shear_yield_percent = end_shear_yield_percent
 
@@ -134,6 +134,16 @@ class ExtensionSpring(Spring):
             print(f"good_design = {good_design}")
 
         return good_design
+
+    @property
+    def body_shear_yield_strength(self):
+        """ Ssy - yield strength for shear
+        (shear_yield_stress = % * ultimate_tensile_strength))
+
+        :returns: yield strength for shear stress
+        :rtype: float
+        """
+        return percent_to_decimal(self.body_shear_yield_percent) * self.ultimate_tensile_strength
 
     @property
     def end_normal_yield_strength(self):  # pylint: disable=invalid-name
@@ -419,7 +429,7 @@ class ExtensionSpring(Spring):
         :type: tuple[float, float, float] or tuple[Symbol, Symbol, Symbol]
         """
 
-        n_body = self.shear_yield_strength / self.max_body_shear_stress
+        n_body = self.body_shear_yield_strength / self.max_body_shear_stress
         n_hook_normal = self.end_normal_yield_strength / self.max_hook_normal_stress
         n_hook_shear = self.end_shear_yield_strength / self.max_hook_shear_stress
 
@@ -483,9 +493,9 @@ class ExtensionSpring(Spring):
         alt_normal_stress = self.calc_max_normal_stress(alt_force)
         mean_normal_stress = (mean_force / alt_force) * alt_normal_stress
 
-        Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
+        Sse = self.shear_endurance_limit(reliability, metric)  # pylint: disable=invalid-name
         Ssu = self.shear_ultimate_strength
-        Ssy_body = self.shear_yield_strength
+        Ssy_body = self.body_shear_yield_strength
         Ssy_end = self.end_shear_yield_strength
         Sy_end = self.end_normal_yield_strength
         Se = Sse / 0.577  # estimation using distortion-energy theory

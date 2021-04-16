@@ -1,5 +1,5 @@
 """A module containing the helical torsion spring class"""
-from math import pi, sqrt
+from math import pi
 from sympy import Symbol  # pylint: disable=unused-import
 
 from fatigue import FailureCriteria
@@ -10,15 +10,15 @@ from tools import percent_to_decimal
 class HelicalTorsionSpring(Spring):
     """A Helical torsion spring object"""
 
-    def __init__(self, max_moment, yield_percent, wire_diameter, spring_diameter, leg1, leg2,
-                 shear_modulus, elastic_modulus, material=None, Ap=None, m=None,
+    def __init__(self, max_moment, wire_diameter, spring_diameter, leg1, leg2,
+                 shear_modulus, elastic_modulus, yield_percent, material=None, Ap=None, m=None,
                  spring_constant=None, active_coils=None, body_coils=None, shot_peened=False,
                  density=None, working_frequency=None, radius=None, pin_diameter=None):
         self.constructing = True
         max_force = max_moment / radius if radius is not None else None
 
-        super().__init__(max_force, yield_percent, wire_diameter, spring_diameter,shear_modulus,
-                         elastic_modulus, shot_peened, density, working_frequency, material, Ap, m)
+        super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus, elastic_modulus,
+                         shot_peened, density, working_frequency, material, Ap, m)
 
         self.max_moment = max_moment
         self.yield_percent = yield_percent
@@ -71,7 +71,7 @@ class HelicalTorsionSpring(Spring):
 
     @property
     def yield_strength(self):
-        """ Ssy - yield strength for shear
+        """ Sy - yield strength
         (shear_yield_stress = % * ultimate_tensile_strength))
         """
         return percent_to_decimal(self.yield_percent) * self.ultimate_tensile_strength
@@ -351,6 +351,7 @@ class HelicalTorsionSpring(Spring):
         :param float reliability: in percentage
         :param str criterion: fatigue criterion
         :param bool verbose: print more details
+        :param bool metric: Metric or imperial
 
         :returns: static and dynamic safety factor
         :rtype: tuple[float, float]
@@ -364,7 +365,7 @@ class HelicalTorsionSpring(Spring):
         mean_stress = self.calc_max_stress(mean_moment)
 
         Sse = self.shear_endurance_limit(reliability, metric)
-        Se = Sse/0.577  # based on the distortion energy method
+        Se = Sse / 0.577  # based on the distortion energy method
         Sut = self.ultimate_tensile_strength
         Sy = self.yield_strength
         nf, nl = FailureCriteria.get_safety_factor(Sy, Sut, Se, alt_stress, mean_stress, criterion)

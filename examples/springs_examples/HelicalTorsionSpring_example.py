@@ -1,7 +1,4 @@
-from math import pi
 from me_toolbox.springs import HelicalTorsionSpring
-from me_toolbox.tools import inch_to_millimetre
-from me_toolbox.tools import newtons_to_pound_force
 from sympy import symbols, Eq, solve
 
 F = symbols('F')
@@ -18,10 +15,10 @@ spring = HelicalTorsionSpring(max_moment, Ap=201e3, m=0.145, yield_percent=0.78,
                               body_coils=Nb, shot_peened=False, density=None,
                               working_frequency=None, radius=1, pin_diameter=0.4)
 eq = Eq(spring.static_safety_factor, 1)
-Fsol = solve(eq, F)[0]
-print(f"F = {Fsol}")
-print(spring.max_angular_deflection.subs(F, Fsol))
-print(spring.max_total_angular_deflection.subs(F, Fsol))
-spring.max_moment = Fsol * 1
+F_sol = solve(eq, F)[0]
+print(f"F = {F_sol}")
+print(spring.max_angular_deflection.subs(F, F_sol))
+print(spring.max_total_angular_deflection.subs(F, F_sol))
+spring.max_moment = F_sol * 1
 
 print(spring.fatigue_analysis(5, 1, 50, verbose=True, metric=False))

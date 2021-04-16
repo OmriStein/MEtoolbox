@@ -4,19 +4,20 @@ from sympy import Symbol  # pylint: disable=unused-import
 
 from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import Spring
+from tools import percent_to_decimal
 
 
 class HelicalPushSpring(Spring):
     """A helical push spring object"""
 
-    def __init__(self, force, wire_diameter, spring_diameter, yield_percent, end_type,
-                 shear_modulus, material=None, Ap=None, m=None, elastic_modulus=None,
+    def __init__(self, max_force, wire_diameter, spring_diameter, shear_yield_percent, end_type,
+                 shear_modulus, elastic_modulus, material=None, Ap=None, m=None,
                  spring_constant=None, active_coils=None, free_length=None, density=None,
                  working_frequency=None, set_removed=False, shot_peened=False, anchors=None,
                  zeta=0.15):
         """Instantiate a helical push spring object with the given parameters
 
-        :param float or Symbol force: The maximum load on the spring
+        :param float or Symbol max_force: The maximum load on the spring
         :param float or Symbol wire_diameter: spring wire diameter
         :param float or Symbol spring_diameter: spring diameter measured from
             the center point of the wire diameter
@@ -25,7 +26,7 @@ class HelicalPushSpring(Spring):
         :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
         :param float shear_modulus: Shear modulus
         :param str end_type: what kind of ending the spring has
-        :param float yield_percent: yield percent used to estimate shear_yield_stress
+        :param float shear_yield_percent: yield percent used to estimate shear_yield_stress
         :param float or None spring_constant: K - spring constant
         :param float or None active_coils: active_coils - number of active coils
         :param float zeta: overrun safety factor
@@ -45,15 +46,17 @@ class HelicalPushSpring(Spring):
         :returns: HelicalPushSpring
         """
         self.constructing = True  # flag so methods know they are being called from within __init__
-        super().__init__(force, yield_percent, wire_diameter, spring_diameter, shear_modulus,
+
+        super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus,
                          elastic_modulus, shot_peened, density, working_frequency, material, Ap, m)
+
         if set_removed:
             print("Note: set should ONLY be removed for static loading"
                   "and NOT for periodical loading")
 
         self.set_removed = set_removed
         self.shot_peened = shot_peened
-        self.yield_percent = yield_percent
+        self.shear_yield_percent = shear_yield_percent
         self.zeta = zeta  # overrun safety factor
 
         self.end_type = end_type.lower()
@@ -146,6 +149,16 @@ class HelicalPushSpring(Spring):
                 good_design = False
 
         return good_design
+
+    @property
+    def shear_yield_strength(self):
+        """ Ssy - yield strength for shear
+        (shear_yield_stress = % * ultimate_tensile_strength))
+
+        :returns: yield strength for shear stress
+        :rtype: float
+        """
+        return percent_to_decimal(self.shear_yield_percent) * self.ultimate_tensile_strength
 
     @property
     def wire_diameter(self):
@@ -427,7 +440,7 @@ class HelicalPushSpring(Spring):
         factor_k = self.factor_Ks if self.set_removed else self.factor_Kw
         force = self.Fsolid if solid else self.max_force
         return ((8 * factor_k * force * self.spring_index * static_safety_factor) / (
-                self.yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
+                self.shear_yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
 
     def min_spring_diameter(self, static_safety_factor, solid=False):
         """return the minimum spring diameter to avoid static failure
@@ -501,7 +514,7 @@ class HelicalPushSpring(Spring):
         alt_shear_stress = self.calc_max_shear_stress(alternating_force, k_factor)
         mean_shear_stress = self.calc_max_shear_stress(mean_force, k_factor)
 
-        Sse = self.shear_endurance_limit(reliability)  # pylint: disable=invalid-name
+        Sse = self.shear_endurance_limit(reliability, metric)
         Ssu = self.shear_ultimate_strength
         Ssy = self.shear_yield_strength
         nf, nl = FailureCriteria.get_safety_factor(Ssy, Ssu, Sse, alt_shear_stress,

@@ -19,10 +19,10 @@ print(f"Fsolid = {Fs}")
 Ap = 2211
 m = 0.145
 
-spring = HelicalPushSpring(force=Fmax, Ap=Ap, m=m, yield_percent=0.4, wire_diameter=d,
-                           spring_diameter=D, shear_modulus=G, elastic_modulus=205e3,
-                           end_type='squared and ground', anchors='fixed-hinged',
-                           spring_constant=6.189, set_removed=False, shot_peened=True, zeta=0.25)
+spring = HelicalPushSpring(max_force=Fmax, wire_diameter=d, spring_diameter=D,
+                           shear_yield_percent=0.45, end_type='squared and ground', shear_modulus=G,
+                           Ap=Ap, m=m, elastic_modulus=205e3, spring_constant=6.189,
+                           set_removed=False, shot_peened=True, anchors='fixed-hinged', zeta=0.25)
 
 # spring diameter for solid state safety factor of 1.5
 print(f"minimum wire diameter for Fsolid = {spring.min_wire_diameter(1.5, solid=True)}")
@@ -37,10 +37,10 @@ print(f"collapse: {buckling[0]}, max free length (L0) = {buckling[1]}")
 nf, ns = spring.fatigue_analysis(575, 185, 99.999)
 print(f"fatigue safety factor={nf}, safety factor for first cycle={ns}\n")
 
-spring2 = HelicalPushSpring(force=Fmax, material='music wire', yield_percent=0.45, wire_diameter=6,
-                            spring_diameter=60, shear_modulus=G, elastic_modulus=205e3,
-                            end_type='squared and ground', anchors='fixed-hinged',
-                            spring_constant=6, set_removed=False, shot_peened=True)
+spring2 = HelicalPushSpring(max_force=Fmax, wire_diameter=6, spring_diameter=60,
+                            shear_yield_percent=0.45, end_type='squared and ground', shear_modulus=G,
+                            material='music wire', elastic_modulus=205e3, spring_constant=6,
+                            set_removed=False, shot_peened=True, anchors='fixed-hinged')
 print()
 print(f"static safety factor = {spring2.static_safety_factor()}")
 print(f"minimum wire diameter for n=2: {spring2.min_wire_diameter(2)}")
@@ -48,4 +48,3 @@ buckling = spring2.buckling
 print(f"buckling: {buckling[0]}, max free length (L0) = {buckling[1]} , L0= {spring2.free_length}")
 
 print(f"the natural frequency = {spring2.natural_frequency(8050):.2e} [Hz]")
-
