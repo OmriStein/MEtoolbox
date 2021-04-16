@@ -62,7 +62,7 @@ def parse_input(obj, fields, kwargs):
 
 # unit conversions
 def pound_force_to_newtons(val):
-    """convert pound force to newtons
+    """convert pound max_force to newtons
 
     :param float or list or tuple val: value to convert
 
@@ -76,7 +76,7 @@ def pound_force_to_newtons(val):
 
 
 def newtons_to_pound_force(val):
-    """convert newtons to pound force
+    """convert newtons to pound max_force
 
     :param float or list or tuple val: value to convert
 

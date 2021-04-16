@@ -1,7 +1,9 @@
 # third party
+import csv
+import os
 from math import pi, sqrt
 import numpy as np
-
+from sympy import Symbol
 
 # internal package
 from me_toolbox.tools import print_atributes
@@ -10,11 +12,17 @@ from me_toolbox.tools import percent_to_decimal
 
 # TODO: add optimization based on cost and other needs
 class Spring:
-    def __init__(self, force, Ap, m, torsion_yield_percent, wire_diameter, spring_diameter,
-                 shear_modulus, elastic_modulus, shot_peened, density, working_frequency):
-        self.force = force
-        self.Ap = Ap
-        self.m = m
+    def __init__(self, max_force, torsion_yield_percent, wire_diameter, spring_diameter,
+                 shear_modulus, elastic_modulus, shot_peened, density, working_frequency, material,
+                 Ap, m):
+        self.max_force = max_force
+
+        if (Ap is None or m is None) and material is None:
+            raise ValueError("Ap, m and material keywords can't all be None")
+
+        self.Ap, self.m = self.material_prop(material, wire_diameter) if (
+                    Ap is None or m is None) else (Ap, m)
+
         self.torsion_yield_percent = torsion_yield_percent
         self.wire_diameter = wire_diameter
         self.spring_diameter = spring_diameter
@@ -23,6 +31,10 @@ class Spring:
         self.shot_peened = shot_peened
         self.density = density
         self.working_frequency = working_frequency
+
+        self._active_coils = None
+        self._body_coils = None
+        self._spring_constant = None
 
     def get_info(self):
         """print all of the spring properties"""
@@ -79,9 +91,9 @@ class Spring:
         return Ke * (Ssa / (1 - (Ssm / self.shear_ultimate_strength) ** 2))
 
     def calc_max_shear_stress(self, force, k_factor):
-        """Calculates the max shear stress based on the force applied
+        """Calculates the max shear stress based on the max_force applied
 
-        :param float of Symbol force: Working force of the spring
+        :param float of Symbol force: Working max_force of the spring
         :param float k_factor: the appropriate k factor for the calculation
 
         :returns: Shear stress
@@ -98,7 +110,7 @@ class Spring:
         :rtype: float
         """
         return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.active_coils * pi)) \
-            * sqrt(self.shear_modulus / (2 * density))
+               * sqrt(self.shear_modulus / (2 * density))
 
     def weight(self, density):
         """Return's the spring *active coils* weight according to the specified density
@@ -119,16 +131,44 @@ class Spring:
         :returns: The spring constant
         :rtype: float
         """
-        return ((self.shear_modulus * self.wire_diameter) /
-                (8 * self.spring_index ** 3 * self.active_coils)) * (
-                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
+        G = self.shear_modulus
+        d = self.wire_diameter
+        C = self.spring_index
+        Na = self.active_coils
+        return ((G * d) / (8 * C ** 3 * Na)) * ((2 * C ** 2) / (1 + 2 * C ** 2))
 
-    def calc_active_coils(self):
-        """Calculate active_coils which is the number of active coils (using Castigliano's theorem)
+    @staticmethod
+    def material_prop(material, diameter, metric=True):
+        """Reads table 10-4 from file and returns the
+        material properties Ap and m for Sut estimation
 
-        :returns: number of active coils
-        :rtype: float
+        :param str material: The spring's material
+        :param float diameter: Wire diameter
+        :param str metric: Metric or imperial
+
+        :returns: Ap and m for Sut estimation
+        :rtype: (float, float)
         """
-        return ((self.shear_modulus * self.wire_diameter) /
-                (8 * self.spring_index ** 3 * self.spring_constant)) * (
-                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
+        if isinstance(diameter, Symbol):
+            raise ValueError(f"the material keyword can't be used if the diameter is symbolic "
+                             f"specify Ap and m manually")
+
+        path = os.path.dirname(__file__) + "\\tables\\A_and_m.csv"
+        with open(path, newline='') as file:
+            reader = csv.DictReader(file)
+            table = []
+            available_types = []
+            for line in reader:
+                table.append(line)
+                available_types.append(line['type'])
+
+        for line in table:
+            min_d = float(line['min_d_mm'] if metric else line['min_d_in'])
+            max_d = float(line['max_d_mm'] if metric else line['max_d_in'])
+            if line['type'] == material.lower() and min_d <= diameter <= max_d:
+                return float(line['A_mm'] if metric else line['A_in']), float(line['m'])
+
+        if material not in available_types:
+            raise KeyError("The material is unknown")
+        else:
+            raise ValueError("The diameter don't match any of the values in the table")

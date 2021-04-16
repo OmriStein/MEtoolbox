@@ -162,7 +162,7 @@ class HelicalGear(SpurGear):
         :param HelicalGear gear: gear object
         :param float power: power
 
-        :returns: Wt - tangent force in [N], Wr - radial force in [N], Wx - axial force in [N]
+        :returns: Wt - tangent max_force in [N], Wr - radial max_force in [N], Wx - axial max_force in [N]
         :rtype: tuple[float, float, float]
         """
 

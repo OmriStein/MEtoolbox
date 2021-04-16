@@ -21,7 +21,7 @@ spring = ExtensionSpring(max_force=Fmax, initial_tension=Fi, wire_diameter=d, sp
                          end_shear_yield_percent=0.4, spring_constant=None, active_coils=None,
                          body_coils=12.17, free_length=None, density=None, working_frequency=None)
 
-n_body, n_hook_normal, n_hook_shear = spring.static_safety_factor()
+n_body, n_hook_normal, n_hook_shear = spring.static_safety_factor
 print(f"ns_body={n_body}, ns_hook_normal={n_hook_normal}, ns_hook_shear={n_hook_shear}")
 nf_body, ns_body, nf_hook_bending, nf_hook_shear = spring.fatigue_analysis(Fmax, Fmin, 50,)
 print(f"nf_body={nf_body}, ns_body={ns_body}, nf_hook_bending={nf_hook_bending},"

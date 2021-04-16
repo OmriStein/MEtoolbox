@@ -419,7 +419,7 @@ class SpurGear:
         :param SpurGear gear: gear object
         :param float power: power
 
-        :returns: Wt - tangent force in [N], Wr - radial force in [N]
+        :returns: Wt - tangent max_force in [N], Wr - radial max_force in [N]
         :rtype: tuple[float, float]
         """
 

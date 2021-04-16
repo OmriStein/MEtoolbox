@@ -10,10 +10,10 @@ from me_toolbox.tools import percent_to_decimal
 class ExtensionSpring(Spring):
     """An extension spring object"""
 
-    def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, Ap, m,
-                 hook_r1, hook_r2, shear_modulus, elastic_modulus, body_shear_yield_percent,
-                 end_normal_yield_percent, end_shear_yield_percent, spring_constant=None,
-                 active_coils=None, shot_peened=False, body_coils=None, free_length=None,
+    def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, hook_r1, hook_r2,
+                 shear_modulus, elastic_modulus, body_shear_yield_percent, end_normal_yield_percent,
+                 end_shear_yield_percent, material=None, Ap=None, m=None, spring_constant=None,
+                 active_coils=None, body_coils=None, shot_peened=False, free_length=None,
                  density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
 
@@ -35,7 +35,7 @@ class ExtensionSpring(Spring):
         :param float or None active_coils: active_coils - number of active coils
         :param bool shot_peened: if True adds to fatigue strength
         :param float or None body_coils: Spring's number of body coils
-        :param float or None free_length: the spring length when no force is applied
+        :param float or None free_length: the spring length when no max_force is applied
         :param float or None density: Spring's material density
             (used for buckling and weight calculations)
         :param float or None working_frequency: the spring working frequency
@@ -45,8 +45,9 @@ class ExtensionSpring(Spring):
 
         """
         self.constructing = True
-        super().__init__(max_force, Ap, m, body_shear_yield_percent, wire_diameter, spring_diameter,
-                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency)
+        super().__init__(max_force, body_shear_yield_percent, wire_diameter, spring_diameter,
+                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency,
+                         material, Ap, m)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1
@@ -54,11 +55,52 @@ class ExtensionSpring(Spring):
         self.end_normal_yield_percent = end_normal_yield_percent
         self.end_shear_yield_percent = end_shear_yield_percent
 
-        self.shot_peened = shot_peened
         self._na_k_sorter(active_coils, body_coils, spring_constant)
         self.free_length = free_length
+
         self.check_design()
         self.constructing = False
+
+    def _na_k_sorter(self, active_coils, body_coils, spring_constant):
+        """The active coils, body coils and the spring
+        constant are linked this method is meant to
+        determine the order of assignment and calculation
+        based on the class input
+
+        :param float or None active_coils: The spring's number of active coils
+        :param float or None body_coils: The spring's number of body coils
+        :param float or None spring_constant: The spring's constant (rate)
+
+        """
+        if (active_coils is None) and (spring_constant is None) and (body_coils is None):
+            # if None were given
+            raise ValueError(
+                "active_coils, body_coils and the spring_constant can't all be None,"
+                "Tip: Find the spring constant")
+        elif active_coils is None and spring_constant is not None and body_coils is None:
+            # calculating active_coils based on the spring constant and
+            # than body_coils based on active_coils
+            # K -> active_coils -> body_coils
+            self.spring_constant = spring_constant
+            self.active_coils = active_coils
+            self.body_coils = body_coils
+        elif spring_constant is None and active_coils is not None and body_coils is None:
+            # calculating the spring constant and body_coils based on active_coils
+            # active_coils -> k, active_coils->body_coils
+            self.active_coils = active_coils
+            self.body_coils = body_coils
+            self.spring_constant = spring_constant
+        elif spring_constant is None and active_coils is None and body_coils is not None:
+            # calculating active_coils based on body_coils and
+            # than the spring constant based on active_coils
+            # body_coils -> active_coils -> k
+            self.body_coils = body_coils
+            self.active_coils = active_coils
+            self.spring_constant = spring_constant
+        else:
+            # if two or more are given raise error to prevent mistakes
+            raise ValueError("active_coils, body_coils and/or the spring constant were"
+                             "given but only one is expected")
 
     def check_design(self, verbose=False):
         """Check if the spring index,active_coils,zeta and free_length
@@ -303,12 +345,12 @@ class ExtensionSpring(Spring):
         :returns: Normal stress
         :rtype: float or Symbol
         """
-        return self.calc_max_normal_stress(self.force)
+        return self.calc_max_normal_stress(self.max_force)
 
     def calc_max_normal_stress(self, force):
-        """Calculates the normal stress based on the force given
+        """Calculates the normal stress based on the max_force given
 
-        :param float of Symbol force: Working force of the spring
+        :param float of Symbol force: Working max_force of the spring
 
         :returns: normal stress
         :rtype: float or Symbol
@@ -324,8 +366,8 @@ class ExtensionSpring(Spring):
         :returns: Hook torsion stress
         :rtype: float
         """
-        # return self.calc_max_shear_stress(self.force)
-        return HelicalPushSpring.calc_max_shear_stress(self, self.force, self.hook_KB)
+        # return self.calc_max_shear_stress(self.max_force)
+        return HelicalPushSpring.calc_max_shear_stress(self, self.max_force, self.hook_KB)
 
     @property
     def max_body_shear_stress(self):
@@ -334,8 +376,8 @@ class ExtensionSpring(Spring):
         :returns: Body torsion stress
         :rtype: float
         """
-        # return self.calc_max_shear_stress(self.force, hook=False)
-        return self.calc_max_shear_stress(self.force, self.factor_Kw)
+        # return self.calc_max_shear_stress(self.max_force, hook=False)
+        return self.calc_max_shear_stress(self.max_force, self.factor_Kw)
 
     @property
     def free_length(self):
@@ -367,6 +409,7 @@ class ExtensionSpring(Spring):
         return 2 * (self.spring_diameter - self.wire_diameter) + (
                 self.body_coils + 1) * self.wire_diameter
 
+    @property
     def static_safety_factor(self):  # pylint: disable=unused-argument
         """ Returns the static safety factors for the hook (torsion and
         bending), and for the spring's body (torsion)
@@ -383,20 +426,20 @@ class ExtensionSpring(Spring):
         return n_body, n_hook_normal, n_hook_shear
 
     @property
-    def deflection(self):
-        """Returns the spring deflection, It's change in length
+    def max_deflection(self):
+        """Returns the spring max_deflection, It's change in length
 
-        :returns: Spring deflection
+        :returns: Spring max_deflection
         :rtype: float or Symbol
         """
-        return self.calc_deflection(self.force)
+        return self.calc_deflection(self.max_force)
 
     def calc_deflection(self, force):
-        """Calculate the spring deflection (change in length) due to a specific force
+        """Calculate the spring max_deflection (change in length) due to a specific max_force
 
-        :param float or Symbol force: Spring working force
+        :param float or Symbol force: Spring working max_force
 
-        :returns: Spring deflection
+        :returns: Spring max_deflection
         :rtype: float or Symbol
         """
         return (force - self.initial_tension) / self.spring_constant
@@ -417,8 +460,8 @@ class ExtensionSpring(Spring):
         for normal and shear stress,and for the
         body section for shear and static yield.
 
-        :param float max_force: Maximal force acting on the spring
-        :param float min_force: Minimal force acting on the spring
+        :param float max_force: Maximal max_force acting on the spring
+        :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
         :param str criterion: fatigue criterion
         :param bool verbose: print more details
@@ -463,7 +506,7 @@ class ExtensionSpring(Spring):
                                                              mean_body_shear_stress, criterion)
 
         if verbose:
-            print(f"Alternating force = {alt_force}, Mean force = {mean_force}\n"
+            print(f"Alternating max_force = {alt_force}, Mean max_force = {mean_force}\n"
                   f"Alternating shear stress = {alt_shear_stress},"
                   f"Mean shear stress = {mean_shear_stress}\n"
                   f"Alternating normal stress = {alt_normal_stress},"
@@ -492,7 +535,7 @@ class ExtensionSpring(Spring):
         factor_k, temp_k = 1.1, 0
         min_diam_shear = 0
         while abs(factor_k - temp_k) > 1e-3:
-            diam = ((8 * factor_k * self.force * self.spring_index * static_safety_factor)
+            diam = ((8 * factor_k * self.max_force * self.spring_index * static_safety_factor)
                     / (self.end_shear_yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
             if isinstance(diam, float):
                 min_diam_shear = diam
@@ -504,7 +547,7 @@ class ExtensionSpring(Spring):
         factor_k, temp_k = 1.1, 0
         min_diam_normal = 0
         while abs(factor_k - temp_k) > 1e-3:
-            diam = ((factor_k * self.force * (
+            diam = ((factor_k * self.max_force * (
                     16 * self.spring_index + 4) * static_safety_factor) / (
                             self.end_normal_yield_percent * self.Ap * pi)) ** (
                            1 / (2 - self.m))
@@ -533,49 +576,9 @@ class ExtensionSpring(Spring):
         """
         # extracted from shear stress
         diameter_shear = (self.end_shear_yield_strength * pi * self.wire_diameter ** 3) / (
-                self.hook_KB * 8 * self.force * static_safety_factor)
+                self.hook_KB * 8 * self.max_force * static_safety_factor)
         # extracted from normal stress
         diameter_normal = (1 / (4 * self.hook_KA)) * \
                           (((self.end_normal_yield_strength * pi * self.wire_diameter ** 3) /
-                            (4 * self.force * static_safety_factor)) - self.wire_diameter)
+                            (4 * self.max_force * static_safety_factor)) - self.wire_diameter)
         return max(diameter_shear, diameter_normal)
-
-    def _na_k_sorter(self, *args):
-        """The active coils, body coils and the spring
-        constant are linked this method is meant to
-        determine the order of assignment and calculation
-        based on the class input
-        """
-        active_coils = args[0]
-        body_coils = args[1]
-        spring_constant = args[2]
-
-        if (active_coils is None) and (spring_constant is None) and (body_coils is None):
-            # if None were given
-            raise ValueError(
-                "active_coils, body_coils and the spring_constant can't all be None,"
-                "Tip: Find the spring constant")
-        elif active_coils is None and spring_constant is not None and body_coils is None:
-            # calculating active_coils based on the spring constant and
-            # than body_coils based on active_coils
-            # K -> active_coils -> body_coils
-            self.spring_constant = spring_constant
-            self.active_coils = active_coils
-            self.body_coils = body_coils
-        elif spring_constant is None and active_coils is not None and body_coils is None:
-            # calculating the spring constant and body_coils based on active_coils
-            # active_coils -> k, active_coils->body_coils
-            self.active_coils = active_coils
-            self.body_coils = body_coils
-            self.spring_constant = spring_constant
-        elif spring_constant is None and active_coils is None and body_coils is not None:
-            # calculating active_coils based on body_coils and
-            # than the spring constant based on active_coils
-            # body_coils -> active_coils -> k
-            self.body_coils = body_coils
-            self.active_coils = active_coils
-            self.spring_constant = spring_constant
-        else:
-            # if two or more are given raise error to prevent mistakes
-            raise ValueError("active_coils, body_coils and/or the spring constant were"
-                             "given but only one is expected")

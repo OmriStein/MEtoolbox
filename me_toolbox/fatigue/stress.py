@@ -37,7 +37,7 @@ def bending_stress(My, Iy, z, Mz=None, Iz=None, y=None):
 def shear_bending_stress(V, Q, I, b):
     """ Shear stresses due to bending
 
-    :param float V: Shear force in y direction
+    :param float V: Shear max_force in y direction
     :param float Q: first moment of in cross section in y direction
     :param float I: Area moment of inertia around the y axis
     :param float b: thickness
