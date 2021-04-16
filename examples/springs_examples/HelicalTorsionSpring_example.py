@@ -22,3 +22,5 @@ print(spring.max_total_angular_deflection.subs(F, F_sol))
 spring.max_moment = F_sol * 1
 
 print(spring.fatigue_analysis(5, 1, 50, verbose=True, metric=False))
+
+spring.get_info()

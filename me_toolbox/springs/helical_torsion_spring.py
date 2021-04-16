@@ -266,8 +266,15 @@ class HelicalTorsionSpring(Spring):
             # spring_constant was not given so calculate it
             self._spring_constant = self.calc_spring_constant()
 
+    @property
+    def spring_const_deg(self):
+        """convert the spring constant from
+        [N*mm/turn] or [pound force*inch/turn]
+        to [N*mm/deg] or [pound force*inch/deg]"""
+        return self.spring_constant/360
+
     def calc_spring_constant(self):
-        """Calculate spring constant (using Castigliano's theorem)
+        """Calculate spring constant in [N*mm/turn] or [pound force*inch/turn]
 
         :returns: The spring constant
         :rtype: float
@@ -319,19 +326,31 @@ class HelicalTorsionSpring(Spring):
         return self.calc_angular_deflection(self.max_moment)
 
     @property
+    def max_total_angular_deflection_deg(self):
+        """convert max angular deflection from [turns] to [degrees]"""
+        return self.max_total_angular_deflection * 360
+
+    @property
     def max_angular_deflection(self):
         """The angular deflection due to the max moment
-        of *only* the coil body
+        of *only* the coil body in [turns]
 
         :returns: Max angular deflection
         :rtype: float or Symbol
         """
         return self.calc_angular_deflection(self.max_moment, total=False)
 
+    @property
+    def max_angular_deflection_deg(self):
+        """convert max angular deflection from [turns] to [degrees]"""
+        return self.max_angular_deflection * 360
+
     def calc_angular_deflection(self, moment, total=True):
         """Calculates the total angular deflection based on the moment given
         if the total flag is True than the total angular deflection is calculated,
         if False only the deflection of the coil body is calculated
+
+        NOTE: the units of the deflection is in [turns]
 
         :param float of Symbol moment: Working moment of the spring
         :param bool total: total or partial deflection
