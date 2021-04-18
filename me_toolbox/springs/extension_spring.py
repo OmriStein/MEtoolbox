@@ -54,9 +54,9 @@ class ExtensionSpring(Spring):
         self.end_normal_yield_percent = end_normal_yield_percent
         self.end_shear_yield_percent = end_shear_yield_percent
 
-        if (active_coils is not None) and (spring_constant is not None) and (body_coils is not None):
-            # to prevent input mistakes
-            raise ValueError("active_coils, body_coils and/or the spring constant were"
+        if sum([active_coils is not None, spring_constant is not None, body_coils is not None]) > 1:
+            # if two or more are given raise error to prevent input mistakes
+            raise ValueError("active_coils, body_coils and/or spring_constant were"
                              "given but only one is expected")
         elif spring_constant is not None:
             # spring_constant -> active_coils -> body_coils
@@ -68,8 +68,8 @@ class ExtensionSpring(Spring):
             # body_coils -> active_coils -> spring_constant
             self.body_coils = body_coils
         else:
-            raise ValueError("active_coils, body_coils and the spring_constant can't all be None,"
-                             "Tip: Find the spring constant")
+            raise ValueError("active_coils, body_coils and the spring_constant"
+                             "can't all be None, Tip: Find the spring constant")
 
         self.free_length = free_length
 
@@ -542,7 +542,7 @@ class ExtensionSpring(Spring):
             # waiting for k to converge
             percent = self.end_shear_yield_percent
             shear_diam = ((8 * factor_k * F * C * safety_factor) / (percent * Ap * pi)) ** (
-                        1 / (2 - m))
+                    1 / (2 - m))
             temp_k = factor_k
             factor_k = (8 * self.hook_r2 - shear_diam) / (8 * self.hook_r2 - 4 * shear_diam)
 

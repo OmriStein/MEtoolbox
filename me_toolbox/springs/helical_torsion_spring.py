@@ -50,11 +50,10 @@ class HelicalTorsionSpring(Spring):
         self.leg1, self.leg2 = leg1, leg2
         self.pin_diameter = pin_diameter
 
-        if (active_coils is not None) and (spring_constant is not None) and (body_coils is not None):
-            # if two or more are given raise error to prevent mistakes
-            raise ValueError("active_coils, body_coils and/or the spring constant were"
+        if sum([active_coils is not None, spring_constant is not None, body_coils is not None]) > 1:
+            # if two or more are given raise error to prevent input mistakes
+            raise ValueError("active_coils, body_coils and/or spring_constant were"
                              "given but only one is expected")
-
         elif spring_constant is not None:
             # spring_constant -> active_coils -> body_coils
             self.spring_constant = spring_constant
