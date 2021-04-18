@@ -34,12 +34,13 @@ print(f"Ls = {spring.solid_length}")
 print(f"L0 = {spring.free_length}")
 buckling = spring.buckling
 print(f"collapse: {buckling[0]}, max free length (L0) = {buckling[1]}")
+print(f"static safety factor = {spring.static_safety_factor()}")
 nf, ns = spring.fatigue_analysis(575, 185, 99.999)
 print(f"fatigue safety factor={nf}, safety factor for first cycle={ns}\n")
 
 spring2 = HelicalPushSpring(max_force=Fmax, wire_diameter=6, spring_diameter=60,
                             shear_yield_percent=0.45, end_type='squared and ground', shear_modulus=G,
-                            material='music wire', elastic_modulus=205e3, spring_constant=6,
+                            Ap=2211, m=0.145, elastic_modulus=205e3, spring_constant=6,
                             set_removed=False, shot_peened=True, anchors='fixed-hinged')
 print()
 print(f"static safety factor = {spring2.static_safety_factor()}")

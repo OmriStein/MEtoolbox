@@ -10,9 +10,9 @@ from me_toolbox.tools import percent_to_decimal
 class ExtensionSpring(Spring):
     """An extension spring object"""
 
-    def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, hook_r1, hook_r2,
-                 shear_modulus, elastic_modulus, body_shear_yield_percent, end_normal_yield_percent,
-                 end_shear_yield_percent, material=None, Ap=None, m=None, spring_constant=None,
+    def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter,
+                 hook_r1, hook_r2, shear_modulus, elastic_modulus, body_shear_yield_percent,
+                 end_normal_yield_percent, end_shear_yield_percent, Ap, m, spring_constant=None,
                  active_coils=None, body_coils=None, shot_peened=False, free_length=None,
                  density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
@@ -43,9 +43,9 @@ class ExtensionSpring(Spring):
 
         :returns: HelicalPushSpring
         """
-        self.constructing = True
+
         super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus, elastic_modulus,
-                         shot_peened, density, working_frequency, material, Ap, m)
+                         shot_peened, density, working_frequency, Ap, m)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1
@@ -54,52 +54,26 @@ class ExtensionSpring(Spring):
         self.end_normal_yield_percent = end_normal_yield_percent
         self.end_shear_yield_percent = end_shear_yield_percent
 
-        self._na_k_sorter(active_coils, body_coils, spring_constant)
+        if (active_coils is not None) and (spring_constant is not None) and (body_coils is not None):
+            # to prevent input mistakes
+            raise ValueError("active_coils, body_coils and/or the spring constant were"
+                             "given but only one is expected")
+        elif spring_constant is not None:
+            # spring_constant -> active_coils -> body_coils
+            self.spring_constant = spring_constant
+        elif active_coils is not None:
+            # active_coils -> spring_constant, active_coils->body_coils
+            self.active_coils = active_coils
+        elif body_coils is not None:
+            # body_coils -> active_coils -> spring_constant
+            self.body_coils = body_coils
+        else:
+            raise ValueError("active_coils, body_coils and the spring_constant can't all be None,"
+                             "Tip: Find the spring constant")
+
         self.free_length = free_length
 
         self.check_design()
-        self.constructing = False
-
-    def _na_k_sorter(self, active_coils, body_coils, spring_constant):
-        """The active coils, body coils and the spring
-        constant are linked this method is meant to
-        determine the order of assignment and calculation
-        based on the class input
-
-        :param float or None active_coils: The spring's number of active coils
-        :param float or None body_coils: The spring's number of body coils
-        :param float or None spring_constant: The spring's constant (rate)
-
-        """
-        if (active_coils is None) and (spring_constant is None) and (body_coils is None):
-            # if None were given
-            raise ValueError(
-                "active_coils, body_coils and the spring_constant can't all be None,"
-                "Tip: Find the spring constant")
-        elif active_coils is None and spring_constant is not None and body_coils is None:
-            # calculating active_coils based on the spring constant and
-            # than body_coils based on active_coils
-            # K -> active_coils -> body_coils
-            self.spring_constant = spring_constant
-            self.active_coils = active_coils
-            self.body_coils = body_coils
-        elif spring_constant is None and active_coils is not None and body_coils is None:
-            # calculating the spring constant and body_coils based on active_coils
-            # active_coils -> k, active_coils->body_coils
-            self.active_coils = active_coils
-            self.body_coils = body_coils
-            self.spring_constant = spring_constant
-        elif spring_constant is None and active_coils is None and body_coils is not None:
-            # calculating active_coils based on body_coils and
-            # than the spring constant based on active_coils
-            # body_coils -> active_coils -> k
-            self.body_coils = body_coils
-            self.active_coils = active_coils
-            self.spring_constant = spring_constant
-        else:
-            # if two or more are given raise error to prevent mistakes
-            raise ValueError("active_coils, body_coils and/or the spring constant were"
-                             "given but only one is expected")
 
     def check_design(self, verbose=False):
         """Check if the spring index,active_coils,zeta and free_length
@@ -178,11 +152,10 @@ class ExtensionSpring(Spring):
         :param float wire_diameter: Spring's wire diameter
         """
         self._wire_diameter = wire_diameter
-        if not self.constructing:
-            # updating active_coils and free length with the new diameter
-            self.active_coils = None
-            self.spring_constant = None
-            self.free_length = None
+        # updating active_coils and free length with the new diameter
+        self.active_coils = None
+        self.spring_constant = None
+        self.free_length = None
 
     @property
     def spring_diameter(self):
@@ -200,11 +173,10 @@ class ExtensionSpring(Spring):
         :param float wire_diameter: Spring's diameter
         """
         self._spring_diameter = wire_diameter
-        if not self.constructing:
-            # updating active_coils and free length with the new diameter
-            self.active_coils = None
-            self.spring_constant = None
-            self.free_length = None
+        # updating active_coils and free length with the new diameter
+        self.active_coils = None
+        self.spring_constant = None
+        self.free_length = None
 
     @property
     def active_coils(self):
@@ -500,11 +472,16 @@ class ExtensionSpring(Spring):
         Se = Sse / 0.577  # estimation using distortion-energy theory
         Sut = self.ultimate_tensile_strength
 
-        nf_hook_normal, _ = FailureCriteria.get_safety_factor(Sy_end, Sut, Se, alt_normal_stress,
-                                                              mean_normal_stress, criterion)
+        try:
+            nf_hook_normal, _ = FailureCriteria.get_safety_factor(Sy_end, Sut, Se,
+                                                                  alt_normal_stress,
+                                                                  mean_normal_stress, criterion)
 
-        nf_hook_shear, _ = FailureCriteria.get_safety_factor(Ssy_end, Ssu, Sse, alt_shear_stress,
-                                                             mean_shear_stress, criterion)
+            nf_hook_shear, _ = FailureCriteria.get_safety_factor(Ssy_end, Ssu, Sse,
+                                                                 alt_shear_stress,
+                                                                 mean_shear_stress, criterion)
+        except TypeError as typ_err:
+            raise ValueError(f"Fatigue analysis can't handle symbolic vars") from typ_err
 
         # calculating mean and alternating stresses for the body section
         # shear stresses:
@@ -527,53 +504,52 @@ class ExtensionSpring(Spring):
 
         return nf_body, ns_body, nf_hook_normal, nf_hook_shear
 
-    def min_wire_diameter(self, static_safety_factor):
+    def min_wire_diameter(self, safety_factor, spring_index=None):
         """The minimal wire diameters (for shear and normal stresses)
         for a given safety factor in order to avoid failure,
 
-        NOTE: Because KA and KB contains d no simple solution is available as in the
-            HelicalPushSpring, so we assume an initial K and iterate until convergence,
-            be aware that for some static_safety_factor a convergence my not occur.
+        Because KA and KB contains d no simple solution is available as in the
+        HelicalPushSpring, so we assume an initial K and iterate until convergence,
+        be aware that for some static_safety_factor a convergence my not occur.
 
         NOTE: for static use only
 
-        :param float static_safety_factor: factor of safety
+        :param float safety_factor: Static safety factor
+        :param float spring_index: Spring index
 
-        :returns: The minimal wire diameter for shear and normal stresses
-        :rtype: float or Symbol
+        :returns: The minimal wire diameter
+        :rtype: float or tuple[Symbol, Symbol]
         """
-        factor_k, temp_k = 1.1, 0
-        min_diam_shear = 0
-        while abs(factor_k - temp_k) > 1e-3:
-            diam = ((8 * factor_k * self.max_force * self.spring_index * static_safety_factor)
-                    / (self.end_shear_yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
-            if isinstance(diam, float):
-                min_diam_shear = diam
-            else:
-                break
-            temp_k = factor_k
-            factor_k = (8 * self.hook_r2 - min_diam_shear) / (8 * self.hook_r2 - 4 * min_diam_shear)
+        F = self.max_force
+        Ap = self.Ap
+        m = self.m
+        C = spring_index
 
         factor_k, temp_k = 1.1, 0
-        min_diam_normal = 0
-        while abs(factor_k - temp_k) > 1e-3:
-            diam = ((factor_k * self.max_force * (
-                    16 * self.spring_index + 4) * static_safety_factor) / (
-                            self.end_normal_yield_percent * self.Ap * pi)) ** (
-                           1 / (2 - self.m))
-            if isinstance(diam, float):
-                min_diam_normal = diam
-            else:
-                break
+        normal_diam = 0
+        while abs(factor_k - temp_k) > 1e-4:
+            # waiting for k to converge
+            percent = self.end_normal_yield_percent
+            normal_diam = (safety_factor * F * (16 * factor_k * C - 4) / (percent * Ap * pi)) ** (
+                    1 / (2 - m))
             temp_k = factor_k
+            factor_k = ((16 * self.hook_r1 ** 2 - 2 * self.hook_r1 * normal_diam - normal_diam ** 2)
+                        / (16 * self.hook_r1 ** 2 - 8 * self.hook_r1 * normal_diam))
 
-            factor_k = (16 * self.hook_r1 ** 2 - 2 * self.hook_r1 * diam - diam ** 2) / (
-                    16 * self.hook_r1 ** 2 - 8 * self.hook_r1 * diam)
+        factor_k, temp_k = 1.1, 0
+        shear_diam = 0
+        while abs(factor_k - temp_k) > 1e-4:
+            # waiting for k to converge
+            percent = self.end_shear_yield_percent
+            shear_diam = ((8 * factor_k * F * C * safety_factor) / (percent * Ap * pi)) ** (
+                        1 / (2 - m))
+            temp_k = factor_k
+            factor_k = (8 * self.hook_r2 - shear_diam) / (8 * self.hook_r2 - 4 * shear_diam)
 
-            if isinstance(min_diam_shear, float) and isinstance(min_diam_normal, float):
-                return max(min_diam_shear, min_diam_normal)
-            else:
-                return min_diam_shear, min_diam_normal
+        try:
+            return max(normal_diam, shear_diam)
+        except TypeError:
+            return normal_diam, shear_diam
 
     def min_spring_diameter(self, static_safety_factor):
         """return the minimum spring diameter to avoid static failure
@@ -591,4 +567,7 @@ class ExtensionSpring(Spring):
         diameter_normal = (1 / (4 * self.hook_KA)) * \
                           (((self.end_normal_yield_strength * pi * self.wire_diameter ** 3) /
                             (4 * self.max_force * static_safety_factor)) - self.wire_diameter)
-        return max(diameter_shear, diameter_normal)
+        try:
+            return max(diameter_shear, diameter_normal)
+        except TypeError:
+            return diameter_shear, diameter_normal

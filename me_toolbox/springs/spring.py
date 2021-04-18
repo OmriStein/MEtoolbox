@@ -12,19 +12,11 @@ from me_toolbox.tools import print_atributes
 # TODO: add optimization based on cost and other needs
 class Spring:
     def __init__(self, max_force, wire_diameter, spring_diameter,
-                 shear_modulus, elastic_modulus, shot_peened, density, working_frequency, material,
-                 Ap, m):
+                 shear_modulus, elastic_modulus, shot_peened, density, working_frequency, Ap, m):
         self.max_force = max_force
-
-        if (Ap is None or m is None) and material is None:
-            raise ValueError("Ap, m and material keywords can't all be None")
-
-        self.Ap, self.m = self.material_prop(material, wire_diameter) if (
-                Ap is None or m is None) else (Ap, m)
-
-        # self.torsion_yield_percent = torsion_yield_percent
-        self.wire_diameter = wire_diameter
-        self.spring_diameter = spring_diameter
+        self.Ap, self.m = Ap, m
+        self._wire_diameter = wire_diameter
+        self._spring_diameter = spring_diameter
         self.shear_modulus = shear_modulus
         self.elastic_modulus = elastic_modulus
         self.shot_peened = shot_peened
@@ -102,8 +94,11 @@ class Spring:
         :returns: Natural frequency
         :rtype: float
         """
-        return (self.wire_diameter / (2 * self.spring_diameter ** 2 * self.active_coils * pi)) \
-               * sqrt(self.shear_modulus / (2 * density))
+        d = self.wire_diameter
+        D = self.spring_diameter
+        Na = self.active_coils
+        G = self.shear_modulus
+        return (d / (2 * D ** 2 * Na * pi)) * sqrt(G / (2 * density))
 
     def weight(self, density):
         """Return's the spring *active coils* weight according to the specified density
@@ -166,3 +161,13 @@ class Spring:
             raise KeyError("The material is unknown")
         else:
             raise ValueError("The diameter don't match any of the values in the table")
+
+    # def calc_min_diam(self, d_fun, k_fun, static_safety_factor, spring_diameter, initial_k=1.1):
+    #     factor_k, temp_k = initial_k, 0
+    #     diam = 0
+    #     while abs(factor_k - temp_k) > 1e-4:
+    #         # waiting for k to converge
+    #         diam = d_fun(self, factor_k, static_safety_factor)
+    #         temp_k = factor_k
+    #         factor_k = k_fun(spring_diameter, diam)
+    #     return diam

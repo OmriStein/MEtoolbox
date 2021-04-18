@@ -1,5 +1,5 @@
 """A module containing the helical torsion spring class"""
-from math import pi
+from math import pi, sqrt
 from sympy import Symbol  # pylint: disable=unused-import
 
 from fatigue import FailureCriteria
@@ -11,7 +11,7 @@ class HelicalTorsionSpring(Spring):
     """A Helical torsion spring object"""
 
     def __init__(self, max_moment, wire_diameter, spring_diameter, leg1, leg2,
-                 shear_modulus, elastic_modulus, yield_percent, material=None, Ap=None, m=None,
+                 shear_modulus, elastic_modulus, yield_percent, Ap, m,
                  spring_constant=None, active_coils=None, body_coils=None, shot_peened=False,
                  density=None, working_frequency=None, radius=None, pin_diameter=None):
         """Instantiate a helical torsion spring object with the given parameters
@@ -25,7 +25,6 @@ class HelicalTorsionSpring(Spring):
         :param float shear_modulus: Spring's material shear modulus
         :param float elastic_modulus: Spring's material elastic modulus
         :param float yield_percent: Used to estimate the spring's yield stress
-        :param str material: Spring's material (instead of Ap and m)
         :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
         :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
         :param float or None spring_constant: K - spring constant
@@ -41,60 +40,33 @@ class HelicalTorsionSpring(Spring):
 
         :returns: HelicalTorsionSpring
         """
-        self.constructing = True
         max_force = max_moment / radius if radius is not None else None
 
         super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus, elastic_modulus,
-                         shot_peened, density, working_frequency, material, Ap, m)
+                         shot_peened, density, working_frequency, Ap, m)
 
         self.max_moment = max_moment
         self.yield_percent = yield_percent
         self.leg1, self.leg2 = leg1, leg2
         self.pin_diameter = pin_diameter
-        self._na_k_sorter(active_coils, body_coils, spring_constant)
 
-        self.constructing = False
-
-    def _na_k_sorter(self, active_coils, body_coils, spring_constant):
-        """The active coils, body coils and the spring
-        constant are linked this method is meant to
-        determine the order of assignment and calculation
-        based on the class input
-
-        :param float or None active_coils: The spring's number of active coils
-        :param float or None body_coils: The spring's number of body coils
-        :param float or None spring_constant: The spring's constant (rate)
-
-        """
-        if (active_coils is None) and (spring_constant is None) and (body_coils is None):
-            # if None were given
-            raise ValueError(
-                "active_coils, body_coils and the spring_constant can't all be None,"
-                "Tip: Find the spring constant")
-        elif active_coils is None and spring_constant is not None and body_coils is None:
-            # calculating active_coils based on the spring constant and
-            # than body_coils based on active_coils
-            # K -> active_coils -> body_coils
-            self.spring_constant = spring_constant
-            self.active_coils = active_coils
-            self.body_coils = body_coils
-        elif spring_constant is None and active_coils is not None and body_coils is None:
-            # calculating the spring constant and body_coils based on active_coils
-            # active_coils -> k, active_coils->body_coils
-            self.active_coils = active_coils
-            self.body_coils = body_coils
-            self.spring_constant = spring_constant
-        elif spring_constant is None and active_coils is None and body_coils is not None:
-            # calculating active_coils based on body_coils and
-            # than the spring constant based on active_coils
-            # body_coils -> active_coils -> k
-            self.body_coils = body_coils
-            self.active_coils = active_coils
-            self.spring_constant = spring_constant
-        else:
+        if (active_coils is not None) and (spring_constant is not None) and (body_coils is not None):
             # if two or more are given raise error to prevent mistakes
             raise ValueError("active_coils, body_coils and/or the spring constant were"
                              "given but only one is expected")
+
+        elif spring_constant is not None:
+            # spring_constant -> active_coils -> body_coils
+            self.spring_constant = spring_constant
+        elif active_coils is not None:
+            # active_coils -> spring_constant, active_coils->body_coils
+            self.active_coils = active_coils
+        elif body_coils is not None:
+            # body_coils -> active_coils -> spring_constant
+            self.body_coils = body_coils
+        else:
+            raise ValueError("active_coils, body_coils and the spring_constant"
+                             "can't all be None, Tip: Find the spring constant")
 
     @property
     def yield_strength(self):
@@ -119,10 +91,9 @@ class HelicalTorsionSpring(Spring):
         :param float wire_diameter: Spring's wire diameter
         """
         self._wire_diameter = wire_diameter
-        if not self.constructing:
-            # updating active_coils and free length with the new diameter
-            self.active_coils = None
-            self.spring_constant = None
+        # updating active_coils and free length with the new diameter
+        self.active_coils = None
+        self.spring_constant = None
 
     @property
     def spring_diameter(self):
@@ -140,10 +111,9 @@ class HelicalTorsionSpring(Spring):
         :param float wire_diameter: Spring's diameter
         """
         self._spring_diameter = wire_diameter
-        if not self.constructing:
-            # updating active_coils and free length with the new diameter
-            self.active_coils = None
-            self.spring_constant = None
+        # updating active_coils and free length with the new diameter
+        self.active_coils = None
+        self.spring_constant = None
 
     @property
     def active_coils(self):
@@ -271,7 +241,7 @@ class HelicalTorsionSpring(Spring):
         """convert the spring constant from
         [N*mm/turn] or [pound force*inch/turn]
         to [N*mm/deg] or [pound force*inch/deg]"""
-        return self.spring_constant/360
+        return self.spring_constant / 360
 
     def calc_spring_constant(self):
         """Calculate spring constant in [N*mm/turn] or [pound force*inch/turn]
@@ -420,3 +390,53 @@ class HelicalTorsionSpring(Spring):
                   f"Alternating stress = {alt_stress}, Mean stress = {mean_stress}\n"
                   f"Sse = {Sse}, Se= {Se}")
         return nf, nl
+
+    def min_wire_diameter(self, safety_factor, spring_diameter=None, spring_index=None):
+        """The minimal wire diameter for a given safety factor
+        in order to avoid failure, according to the spring parameters
+
+        Note: In order for the calculation to succeed the
+            spring diameter or the spring index should be known
+
+        :param float safety_factor: static safety factor
+        :param float spring_diameter: The spring diameter
+        :param float spring_index: The spring index
+
+        :returns: The minimal wire diameter
+        :rtype: float
+        """
+        factor_k, temp_k = 1.1, 0
+        diam = 0
+        while abs(factor_k - temp_k) > 1e-4:
+            # waiting for k to converge
+            diam = ((32 * self.max_moment * factor_k * safety_factor) / (
+                    self.yield_percent * self.Ap * pi)) ** (
+                           1 / (3 - self.m))
+            temp_k = factor_k
+            if spring_diameter is not None:
+                D = spring_diameter
+                factor_k = (4 * D ** 2 - D * diam - diam ** 2) / (4 * D * (D - diam))
+            elif spring_index is not None:
+                c = spring_index
+                factor_k = (4 * c ** 2 - c - 1) / (4 * c * (c - 1))
+            else:
+                print("Need to know spring index or spring diameter to calculate wire diameter")
+        return diam
+
+    def min_spring_diameter(self, safety_factor, wire_diameter):
+        """return the minimum spring diameter to avoid static failure
+        according to the specified safety factor
+
+        :param float safety_factor: static safety factor
+        :param float wire_diameter: Spring's wire diameter
+
+        :returns: The minimal spring diameter
+        :rtype: float
+        """
+        d = wire_diameter
+        Sy = self.yield_strength
+        M = self.max_moment
+        alpha = 4 * (Sy * pi * d ** 3 - 32 * M * safety_factor)
+        beta = -d * (4 * Sy * pi * d ** 3 + 32 * M * safety_factor)
+        gamma = 32 * M * safety_factor * d ** 2
+        return (-beta + sqrt(beta ** 2 - 4 * alpha * gamma)) / (2 * alpha)

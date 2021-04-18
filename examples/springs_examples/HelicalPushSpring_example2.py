@@ -24,7 +24,7 @@ print(f"eq1: {eq1}")
 solution = solveset(eq1, D)
 print(f"Ds = {solution.args[0]}")
 # finding D with the MinSpringDiameter method
-print(f"Dm = {spring.min_spring_diameter(1.2, solid=True)}")
+print(f"Dm = {spring.min_spring_diameter(1.2, wire_diameter=spring.wire_diameter ,solid=True)}")
 
 # finding active_coils - number of active coils
 print(f"active_coils = {spring.active_coils}")  # parametric expression
