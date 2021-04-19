@@ -32,6 +32,24 @@ class Spring:
         print_atributes(self)
 
     @property
+    def wire_diameter(self):
+        """Getter for the wire diameter attribute
+
+        :returns: The spring's wire diameter
+        :rtype: float or Symbol
+        """
+        return self._wire_diameter
+
+    @property
+    def spring_diameter(self):
+        """Getter for the spring diameter attribute
+
+        :returns: The spring diameter
+        :rtype: float or Symbol
+        """
+        return self._spring_diameter
+
+    @property
     def spring_index(self):
         """C - spring index
 
