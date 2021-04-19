@@ -19,9 +19,12 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install me_tool
 ```python
 import me_toolbox.springs as springs 
 import me_toolbox.gears as gears
-spring_obj = springs.HelicalSpring(...)
-gear_obj = gears.SpurGear(...)
-trasmission_obj = gears.Transmission(...)
+import me_toolbox.fatigue as fatigue
+spring = springs.HelicalSpring(...)
+gear = gears.SpurGear(...)
+transmission = gears.Transmission(...)
+se = fatigue.EnduranceLimit(...)
+fatigue_analysis = fatigue.FatigueAnalysis(se,...)
 ```
 
 ## Contributing
