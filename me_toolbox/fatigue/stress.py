@@ -6,7 +6,7 @@ def uniform_stress(F, A):
     """Returns stress assuming uniform distribution in cross section
 
     :param float F: Force
-    :param foat A: Cross section area
+    :param float A: Cross section area
 
     :returns Stress
     :rtype: float
