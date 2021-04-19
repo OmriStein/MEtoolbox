@@ -1,3 +1,6 @@
+"""module containing the FatigueAnalysis class and
+calc_kf for calculating dynamic stress concentration factor
+"""
 from math import log10
 from sympy import sqrt
 from me_toolbox.tools import NotInRangeError, print_atributes

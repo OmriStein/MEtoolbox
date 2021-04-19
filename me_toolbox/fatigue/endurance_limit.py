@@ -5,9 +5,9 @@ from math import sqrt
 class EnduranceLimit:
     """calculates Marin modification factors and return modified endurance limit"""
 
-    def __init__(self, Sut, surface_finish, rotating, max_normal_stress, max_bending_stress, stress_type, temp,
-                 reliability, material=None, unmodified_endurance=None, A95=None, diameter=None, height=None,
-                 width=None):
+    def __init__(self, Sut, surface_finish, rotating, max_normal_stress, max_bending_stress,
+                 stress_type, temp, reliability, material=None, unmodified_endurance=None,
+                 A95=None, diameter=None, height=None, width=None):
         """ Instantiating EnduranceLimit Object
 
         :param float Sut: ultimate tensile strength
@@ -112,7 +112,8 @@ class EnduranceLimit:
 
         import numpy as np
         percentage = np.array([20, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600])
-        reliability_factors = np.array([1, 1.01, 1.02, 1.025, 1.02, 1, 0.975, 0.943, 0.9, 0.843, 0.768, 0.672, 0.549])
+        reliability_factors = np.array([1, 1.01, 1.02, 1.025, 1.02, 1, 0.975, 0.943, 0.9, 0.843,
+                                        0.768, 0.672, 0.549])
         return np.interp(self.temp, percentage, reliability_factors)
 
     @property
@@ -167,5 +168,5 @@ class EnduranceLimit:
 
     def get_factors(self):
         """print Marine factors"""
-        print(
-            f"Ka={self.Ka:.3f}, Kb={self.Kb:.3f}, Kc={self.Kc:.3f}, factor_Ks={self.Kd:.3f}, Ke={self.Ke:.3f}, Kf={self.Kf:.3f}")
+        print(f"Ka={self.Ka:.3f}, Kb={self.Kb:.3f}, Kc={self.Kc:.3f}, "
+              f"factor_Ks={self.Kd:.3f}, Ke={self.Ke:.3f}, Kf={self.Kf:.3f}")
