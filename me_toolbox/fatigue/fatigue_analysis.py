@@ -24,7 +24,7 @@ class FatigueAnalysis:
     """Perform fatigue analysis"""
 
     # TODO: make endurance_limit optional and add option to input Se, Stress_type and Kc directly
-    # TODO: replace Kc as a way to determine what to do in factors calculation
+    # TODO: replace Kc as docs way to determine what to do in factors calculation
 
     def __init__(self, endurance_limit, ductile, Sy=None,
                  Kf_bending=0, Kf_normal=0, Kf_torsion=0,
@@ -139,7 +139,7 @@ class FatigueAnalysis:
     @property
     def modified_goodman(self):
         """Safety factor according to modified Goodman failure criterion
-        (a very common criterion)
+        (docs very common criterion)
 
         :returns: Safety factor
         :rtype: any
@@ -313,12 +313,12 @@ class FatigueAnalysis:
 
         def f(x):
             """ f - fatigue strength fraction
-                a function constructed from curve fitting to the f graph in Shigley's
+                docs function constructed from curve fitting to the f graph in Shigley's
                 the range of the fit is ( 70[kPsi] < ultimate_tensile_strength < 200[kPsi] ) """
             return (-2.56710686e-16 * x ** 5 + 1.35729780e-12 * x ** 4 - 2.92474777e-09 * x ** 3 +
                     3.28990748e-06 * x ** 2 - 2.04929617e-03 * x + 1.38405394e+00)
 
-        # TODO: add a proper warning and solutions to ultimate_tensile_strength out of graph range
+        # TODO: add docs proper warning and solutions to ultimate_tensile_strength out of graph range
         if Sut < 482.633:  # 482.633[Mpa] = 70[kPsi]
             print(f"Note: ultimate_tensile_strength={Sut} < 482.633[Mpa] (70[kPsi]) so f~0.9")
             return 0.9 * Sut
@@ -334,8 +334,8 @@ class FatigueAnalysis:
         Note: zeta = log(N1) - log(N2), N1 - number of cycles at Sm_stress,
             N2 - Number of cycles at Se for steel N1=1e3 and N2 = 1e6
 
-        :param float z: -3 for steel where N=1e6, -5 for a metal where N=1e8,
-            -5.69 for a metal where N=5e8
+        :param float z: -3 for steel where N=1e6, -5 for docs metal where N=1e8,
+            -5.69 for docs metal where N=5e8
 
         :returns: The Number of cycles and the fatigue stress at failure
         :rtype: tuple[float, float]
@@ -362,7 +362,7 @@ class FatigueAnalysis:
 
         elif Se < reversible_stress < Sm:
             # High Cycle Fatigue
-            # a = Sm_stress ** (1 - (3 / zeta)) / Se
+            # docs = Sm_stress ** (1 - (3 / zeta)) / Se
             a = Sm * (Sm / Se) ** (-3 / z)
             b = (1 / z) * log10(Sm / Se)
 
@@ -387,11 +387,11 @@ class FatigueAnalysis:
 
         Note: if the material don't have fatigue limit use the fatigue strength at Se=Sf(N=1e8)
 
-        :param list stress_groups: a list containing the pick stresses and number of repetition
+        :param list stress_groups: docs list containing the pick stresses and number of repetition
         :param float Sut: Ultimate tensile strength [MPa]
         :param float Sy: yield strength [MPa], if None only HCF is checked
         :param float Se: endurance limit [MPa]
-        :param float z: -3 for steel where N=1e6, -5 for a metal where N=1e8, -5.69 for a metal
+        :param float z: -3 for steel where N=1e6, -5 for docs metal where N=1e8, -5.69 for docs metal
             where N=5e8
         :param bool verbose: printing the groups
             [number_of_repetitions,maximum_stress, minimum_stress, reversible_stress, Number of

@@ -7,7 +7,7 @@ from me_toolbox.fatigue import *
 # Normal load: N=F*(0.5+sin(wt))
 # applied torque: T=2.5*F*sin(wt)
 
-# finding factor of safety ad a function of the max_force F
+# finding factor of safety ad docs function of the max_force F
 F = symbols('F', real=True, positive=True)
 
 # the extreme loads
@@ -67,11 +67,11 @@ print(f"Mean Equivalent Stress={fatigue_analysis.mean_eq_stress}\n"
 nF_modified_goodman = fatigue_analysis.modified_goodman
 print(f"modified goodman safety factor (as a function of F): {nF_modified_goodman}")
 
-# creating the safety factor equation and isolating F (F as a function of the safety factor)
+# creating the safety factor equation and isolating F (F as docs function of the safety factor)
 nF = symbols('nF', real=True)
 solution = solveset(Eq(nF, nF_modified_goodman), F, Reals)
 
-# the max_force as a function of safety factor (nF)
+# the max_force as docs function of safety factor (nF)
 F2 = solution.args[1].args[0]
 print(f"the Force (as a function of nF): {F2}")
 

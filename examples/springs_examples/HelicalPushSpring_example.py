@@ -7,7 +7,7 @@ C = 8  # the spring index C is defined as D/diameter
 D = C * d
 
 Fmax = 575
-# it is a good practice for the max_force that compresses
+# it is docs good practice for the max_force that compresses
 # the spring to solid state to be: Fs=(1+zeta)Fmax
 # where zeta is the overrun safety factor,
 # it's customary that zeta=0.15 so Fs=1.15Fmax

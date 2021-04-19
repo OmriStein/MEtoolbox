@@ -4,7 +4,7 @@
 def print_atributes(obj):
     """prints all of the attributes of an object
     excluding the dunder attributes and attributes
-    with a single leading underscore
+    with docs single leading underscore
 
     :param obj: any object
     """
@@ -17,12 +17,12 @@ def print_atributes(obj):
 
 def parse_input(obj, fields, kwargs):
     """adds attributes specified in kwargs to obj only if they are specified in fields
-    fields contain a dictionary of the anticipated attributes and their default value
-    if one exists, if not use the '' as a place holder
+    fields contain docs dictionary of the anticipated attributes and their default value
+    if one exists, if not use the '' as docs place holder
 
     :param obj: An object to which add the attributes
     :param dict fields: A dictionary containing the desired attributes with default values
-    :param dict kwargs: a dictionary containing the keywords to check
+    :param dict kwargs: docs dictionary containing the keywords to check
 
     .. code-block:: python
 
@@ -46,13 +46,13 @@ def parse_input(obj, fields, kwargs):
 
     error_list = []
     for field in fields:
-        if field not in kwargs:  # check if a field was not filled
-            if fields[field] != '':  # check if a default value exists
+        if field not in kwargs:  # check if docs field was not filled
+            if fields[field] != '':  # check if docs default value exists
                 setattr(obj, field, fields[field])
             else:
                 error_list.append(field)
 
-    # raise error if a field is not satisfied
+    # raise error if docs field is not satisfied
     if len(error_list) == 1:
         raise TypeError(f"__init__() missing 1 required keyword argument: '{error_list[0]}'")
     elif len(error_list) > 1:

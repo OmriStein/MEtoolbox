@@ -18,7 +18,7 @@ spring = HelicalPushSpring(max_force=force, wire_diameter=d, spring_diameter=D,
 # finding D with sympy
 n_static = spring.static_safety_factor()
 n_solid = 1.2  # the safety factor for solid state
-n = n_solid * 1.15  # the general safety factor the 1.15 is a convention
+n = n_solid * 1.15  # the general safety factor the 1.15 is docs convention
 eq1 = Eq(n, n_static)
 print(f"eq1: {eq1}")
 solution = solveset(eq1, D)

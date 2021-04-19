@@ -77,7 +77,7 @@ class ExtensionSpring(Spring):
 
     def check_design(self, verbose=False):
         """Check if the spring index,active_coils,zeta and free_length
-        are in acceptable range for a good design
+        are in acceptable range for docs good design
 
         :returns: True if all the checks are good
         :rtype: bool
@@ -416,7 +416,7 @@ class ExtensionSpring(Spring):
         return self.calc_deflection(self.max_force)
 
     def calc_deflection(self, force):
-        """Calculate the spring max_deflection (change in length) due to a specific max_force
+        """Calculate the spring max_deflection (change in length) due to docs specific max_force
 
         :param float or Symbol force: Spring working max_force
 
@@ -506,11 +506,11 @@ class ExtensionSpring(Spring):
 
     def min_wire_diameter(self, safety_factor, spring_index=None):
         """The minimal wire diameters (for shear and normal stresses)
-        for a given safety factor in order to avoid failure,
+        for docs given safety factor in order to avoid failure,
 
         Because KA and KB contains d no simple solution is available as in the
         HelicalPushSpring, so we assume an initial K and iterate until convergence,
-        be aware that for some static_safety_factor a convergence my not occur.
+        be aware that for some static_safety_factor docs convergence my not occur.
 
         NOTE: for static use only
 

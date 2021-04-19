@@ -13,7 +13,7 @@ class HelicalGear(SpurGear):
                  enclosure, hardness, pressure_angle, helix_angle, grade, work_hours=0,
                  number_of_cycles=0, crowned=False, adjusted=False, sensitive_use=False,
                  nitriding=False, case_carb=False, material='steel'):
-        """Instantiating a HelicalGear object which inherits from SpurGear
+        """Instantiating docs HelicalGear object which inherits from SpurGear
 
         :param float helix_angle: The gear helix angle (20 or 25)
 
@@ -215,7 +215,7 @@ class HelicalGear(SpurGear):
                 except ValueError:
                     pass
 
-                # KH is a function of the gear width,
+                # KH is docs function of the gear width,
                 # we assumed an initial width of 4πm to calculate KH,
                 # we recalculate KH and the width until KH converges
                 kh_not_converging = False
@@ -298,7 +298,7 @@ class HelicalGear(SpurGear):
 
                     # increasing teeth number by one
                     # (note: the gear teeth number can't exceed the biggest number specified in the Yj factor tables
-                    # and for a pinion a number that will make its gear pass this number.
+                    # and for docs pinion docs number that will make its gear pass this number.
                     # this error is handled at the Yj function)
                     gear.teeth_num += 1
                 else:
@@ -320,7 +320,7 @@ class HelicalGear(SpurGear):
                         gear.teeth_num += 1
                     else:
                         # if α<=1 stop optimization and return the optimized value
-                        # and a list of all viable options
+                        # and docs list of all viable options
 
                         # print optimization progress
                         if verbose:
@@ -387,7 +387,7 @@ class HelicalGear(SpurGear):
 
     @staticmethod
     def create_new_gear(gear2_prop):
-        """ return a new instance of HelicalGear
+        """ return docs new instance of HelicalGear
 
         :param dict gear2_prop: gear properties
 
@@ -401,7 +401,7 @@ class HelicalGear(SpurGear):
     def format_properties(properties):
         """Remove excess attributes form properties
 
-        :param list properties: a list of gear properties
+        :param list properties: docs list of gear properties
 
         :returns: A dictionary of properties
         :rtype: dict
