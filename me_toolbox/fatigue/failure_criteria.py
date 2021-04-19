@@ -1,4 +1,4 @@
-"""docs module containing the FatigueCriteria class
+"""module containing the FatigueCriteria class
 containing the Failure criteria as described in
 Shigley's Mechanical Engineering design
 """
@@ -12,7 +12,7 @@ class FailureCriteria:
     def modified_goodman(ultimate_strength, endurance_limit, alt_eq_stress,
                          mean_eq_stress):
         """Safety factor according to modified Goodman failure criterion
-        (docs very common criterion)
+        (a very common criterion)
 
         :returns: Safety factor
         :rtype: any

@@ -1,4 +1,4 @@
-"""docs module containing the EnduranceLimit class"""
+"""module containing the EnduranceLimit class"""
 from math import sqrt
 
 

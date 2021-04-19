@@ -14,7 +14,7 @@ class HelicalTorsionSpring(Spring):
                  shear_modulus, elastic_modulus, yield_percent, Ap, m,
                  spring_constant=None, active_coils=None, body_coils=None, shot_peened=False,
                  density=None, working_frequency=None, radius=None, pin_diameter=None):
-        """Instantiate docs helical torsion spring object with the given parameters
+        """Instantiate helical torsion spring object with the given parameters
 
         :param float or Symbol max_moment: The maximum load on the spring
         :param float or Symbol wire_diameter: spring wire diameter
@@ -286,7 +286,7 @@ class HelicalTorsionSpring(Spring):
     def max_total_angular_deflection(self):
         """The total angular deflection due to the max moment
         this deflection is comprise out of the angular deflection
-        of the coil body and from the end deflection of docs cantilever
+        of the coil body and from the end deflection of cantilever
         for *each* leg.
 
         :returns: Max angular deflection
@@ -391,7 +391,7 @@ class HelicalTorsionSpring(Spring):
         return nf, nl
 
     def min_wire_diameter(self, safety_factor, spring_diameter=None, spring_index=None):
-        """The minimal wire diameter for docs given safety factor
+        """The minimal wire diameter for given safety factor
         in order to avoid failure, according to the spring parameters
 
         Note: In order for the calculation to succeed the

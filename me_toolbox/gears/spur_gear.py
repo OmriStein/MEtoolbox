@@ -10,13 +10,13 @@ class SpurGear:
     """A gear object that contains all of its design parameters (AGMA 2001-D04)"""
 
     # TODO: YN - add solution for low cycle of material not in the graph
-    # TODO: Qv - add docs way to calculate the Qv value as in AGMA 2001-D04
+    # TODO: Qv - add a way to calculate the Qv value as in AGMA 2001-D04
 
     def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
                  enclosure, hardness, pressure_angle, grade, work_hours=0, number_of_cycles=0,
                  crowned=False, adjusted=False, sensitive_use=False, nitriding=False,
                  case_carb=False, material='steel'):
-        """ Instantiating docs SpurGear object
+        """ Instantiating SpurGear object
 
         :param str name: the name of the gear
         :param float modulus: modulus in [mm]
@@ -300,7 +300,7 @@ class SpurGear:
                                  f"but the minimum number is {1e2} ")
             return Y_N
         except KeyError as bad_key:
-            print(f"at YN: not docs valid hardness {bad_key}")
+            print(f"at YN: not valid hardness {bad_key}")
             return "Error"
 
     @property
@@ -495,7 +495,7 @@ class SpurGear:
                 # update Yj factors after attribute changed
                 transmission.gear1.Y_j(transmission.gear1, transmission.gear2)
 
-                # KH is docs function of the gear width,
+                # KH is a function of the gear width,
                 # we assumed an initial width of 4πm to calculate KH,
                 # we recalculate KH and the width until KH converges
                 kh_not_converging = False
@@ -569,7 +569,7 @@ class SpurGear:
                     # increasing teeth number by one
                     # (note: the gear teeth number can't exceed the
                     # biggest number specified in the Yj factor tables
-                    # and for docs pinion docs number that will make its gear pass this number.
+                    # and for a pinion a number that will make its gear pass this number.
                     # this error is handled at the Yj function)
                     gear.teeth_num += 1
                 else:
@@ -589,7 +589,7 @@ class SpurGear:
                         gear.teeth_num += 1
                     else:
                         # if α<=1 stop optimization and return the optimized value
-                        # and docs list of all viable options
+                        # and a list of all viable options
 
                         # print optimization progress
                         if verbose:
@@ -660,7 +660,7 @@ class SpurGear:
 
     @staticmethod
     def create_new_gear(gear2_prop):
-        """Return docs new instance of SpurGear
+        """Return new instance of SpurGear
 
         :param dict gear2_prop: gear properties
 
@@ -674,7 +674,7 @@ class SpurGear:
     def format_properties(properties):
         """Remove excess attributes form properties
 
-        :param list properties: docs list of gear properties
+        :param list properties: list of gear properties
 
         :returns: A dictionary of properties
         :rtype: dict

@@ -1,0 +1,638 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <meta name="generator" content="sphinx-3.3.1, furo 2021.04.11.beta34"/>
+        <title>me_toolbox.fatigue.fatigue_analysis - me-toolbox documentation</title>
+      <link rel="stylesheet" href="../../../_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="../../../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="../../../_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">me-toolbox  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">me-toolbox  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../source/modules.html">me_toolbox</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../source/me_toolbox.html">me_toolbox package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../source/me_toolbox.fatigue.html">me_toolbox.fatigue package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../source/me_toolbox.gears.html">me_toolbox.gears package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../source/me_toolbox.springs.html">me_toolbox.springs package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../source/me_toolbox.tools.html">me_toolbox.tools package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <h1>Source code for me_toolbox.fatigue.fatigue_analysis</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""module containing the FatigueAnalysis class and</span>
+<span class="sd">calc_kf for calculating dynamic stress concentration factor</span>
+<span class="sd">"""</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">log10</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">from</span> <span class="nn">me_toolbox.tools</span> <span class="kn">import</span> <span class="n">NotInRangeError</span><span class="p">,</span> <span class="n">print_atributes</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">oo</span>
+<span class="kn">from</span> <span class="nn">me_toolbox.fatigue</span> <span class="kn">import</span> <span class="n">FailureCriteria</span>
+
+
+<div class="viewcode-block" id="calc_kf"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.calc_kf">[docs]</a><span class="k">def</span> <span class="nf">calc_kf</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">Kt</span><span class="p">):</span>
+    <span class="sd">"""Kf - dynamic stress concentration factor</span>
+
+<span class="sd">    :param float Kt: stress concentration theoretical factor</span>
+<span class="sd">    :param float q: notch Sensitivity</span>
+
+<span class="sd">    :returns: dynamic stress concentration factor</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">q</span> <span class="o">*</span> <span class="p">(</span><span class="n">Kt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FatigueAnalysis"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis">[docs]</a><span class="k">class</span> <span class="nc">FatigueAnalysis</span><span class="p">:</span>
+    <span class="sd">"""Perform fatigue analysis"""</span>
+
+    <span class="c1"># TODO: make endurance_limit optional and add option to input Se, Stress_type and Kc directly</span>
+    <span class="c1"># TODO: replace Kc as a way to determine what to do in factors calculation</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endurance_limit</span><span class="p">,</span> <span class="n">ductile</span><span class="p">,</span> <span class="n">Sy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">Kf_bending</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Kf_normal</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Kf_torsion</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">alt_bending_stress</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alt_normal_stress</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alt_torsion_stress</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">mean_bending_stress</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mean_normal_stress</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mean_torsion_stress</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">""" Instantiating fatigue object</span>
+<span class="sd">        Note: all stresses are in [MPa]</span>
+
+<span class="sd">        :param fatigue_analysis.EnduranceLimit endurance_limit: EnduranceLimit object containing</span>
+<span class="sd">        the modified Se</span>
+<span class="sd">        :param bool ductile: True if material is ductile</span>
+<span class="sd">        :param float Sut: Ultimate tensile strength in [Mpa]</span>
+<span class="sd">        :param float Sy: Yield strength in [Mpa]</span>
+<span class="sd">        :param float Kf_bending: dynamic stress concentration factor for bending</span>
+<span class="sd">        :param Kf_normal: dynamic stress concentration factor for normal</span>
+<span class="sd">        :param Kf_torsion: dynamic stress concentration factor for torsion</span>
+<span class="sd">        :param float alt_bending_stress: Alternating bending stress</span>
+<span class="sd">        :param float alt_normal_stress: Alternating normal stress</span>
+<span class="sd">        :param float alt_torsion_stress: Alternating torsion stress</span>
+<span class="sd">        :param float mean_bending_stress: Mean bending stresses</span>
+<span class="sd">        :param float mean_normal_stress: Mean normal stresses</span>
+<span class="sd">        :param float mean_torsion_stress: Mean torsion stresses</span>
+<span class="sd">        """</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sy</span> <span class="o">=</span> <span class="n">Sy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Se</span> <span class="o">=</span> <span class="n">endurance_limit</span><span class="o">.</span><span class="n">modified</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span> <span class="o">=</span> <span class="n">endurance_limit</span><span class="o">.</span><span class="n">Kc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span> <span class="o">=</span> <span class="n">endurance_limit</span><span class="o">.</span><span class="n">Sut</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stress_type</span> <span class="o">=</span> <span class="n">endurance_limit</span><span class="o">.</span><span class="n">stress_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ductile</span> <span class="o">=</span> <span class="n">ductile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kf_bending</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_normal</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_torsion</span> <span class="o">=</span> <span class="n">Kf_bending</span><span class="p">,</span> <span class="n">Kf_normal</span><span class="p">,</span> <span class="n">Kf_torsion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alt_bending_stress</span> <span class="o">=</span> <span class="n">alt_bending_stress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alt_normal_stress</span> <span class="o">=</span> <span class="n">alt_normal_stress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alt_torsion_stress</span> <span class="o">=</span> <span class="n">alt_torsion_stress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_bending_stress</span> <span class="o">=</span> <span class="n">mean_bending_stress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_normal_stress</span> <span class="o">=</span> <span class="n">mean_normal_stress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_torsion_stress</span> <span class="o">=</span> <span class="n">mean_torsion_stress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alt_eq_stress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_alt_eq_stress</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_eq_stress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_mean_eq_stress</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FatigueAnalysis.calc_alt_eq_stress"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_alt_eq_stress">[docs]</a>    <span class="k">def</span> <span class="nf">calc_alt_eq_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Returns the alternating equivalent stress according to the load type indicated by Kc</span>
+
+<span class="sd">        :returns: Alternating equivalent stress</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        """</span>
+
+        <span class="n">Kc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span>
+        <span class="k">if</span> <span class="n">Kc</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stress_type</span> <span class="o">==</span> <span class="s1">'multiple'</span><span class="p">:</span>
+            <span class="n">corrected_bending</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_bending</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_bending_stress</span>
+            <span class="n">corrected_normal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_normal</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alt_normal_stress</span> <span class="o">/</span> <span class="mf">0.85</span><span class="p">)</span>
+            <span class="n">corrected_torsion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_torsion</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_torsion_stress</span>
+            <span class="k">return</span> <span class="n">sqrt</span><span class="p">((</span><span class="n">corrected_bending</span> <span class="o">+</span> <span class="n">corrected_normal</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">corrected_torsion</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">Kc</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_bending</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_bending_stress</span>
+
+        <span class="k">elif</span> <span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.85</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_normal</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_normal_stress</span>
+
+        <span class="k">elif</span> <span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.59</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_torsion</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_torsion_stress</span></div>
+
+<div class="viewcode-block" id="FatigueAnalysis.calc_mean_eq_stress"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_mean_eq_stress">[docs]</a>    <span class="k">def</span> <span class="nf">calc_mean_eq_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Returns the mean equivalent stress according to the load type indicated by Kc</span>
+
+<span class="sd">        :returns: Mean equivalent stress</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ductile</span><span class="p">:</span>
+            <span class="c1"># if the material is ductile no correction is needed</span>
+            <span class="n">Kf_bending</span><span class="p">,</span> <span class="n">Kf_normal</span><span class="p">,</span> <span class="n">Kf_torsion</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Kf_bending</span><span class="p">,</span> <span class="n">Kf_normal</span><span class="p">,</span> <span class="n">Kf_torsion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_bending</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_normal</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf_torsion</span>
+
+        <span class="n">Kc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span>
+        <span class="k">if</span> <span class="n">Kc</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stress_type</span> <span class="o">==</span> <span class="s1">'multiple'</span><span class="p">:</span>
+            <span class="n">corrected_bending</span> <span class="o">=</span> <span class="n">Kf_bending</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_bending_stress</span>
+            <span class="n">corrected_normal</span> <span class="o">=</span> <span class="n">Kf_normal</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_normal_stress</span>
+            <span class="n">corrected_torsion</span> <span class="o">=</span> <span class="n">Kf_torsion</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_torsion_stress</span>
+
+            <span class="k">return</span> <span class="n">sqrt</span><span class="p">((</span><span class="n">corrected_bending</span> <span class="o">+</span> <span class="n">corrected_normal</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">corrected_torsion</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">Kc</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Kf_bending</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_bending_stress</span>
+
+        <span class="k">elif</span> <span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.85</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Kf_normal</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_normal_stress</span>
+
+        <span class="k">elif</span> <span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.59</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Kf_torsion</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_torsion_stress</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shear_ultimate_strength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Returns shear_ultimate_strength which is the</span>
+<span class="sd">        ultimate_tensile_strength correction for shear stress</span>
+
+<span class="sd">        :returns: Sst - ultimate shear tensile strength</span>
+<span class="sd">        :type: float</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="mf">0.67</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shear_yield_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Returns shear_yield_strength which is the Sy correction for shear stress</span>
+
+<span class="sd">        :returns: shear_yield_strength - yield stress for shear</span>
+<span class="sd">        :type: float</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sy</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modified_goodman</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Safety factor according to modified Goodman failure criterion</span>
+<span class="sd">        (a very common criterion)</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+
+<span class="sd">        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"ultimate_tensile_strength is None"</span><span class="p">)</span>
+
+        <span class="n">ultimate_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.59</span><span class="p">:</span>
+            <span class="c1"># ultimate_tensile_strength correction for shear stress</span>
+            <span class="n">ultimate_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shear_ultimate_strength</span>
+
+        <span class="k">return</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">modified_goodman</span><span class="p">(</span><span class="n">ultimate_strength</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Se</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">alt_eq_stress</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">mean_eq_stress</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">soderberg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Safety factor according to Soderberg failure criterion</span>
+<span class="sd">        (the safest criterion)</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+
+<span class="sd">        :raises ValueError: if Sy is not in the fatigue call</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Sy is None"</span><span class="p">)</span>
+
+        <span class="n">yield_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sy</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.59</span><span class="p">:</span>
+            <span class="c1"># ultimate_tensile_strength correction for shear stress</span>
+            <span class="n">yield_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shear_yield_stress</span>
+
+        <span class="k">return</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">soderberg</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Se</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">alt_eq_stress</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">mean_eq_stress</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gerber</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Safety factor according to Gerber failure criterion</span>
+<span class="sd">        (the most lenient criterion)</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+<span class="sd">        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"ultimate_tensile_strength is None"</span><span class="p">)</span>
+
+        <span class="n">ultimate_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.59</span><span class="p">:</span>
+            <span class="c1"># ultimate_tensile_strength correction for shear stress</span>
+            <span class="n">ultimate_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shear_ultimate_strength</span>
+
+        <span class="k">return</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">gerber</span><span class="p">(</span><span class="n">ultimate_strength</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Se</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">alt_eq_stress</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">mean_eq_stress</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ASME_elliptic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Safety factor according to ASME Failure criterion</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+
+<span class="sd">        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"ultimate_tensile_strength is None"</span><span class="p">)</span>
+
+        <span class="n">yield_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.59</span><span class="p">:</span>
+            <span class="c1"># ultimate_tensile_strength correction for shear stress</span>
+            <span class="n">yield_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shear_yield_stress</span>
+
+        <span class="k">return</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">asme_elliptic</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Se</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_eq_stress</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">mean_eq_stress</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">langer_static_yield</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">""" Static safety factor according to Langer Failure criterion</span>
+<span class="sd">        it's customary to use Langer, as an assessment to yielding in the first cycle</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+
+<span class="sd">        :raises ValueError: if Sy is not in the fatigue call</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Sy is None"</span><span class="p">)</span>
+
+        <span class="n">yield_strength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sy</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span> <span class="o">==</span> <span class="mf">0.59</span><span class="p">:</span>
+            <span class="c1"># yield_strength correction for shear stress</span>
+            <span class="n">Ssy</span> <span class="o">=</span> <span class="mf">0.67</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span>
+            <span class="n">yield_strength</span> <span class="o">=</span> <span class="n">Ssy</span>
+
+        <span class="k">return</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">langer_static_yield</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">alt_eq_stress</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">mean_eq_stress</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FatigueAnalysis.get_safety_factor"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.get_safety_factor">[docs]</a>    <span class="k">def</span> <span class="nf">get_safety_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">"""Returns dynamic and static safety factors</span>
+<span class="sd">        according to the quadrant in the alternating-mean</span>
+<span class="sd">        stress plain where the stresses are in</span>
+
+<span class="sd">        Note: Should always be used instead of accessing the</span>
+<span class="sd">        individual safety factors properties directly</span>
+
+<span class="sd">        :param str criterion: The criterion to use</span>
+<span class="sd">        :param bool verbose: Print the result</span>
+
+<span class="sd">        :returns: dynamic and static safety factors</span>
+<span class="sd">        :rtype: tuple[float, float]</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_eq_stress</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># stress is in the first quadrant of the alternating-mean stress plan</span>
+            <span class="n">safety_factors</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'modified goodman'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">modified_goodman</span><span class="p">,</span>
+                              <span class="s1">'soderberg'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">soderberg</span><span class="p">,</span>
+                              <span class="s1">'gerber'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gerber</span><span class="p">,</span> <span class="s1">'asme-elliptic'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ASME_elliptic</span><span class="p">}</span>
+
+            <span class="n">nF</span> <span class="o">=</span> <span class="n">safety_factors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">criterion</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s1">'Error'</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">nF</span> <span class="o">==</span> <span class="s1">'Error'</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown criterion - </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                                 <span class="sa">f</span><span class="s2">"Available criteria: 'Modified Goodman', 'Soderberg',"</span>
+                                 <span class="sa">f</span><span class="s2">"'Gerber', 'ASME-elliptic'"</span><span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"the </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2"> safety factor is: </span><span class="si">{</span><span class="n">nF</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># stress is in the second quadrant of the alternating-mean stress plan</span>
+            <span class="n">nF</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Se</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_eq_stress</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"the dynamic safety factor is: </span><span class="si">{</span><span class="n">nF</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+
+        <span class="n">nl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">langer_static_yield</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">"the Langer static safety factor is: </span><span class="si">{</span><span class="n">nl</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">nF</span><span class="p">,</span> <span class="n">nl</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Sm_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Getter for the Sm_stress property</span>
+
+<span class="sd">        :returns: Sm - stress at 1e3 cycles</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_Sm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Sut</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FatigueAnalysis.calc_Sm"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_Sm">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calc_Sm</span><span class="p">(</span><span class="n">Sut</span><span class="p">):</span>
+        <span class="sd">"""Calculate Sm_stress which is the stress at 1e3 cycles, the boundary</span>
+<span class="sd">        dividing Low cycle fatigue and high cycle fatigue</span>
+
+<span class="sd">        :param Sut: Ultimate tensile strength</span>
+
+<span class="sd">        :returns: Sm_stress stress</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        """</span>
+
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="sd">""" f - fatigue strength fraction</span>
+<span class="sd">                a function constructed from curve fitting to the f graph in Shigley's</span>
+<span class="sd">                the range of the fit is ( 70[kPsi] &lt; ultimate_tensile_strength &lt; 200[kPsi] ) """</span>
+            <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.56710686e-16</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">5</span> <span class="o">+</span> <span class="mf">1.35729780e-12</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">-</span> <span class="mf">2.92474777e-09</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">+</span>
+                    <span class="mf">3.28990748e-06</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">2.04929617e-03</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mf">1.38405394e+00</span><span class="p">)</span>
+
+        <span class="c1"># TODO: add a proper warning and solutions to ultimate_tensile_strength out of graph range</span>
+        <span class="k">if</span> <span class="n">Sut</span> <span class="o">&lt;</span> <span class="mf">482.633</span><span class="p">:</span>  <span class="c1"># 482.633[Mpa] = 70[kPsi]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Note: ultimate_tensile_strength=</span><span class="si">{</span><span class="n">Sut</span><span class="si">}</span><span class="s2"> &lt; 482.633[Mpa] (70[kPsi]) so f~0.9"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="n">Sut</span>
+        <span class="k">elif</span> <span class="n">Sut</span> <span class="o">&gt;</span> <span class="mf">1378.95</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Note: ultimate_tensile_strength=</span><span class="si">{</span><span class="n">Sut</span><span class="si">}</span><span class="s2"> &gt; 1378.95[Mpa] (200[kPsi]) which is out of "</span>
+                <span class="sa">f</span><span class="s2">"the graph range, f=</span><span class="si">{</span><span class="n">f</span><span class="p">(</span><span class="n">Sut</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">Sut</span><span class="p">)</span> <span class="o">*</span> <span class="n">Sut</span></div>
+
+<div class="viewcode-block" id="FatigueAnalysis.num_of_cycle"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.num_of_cycle">[docs]</a>    <span class="k">def</span> <span class="nf">num_of_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="o">=-</span><span class="mi">3</span><span class="p">):</span>
+        <span class="sd">""" calculate number of cycles until failure</span>
+
+<span class="sd">        Note: zeta = log(N1) - log(N2), N1 - number of cycles at Sm_stress,</span>
+<span class="sd">            N2 - Number of cycles at Se for steel N1=1e3 and N2 = 1e6</span>
+
+<span class="sd">        :param float z: -3 for steel where N=1e6, -5 for a metal where N=1e8,</span>
+<span class="sd">            -5.69 for a metal where N=5e8</span>
+
+<span class="sd">        :returns: The Number of cycles and the fatigue stress at failure</span>
+<span class="sd">        :rtype: tuple[float, float]</span>
+<span class="sd">        """</span>
+        <span class="n">mean_stress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_eq_stress</span>
+        <span class="n">alternating_stress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_eq_stress</span>
+        <span class="n">Se</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Se</span>
+        <span class="n">Sut</span><span class="p">,</span> <span class="n">Sy</span><span class="p">,</span> <span class="n">Sm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sm_stress</span>
+
+        <span class="k">if</span> <span class="n">mean_stress</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">reversible_stress</span> <span class="o">=</span> <span class="n">alternating_stress</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">mean_stress</span> <span class="o">/</span> <span class="n">Sut</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reversible_stress</span> <span class="o">=</span> <span class="n">alternating_stress</span>
+
+        <span class="k">if</span> <span class="n">Sm</span> <span class="o">&lt;</span> <span class="n">reversible_stress</span> <span class="o">&lt;</span> <span class="n">Sy</span><span class="p">:</span>
+            <span class="c1"># Low Cycle Fatigue</span>
+            <span class="k">if</span> <span class="n">z</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"Number of cycles calculation for low cycle fatigue is only possible for "</span>
+                    <span class="s2">"zeta=-3 "</span><span class="p">)</span>
+
+            <span class="n">a</span> <span class="o">=</span> <span class="n">Sut</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="n">log10</span><span class="p">(</span><span class="n">Sut</span> <span class="o">/</span> <span class="n">Sm</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">Se</span> <span class="o">&lt;</span> <span class="n">reversible_stress</span> <span class="o">&lt;</span> <span class="n">Sm</span><span class="p">:</span>
+            <span class="c1"># High Cycle Fatigue</span>
+            <span class="c1"># a = Sm_stress ** (1 - (3 / zeta)) / Se</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">Sm</span> <span class="o">*</span> <span class="p">(</span><span class="n">Sm</span> <span class="o">/</span> <span class="n">Se</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">3</span> <span class="o">/</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="n">log10</span><span class="p">(</span><span class="n">Sm</span> <span class="o">/</span> <span class="n">Se</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">reversible_stress</span> <span class="o">&lt;</span> <span class="n">Se</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"reversible_stress = </span><span class="si">{</span><span class="n">reversible_stress</span><span class="si">}</span><span class="s2"> &lt; Se = </span><span class="si">{</span><span class="n">Se</span><span class="si">}</span><span class="s2">, Number of cycles is "</span>
+                <span class="sa">f</span><span class="s2">"infinite"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">oo</span>  <span class="c1"># TODO: add to documentation the meaning of oo</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NotInRangeError</span><span class="p">(</span><span class="s2">"Reversible Stress"</span><span class="p">,</span> <span class="n">reversible_stress</span><span class="p">,</span>
+                                  <span class="p">(</span><span class="sa">f</span><span class="s1">'Sy=</span><span class="si">{</span><span class="n">Sy</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'Sm_stress=</span><span class="si">{</span><span class="n">Sm</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'Se=</span><span class="si">{</span><span class="n">Se</span><span class="si">}</span><span class="s1">'</span><span class="p">))</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">reversible_stress</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">N</span><span class="p">,</span> <span class="n">a</span> <span class="o">*</span> <span class="n">N</span> <span class="o">**</span> <span class="n">b</span></div>
+
+<div class="viewcode-block" id="FatigueAnalysis.miner_rule"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.miner_rule">[docs]</a>    <span class="k">def</span> <span class="nf">miner_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stress_groups</span><span class="p">,</span> <span class="n">Sut</span><span class="p">,</span> <span class="n">Se</span><span class="p">,</span> <span class="n">Sy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">alt_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">""" Calculates total number of cycles for multiple periodic loads,</span>
+<span class="sd">        the stress_groups format is as follows:</span>
+<span class="sd">        [number_of_repetitions, maximum_stress, minimum_stress]</span>
+
+<span class="sd">        Note: number_of_repetitions = frequency [Hz] * time</span>
+
+<span class="sd">        Note: if the material don't have fatigue limit use the fatigue strength at Se=Sf(N=1e8)</span>
+
+<span class="sd">        :param list stress_groups: a list containing the pick stresses and number of repetition</span>
+<span class="sd">        :param float Sut: Ultimate tensile strength [MPa]</span>
+<span class="sd">        :param float Sy: yield strength [MPa], if None only HCF is checked</span>
+<span class="sd">        :param float Se: endurance limit [MPa]</span>
+<span class="sd">        :param float z: -3 for steel where N=1e6, -5 for a metal where N=1e8, -5.69 for a metal</span>
+<span class="sd">            where N=5e8</span>
+<span class="sd">        :param bool verbose: printing the groups</span>
+<span class="sd">            [number_of_repetitions,maximum_stress, minimum_stress, reversible_stress, Number of</span>
+<span class="sd">            cycles]</span>
+<span class="sd">        :param bool freq: if the input is frequency instead of number of repetition</span>
+<span class="sd">        :param bool alt_mean: if True the stress_group structure contains</span>
+<span class="sd">            alternating and mean stresses: [number_of_repetitions, alternating_stress, mean_stress]</span>
+<span class="sd">            instead of the max and min stresses:</span>
+<span class="sd">            [number_of_repetitions, maximum_stress, minimum_stress]</span>
+
+<span class="sd">        :returns: Total number of cycles</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        """</span>
+
+        <span class="n">Sm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_Sm</span><span class="p">(</span><span class="n">Sut</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">stress_groups</span><span class="p">:</span>
+
+            <span class="c1"># if the stress given are minimum and maximum instead of alternating and mean</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">alt_mean</span><span class="p">:</span>
+                <span class="n">mean_stress</span> <span class="o">=</span> <span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">group</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="n">alternating_stress</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">group</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">alternating_stress</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">mean_stress</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="c1"># calculate the reversible stress according to the mean stress sign</span>
+            <span class="k">if</span> <span class="n">mean_stress</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">reversible_stress</span> <span class="o">=</span> <span class="n">alternating_stress</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">mean_stress</span> <span class="o">/</span> <span class="n">Sut</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">reversible_stress</span> <span class="o">=</span> <span class="n">alternating_stress</span>
+
+            <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reversible_stress</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">((</span><span class="n">Sy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">Sm</span> <span class="o">&lt;</span> <span class="n">reversible_stress</span> <span class="o">&lt;</span> <span class="n">Sy</span><span class="p">))</span> <span class="ow">or</span> <span class="n">reversible_stress</span> <span class="o">&lt;</span> <span class="n">Se</span><span class="p">:</span>
+                <span class="c1"># infinite num of cycle - either the stress is less then</span>
+                <span class="c1"># the endurance limit or its low cycle fatigue</span>
+                <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oo</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">Se</span> <span class="o">&lt;</span> <span class="n">reversible_stress</span> <span class="o">&lt;</span> <span class="n">Sm</span><span class="p">:</span>
+                <span class="c1"># High Cycle Fatigue</span>
+                <span class="c1"># TODO: this calculation is the same every</span>
+                <span class="c1">#   iteration consider change to internal function and implement cash</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">Sm</span> <span class="o">*</span> <span class="p">(</span><span class="n">Sm</span> <span class="o">/</span> <span class="n">Se</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">3</span> <span class="o">/</span> <span class="n">z</span><span class="p">)</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="n">log10</span><span class="p">(</span><span class="n">Sm</span> <span class="o">/</span> <span class="n">Se</span><span class="p">)</span>
+                <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">reversible_stress</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span>
+                <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># print error but don't stop the loop</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Reversible Stress = </span><span class="si">{</span><span class="n">reversible_stress</span><span class="si">}</span><span class="s2"> not in range,"</span>
+                    <span class="sa">f</span><span class="s2">"LCF-range=(Sm_stress=</span><span class="si">{</span><span class="n">Sm</span><span class="si">}</span><span class="s2">,Sy=</span><span class="si">{</span><span class="n">Sy</span><span class="si">}</span><span class="s2">), "</span>
+                    <span class="sa">f</span><span class="s2">"HCF-range(Se=</span><span class="si">{</span><span class="n">Se</span><span class="si">}</span><span class="s2">,Sm_stress=</span><span class="si">{</span><span class="n">Sm</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">stress_groups</span><span class="p">:</span>
+            <span class="c1"># summing n/N</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">group</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+
+        <span class="c1"># casting the result to float - my be needed because the use of sympy's oo</span>
+        <span class="n">N_total</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">result</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">freq</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"total time = </span><span class="si">{</span><span class="n">N_total</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> [s]"</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"N_total = </span><span class="si">{</span><span class="n">N_total</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">N_total</span></div>
+
+<div class="viewcode-block" id="FatigueAnalysis.get_info"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""print object attributes"""</span>
+        <span class="n">print_atributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+</pre></div>
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Omri Stein
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>

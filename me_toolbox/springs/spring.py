@@ -155,7 +155,7 @@ class Spring:
         :returns: Ap and m for Sut estimation
         :rtype: (float, float)
         """
-        # TODO: Find docs way to work with symbolic diameter
+        # TODO: Find a way to work with symbolic diameter
         if isinstance(diameter, Symbol):
             raise ValueError(f"the material keyword can't be used if the diameter is symbolic "
                              f"specify Ap and m manually")

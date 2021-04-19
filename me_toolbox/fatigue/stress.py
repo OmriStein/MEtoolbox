@@ -15,7 +15,7 @@ def uniform_stress(F, A):
 
 
 def bending_stress(My, Iy, z, Mz=None, Iz=None, y=None):
-    """Bending stress in docs principle system
+    """Bending stress in principle system
 
     :param float My: Moment in the y direction
     :param float Mz: Moment in the y direction
@@ -24,7 +24,7 @@ def bending_stress(My, Iy, z, Mz=None, Iz=None, y=None):
     :param float z: Coordinate
     :param float y: Coordinate
 
-    :returns: Bending Stress in docs cross section
+    :returns: Bending Stress in cross section
     :rtype: float
     """
 

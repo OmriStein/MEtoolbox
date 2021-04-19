@@ -15,7 +15,7 @@ class HelicalPushSpring(Spring):
                  spring_constant=None, active_coils=None, free_length=None, density=None,
                  working_frequency=None, set_removed=False, shot_peened=False, anchors=None,
                  zeta=0.15):
-        """Instantiate docs helical push spring object with the given parameters
+        """Instantiate helical push spring object with the given parameters
 
         :param float or Symbol max_force: The maximum load on the spring
         :param float or Symbol wire_diameter: spring wire diameter
@@ -80,7 +80,7 @@ class HelicalPushSpring(Spring):
 
     def check_design(self):
         """Check if the spring index,active_coils,zeta and free_length
-        are in acceptable range for docs good design
+        are in acceptable range for good design
 
         :returns: True if all the checks are good
         :rtype: bool
@@ -299,7 +299,7 @@ class HelicalPushSpring(Spring):
         return self.calc_deflection(self.max_force)
 
     def calc_deflection(self, force):
-        """Calculate the spring deflection (change in length) due to docs specific max_force
+        """Calculate the spring deflection (change in length) due to specific max_force
 
         :param float or Symbol force: Spring working max_force
 
@@ -353,7 +353,7 @@ class HelicalPushSpring(Spring):
     @property
     def Fsolid(self):  # pylint: disable=invalid-name
         """calculate the max_force necessary to bring the spring to solid length
-        it is docs good practice for the max_force that compresses the spring to
+        it is good practice for the max_force that compresses the spring to
         solid state to be greater than the maximum max_force anticipated so we
         use this calculation: Fs=(1+zeta)Fmax in case the free length is unknown
 
@@ -406,7 +406,7 @@ class HelicalPushSpring(Spring):
         return self.shear_yield_strength / shear_stress
 
     def min_wire_diameter(self, safety_factor, spring_diameter=None, spring_index=None, solid=False):
-        """The minimal wire diameter for docs given
+        """The minimal wire diameter for given
         safety factor in order to avoid failure,
         according to the spring parameters.
         if solid is True the calculation uses :attr:`Fsolid`
@@ -534,7 +534,7 @@ class HelicalPushSpring(Spring):
         return nf, nl
 
     def calc_spring_index(self, solid_safety_factor):
-        """Calculate Spring index for docs certain safety factor if only wire diameter was given
+        """Calculate Spring index for certain safety factor if only wire diameter was given
         but the spring diameter was not (from Shigley's)
 
         :param float solid_safety_factor: Spring's safety factor for solid length
