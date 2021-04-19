@@ -1,0 +1,361 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <meta name="generator" content="sphinx-3.3.1, furo 2021.04.11.beta34"/>
+        <title>me_toolbox.springs.spring - me-toolbox documentation</title>
+      <link rel="stylesheet" href="../../../_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="../../../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="../../../_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">me-toolbox  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">me-toolbox  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../source/modules.html">me_toolbox</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../source/me_toolbox.html">me_toolbox package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../source/me_toolbox.fatigue.html">me_toolbox.fatigue package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../source/me_toolbox.gears.html">me_toolbox.gears package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../source/me_toolbox.springs.html">me_toolbox.springs package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../source/me_toolbox.tools.html">me_toolbox.tools package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <h1>Source code for me_toolbox.springs.spring</h1><div class="highlight"><pre>
+<span></span><span class="c1"># third party</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span><span class="p">,</span> <span class="n">sqrt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Symbol</span>
+
+<span class="c1"># internal package</span>
+<span class="kn">from</span> <span class="nn">me_toolbox.tools</span> <span class="kn">import</span> <span class="n">print_atributes</span>
+
+
+<span class="c1"># TODO: add optimization based on cost and other needs</span>
+<div class="viewcode-block" id="Spring"><a class="viewcode-back" href="../../../source/me_toolbox.springs.html#me_toolbox.springs.spring.Spring">[docs]</a><span class="k">class</span> <span class="nc">Spring</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_force</span><span class="p">,</span> <span class="n">wire_diameter</span><span class="p">,</span> <span class="n">spring_diameter</span><span class="p">,</span>
+                 <span class="n">shear_modulus</span><span class="p">,</span> <span class="n">elastic_modulus</span><span class="p">,</span> <span class="n">shot_peened</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">working_frequency</span><span class="p">,</span> <span class="n">Ap</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_force</span> <span class="o">=</span> <span class="n">max_force</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">Ap</span><span class="p">,</span> <span class="n">m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wire_diameter</span> <span class="o">=</span> <span class="n">wire_diameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spring_diameter</span> <span class="o">=</span> <span class="n">spring_diameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shear_modulus</span> <span class="o">=</span> <span class="n">shear_modulus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elastic_modulus</span> <span class="o">=</span> <span class="n">elastic_modulus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shot_peened</span> <span class="o">=</span> <span class="n">shot_peened</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="o">=</span> <span class="n">density</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">working_frequency</span> <span class="o">=</span> <span class="n">working_frequency</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_coils</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_body_coils</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spring_constant</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Spring.get_info"><a class="viewcode-back" href="../../../source/me_toolbox.springs.html#me_toolbox.springs.spring.Spring.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""print all of the spring properties"""</span>
+        <span class="n">print_atributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">wire_diameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Getter for the wire diameter attribute</span>
+
+<span class="sd">        :returns: The spring's wire diameter</span>
+<span class="sd">        :rtype: float or Symbol</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wire_diameter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spring_diameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Getter for the spring diameter attribute</span>
+
+<span class="sd">        :returns: The spring diameter</span>
+<span class="sd">        :rtype: float or Symbol</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spring_diameter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spring_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""C - spring index</span>
+
+<span class="sd">        Note: C should be in range of [4,12], lower C causes surface cracks,</span>
+<span class="sd">            higher C causes the spring to tangle and require separate packing</span>
+
+<span class="sd">        :returns: The spring index</span>
+<span class="sd">        :type: float or Symbol</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spring_diameter</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">wire_diameter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ultimate_tensile_strength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">""" Sut - ultimate tensile strength """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ap</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wire_diameter</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shear_ultimate_strength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">""" Ssu - ultimate tensile strength for shear """</span>
+        <span class="k">return</span> <span class="mf">0.67</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ultimate_tensile_strength</span>
+
+<div class="viewcode-block" id="Spring.shear_endurance_limit"><a class="viewcode-back" href="../../../source/me_toolbox.springs.html#me_toolbox.springs.spring.Spring.shear_endurance_limit">[docs]</a>    <span class="k">def</span> <span class="nf">shear_endurance_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reliability</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">"""Sse - Shear endurance limit according to Zimmerli</span>
+
+<span class="sd">        :param float reliability: reliability in percentage</span>
+<span class="sd">        :param bool metric: metric or imperial</span>
+
+<span class="sd">        :returns: Sse - Shear endurance limit</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        """</span>
+        <span class="c1"># data from table</span>
+        <span class="n">percentage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mf">99.9</span><span class="p">,</span> <span class="mf">99.99</span><span class="p">,</span> <span class="mf">99.999</span><span class="p">,</span> <span class="mf">99.9999</span><span class="p">])</span>
+        <span class="n">reliability_factors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.897</span><span class="p">,</span> <span class="mf">0.868</span><span class="p">,</span> <span class="mf">0.814</span><span class="p">,</span> <span class="mf">0.753</span><span class="p">,</span> <span class="mf">0.702</span><span class="p">,</span> <span class="mf">0.659</span><span class="p">,</span> <span class="mf">0.620</span><span class="p">])</span>
+        <span class="c1"># interpolating from data</span>
+        <span class="n">Ke</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">reliability</span><span class="p">,</span> <span class="n">percentage</span><span class="p">,</span> <span class="n">reliability_factors</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shot_peened</span><span class="p">:</span>
+            <span class="n">Ssa</span><span class="p">,</span> <span class="n">Ssm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">398</span><span class="p">,</span> <span class="mi">534</span><span class="p">)</span> <span class="k">if</span> <span class="n">metric</span> <span class="k">else</span> <span class="p">(</span><span class="mf">57.5e3</span><span class="p">,</span> <span class="mf">77.5e3</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Ssa</span><span class="p">,</span> <span class="n">Ssm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">241</span><span class="p">,</span> <span class="mi">379</span><span class="p">)</span> <span class="k">if</span> <span class="n">metric</span> <span class="k">else</span> <span class="p">(</span><span class="mf">35e3</span><span class="p">,</span> <span class="mf">55e3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Ke</span> <span class="o">*</span> <span class="p">(</span><span class="n">Ssa</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">Ssm</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">shear_ultimate_strength</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Spring.calc_max_shear_stress"><a class="viewcode-back" href="../../../source/me_toolbox.springs.html#me_toolbox.springs.spring.Spring.calc_max_shear_stress">[docs]</a>    <span class="k">def</span> <span class="nf">calc_max_shear_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">,</span> <span class="n">k_factor</span><span class="p">):</span>
+        <span class="sd">"""Calculates the max shear stress based on the max_force applied</span>
+
+<span class="sd">        :param float of Symbol force: Working max_force of the spring</span>
+<span class="sd">        :param float k_factor: the appropriate k factor for the calculation</span>
+
+<span class="sd">        :returns: Shear stress</span>
+<span class="sd">        :rtype: float or Symbol</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">k_factor</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">force</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spring_diameter</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">wire_diameter</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Spring.natural_frequency"><a class="viewcode-back" href="../../../source/me_toolbox.springs.html#me_toolbox.springs.spring.Spring.natural_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">natural_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">density</span><span class="p">):</span>
+        <span class="sd">"""Figures out what is the natural frequency of the spring</span>
+
+<span class="sd">        :param float density: spring material density</span>
+
+<span class="sd">        :returns: Natural frequency</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        """</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wire_diameter</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spring_diameter</span>
+        <span class="n">Na</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_coils</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shear_modulus</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">D</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Na</span> <span class="o">*</span> <span class="n">pi</span><span class="p">))</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">G</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">density</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Spring.weight"><a class="viewcode-back" href="../../../source/me_toolbox.springs.html#me_toolbox.springs.spring.Spring.weight">[docs]</a>    <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">density</span><span class="p">):</span>
+        <span class="sd">"""Return's the spring *active coils* weight according to the specified density</span>
+
+<span class="sd">        :param float density: The material density</span>
+
+<span class="sd">        :returns: Spring weight</span>
+<span class="sd">        :type: float or Symbol</span>
+<span class="sd">        """</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">wire_diameter</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># cross section area</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spring_diameter</span>  <span class="c1"># the circumference of the spring</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="n">length</span>
+        <span class="k">return</span> <span class="n">volume</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_coils</span> <span class="o">*</span> <span class="n">density</span></div>
+
+<div class="viewcode-block" id="Spring.calc_spring_constant"><a class="viewcode-back" href="../../../source/me_toolbox.springs.html#me_toolbox.springs.spring.Spring.calc_spring_constant">[docs]</a>    <span class="k">def</span> <span class="nf">calc_spring_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Calculate spring constant (using Castigliano's theorem)</span>
+
+<span class="sd">        :returns: The spring constant</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        """</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shear_modulus</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wire_diameter</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spring_index</span>
+        <span class="n">Na</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_coils</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">G</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">C</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">Na</span><span class="p">))</span> <span class="o">*</span> <span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">C</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">C</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Spring.material_prop"><a class="viewcode-back" href="../../../source/me_toolbox.springs.html#me_toolbox.springs.spring.Spring.material_prop">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">material_prop</span><span class="p">(</span><span class="n">material</span><span class="p">,</span> <span class="n">diameter</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">"""Reads table A_and_m.csv from file and returns the</span>
+<span class="sd">        material properties Ap and m for Sut estimation</span>
+
+<span class="sd">        :param str material: The spring's material</span>
+<span class="sd">        :param float diameter: Wire diameter</span>
+<span class="sd">        :param str metric: Metric or imperial</span>
+
+<span class="sd">        :returns: Ap and m for Sut estimation</span>
+<span class="sd">        :rtype: (float, float)</span>
+<span class="sd">        """</span>
+        <span class="c1"># TODO: Find a way to work with symbolic diameter</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">diameter</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"the material keyword can't be used if the diameter is symbolic "</span>
+                             <span class="sa">f</span><span class="s2">"specify Ap and m manually"</span><span class="p">)</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\\</span><span class="s2">tables</span><span class="se">\\</span><span class="s2">A_and_m.csv"</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">available_types</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">available_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s1">'type'</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+            <span class="n">min_d</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s1">'min_d_mm'</span><span class="p">]</span> <span class="k">if</span> <span class="n">metric</span> <span class="k">else</span> <span class="n">line</span><span class="p">[</span><span class="s1">'min_d_in'</span><span class="p">])</span>
+            <span class="n">max_d</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s1">'max_d_mm'</span><span class="p">]</span> <span class="k">if</span> <span class="n">metric</span> <span class="k">else</span> <span class="n">line</span><span class="p">[</span><span class="s1">'max_d_in'</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span> <span class="o">==</span> <span class="n">material</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">and</span> <span class="n">min_d</span> <span class="o">&lt;=</span> <span class="n">diameter</span> <span class="o">&lt;=</span> <span class="n">max_d</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s1">'A_mm'</span><span class="p">]</span> <span class="k">if</span> <span class="n">metric</span> <span class="k">else</span> <span class="n">line</span><span class="p">[</span><span class="s1">'A_in'</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s1">'m'</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">material</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">available_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">"The material is unknown"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The diameter don't match any of the values in the table"</span><span class="p">)</span></div></div>
+
+    <span class="c1"># def calc_min_diam(self, d_fun, k_fun, static_safety_factor, spring_diameter, initial_k=1.1):</span>
+    <span class="c1">#     factor_k, temp_k = initial_k, 0</span>
+    <span class="c1">#     diam = 0</span>
+    <span class="c1">#     while abs(factor_k - temp_k) &gt; 1e-4:</span>
+    <span class="c1">#         # waiting for k to converge</span>
+    <span class="c1">#         diam = d_fun(self, factor_k, static_safety_factor)</span>
+    <span class="c1">#         temp_k = factor_k</span>
+    <span class="c1">#         factor_k = k_fun(spring_diameter, diam)</span>
+    <span class="c1">#     return diam</span>
+</pre></div>
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Omri Stein
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>
