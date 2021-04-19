@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>me_toolbox.fatigue.failure_criteria &mdash; me_toolbox  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> me_toolbox
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">me_toolbox</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">me_toolbox</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>me_toolbox.fatigue.failure_criteria</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for me_toolbox.fatigue.failure_criteria</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;a module containing the FatigueCriteria class</span>
+<span class="sd">containing the Failure criteria as described in</span>
+<span class="sd">Shigley&#39;s Mechanical Engineering design&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">sqrt</span>
+
+
+<div class="viewcode-block" id="FailureCriteria"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.failure_criteria.FailureCriteria">[docs]</a><span class="k">class</span> <span class="nc">FailureCriteria</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Bundling the fatigue criteria together&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FailureCriteria.modified_goodman"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.failure_criteria.FailureCriteria.modified_goodman">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">modified_goodman</span><span class="p">(</span><span class="n">ultimate_strength</span><span class="p">,</span> <span class="n">endurance_limit</span><span class="p">,</span> <span class="n">alt_eq_stress</span><span class="p">,</span>
+                         <span class="n">mean_eq_stress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Safety factor according to modified Goodman failure criterion</span>
+<span class="sd">        (a very common criterion)</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+
+<span class="sd">        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mean_eq_stress</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not valid when the mean equivalent stress is negative,&quot;</span>
+                            <span class="s2">&quot;use get_safety_factor method instead &quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">alt_eq_stress</span> <span class="o">/</span> <span class="n">endurance_limit</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+                    <span class="n">mean_eq_stress</span> <span class="o">/</span> <span class="n">ultimate_strength</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FailureCriteria.soderberg"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.failure_criteria.FailureCriteria.soderberg">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">soderberg</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="n">endurance_limit</span><span class="p">,</span> <span class="n">alt_eq_stress</span><span class="p">,</span> <span class="n">mean_eq_stress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Safety factor according to Soderberg failure criterion</span>
+<span class="sd">        (the safest criterion)</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+
+<span class="sd">        :raises ValueError: if Sy is not in the fatigue call</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mean_eq_stress</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not valid when the mean equivalent stress is negative,&quot;</span>
+                            <span class="s2">&quot;use get_safety_factor method instead &quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">alt_eq_stress</span> <span class="o">/</span> <span class="n">endurance_limit</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+                    <span class="n">mean_eq_stress</span> <span class="o">/</span> <span class="n">yield_strength</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FailureCriteria.gerber"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.failure_criteria.FailureCriteria.gerber">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">gerber</span><span class="p">(</span><span class="n">ultimate_strength</span><span class="p">,</span> <span class="n">endurance_limit</span><span class="p">,</span> <span class="n">alt_eq_stress</span><span class="p">,</span> <span class="n">mean_eq_stress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Safety factor according to Gerber failure criterion</span>
+<span class="sd">        (the most lenient criterion)</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+<span class="sd">        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mean_eq_stress</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not valid when the mean equivalent stress is negative,&quot;</span>
+                            <span class="s2">&quot;use get_safety_factor method instead &quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">ultimate_strength</span> <span class="o">/</span> <span class="n">mean_eq_stress</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="n">alt_eq_stress</span> <span class="o">/</span> <span class="n">endurance_limit</span>
+            <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FailureCriteria.asme_elliptic"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.failure_criteria.FailureCriteria.asme_elliptic">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">asme_elliptic</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="n">endurance_limit</span><span class="p">,</span> <span class="n">alt_eq_stress</span><span class="p">,</span>
+                      <span class="n">mean_eq_stress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Safety factor according to ASME Failure criterion</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+
+<span class="sd">        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mean_eq_stress</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not valid when the mean equivalent stress is negative,&quot;</span>
+                            <span class="s2">&quot;use get_safety_factor method instead &quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">alt_eq_stress</span> <span class="o">/</span> <span class="n">endurance_limit</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span>
+                    <span class="n">mean_eq_stress</span> <span class="o">/</span> <span class="n">yield_strength</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FailureCriteria.langer_static_yield"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.failure_criteria.FailureCriteria.langer_static_yield">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">langer_static_yield</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="n">alt_eq_stress</span><span class="p">,</span> <span class="n">mean_eq_stress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Static safety factor according to Langer Failure criterion</span>
+<span class="sd">        it&#39;s customary to use Langer, as an assessment to yielding in the first cycle</span>
+
+<span class="sd">        :returns: Safety factor</span>
+<span class="sd">        :rtype: any</span>
+
+<span class="sd">        :raises ValueError: if Sy is not in the fatigue call</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mean_eq_stress</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># stress is in the first quadrant of the alternating-mean stress plan</span>
+                <span class="k">return</span> <span class="n">yield_strength</span> <span class="o">/</span> <span class="p">(</span><span class="n">alt_eq_stress</span> <span class="o">+</span> <span class="n">mean_eq_stress</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># stress is in the second quadrant of the alternating-mean stress plan</span>
+                <span class="k">return</span> <span class="n">yield_strength</span> <span class="o">/</span> <span class="p">(</span><span class="n">alt_eq_stress</span> <span class="o">-</span> <span class="n">mean_eq_stress</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FailureCriteria.get_safety_factor"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.failure_criteria.FailureCriteria.get_safety_factor">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_safety_factor</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="n">ultimate_strength</span><span class="p">,</span> <span class="n">endurance_limit</span><span class="p">,</span>
+                          <span class="n">alt_eq_stress</span><span class="p">,</span> <span class="n">mean_eq_stress</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns dynamic and static safety factors</span>
+<span class="sd">        according to the quadrant in the alternating-mean</span>
+<span class="sd">        stress plain where the stresses are in</span>
+
+<span class="sd">        Note: Should always be used instead of accessing the</span>
+<span class="sd">        individual safety factors properties directly</span>
+
+<span class="sd">        :param str criterion: The criterion to use</span>
+<span class="sd">        :param float yield_strength: The yield strength (Sy or Ssy)</span>
+<span class="sd">        :param float ultimate_strength: The yield strength (Sut or Ssu)</span>
+<span class="sd">        :param float endurance_limit: Modified endurance limit (Se)</span>
+<span class="sd">        :param float alt_eq_stress: alternating stresses</span>
+<span class="sd">        :param float mean_eq_stress: mean stresses</span>
+<span class="sd">        :param bool verbose: Print the result</span>
+
+<span class="sd">        :returns: dynamic and static safety factors</span>
+<span class="sd">        :rtype: tuple[float, float]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">mean_eq_stress</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># stress is in the first quadrant of the alternating-mean stress plan</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">endurance_limit</span><span class="p">,</span> <span class="n">alt_eq_stress</span><span class="p">,</span> <span class="n">mean_eq_stress</span><span class="p">)</span>
+            <span class="n">safety_factors</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;modified goodman&#39;</span><span class="p">:</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">modified_goodman</span><span class="p">(</span><span class="n">ultimate_strength</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">),</span>
+                <span class="s1">&#39;soderberg&#39;</span><span class="p">:</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">soderberg</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">),</span>
+                <span class="s1">&#39;gerber&#39;</span><span class="p">:</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">gerber</span><span class="p">(</span><span class="n">ultimate_strength</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">),</span>
+                <span class="s1">&#39;asme-elliptic&#39;</span><span class="p">:</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">asme_elliptic</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)}</span>
+
+            <span class="n">nF</span> <span class="o">=</span> <span class="n">safety_factors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">criterion</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s1">&#39;Error&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">nF</span> <span class="o">==</span> <span class="s1">&#39;Error&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown criterion - </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                                 <span class="s2">&quot;Available criteria: &#39;Modified Goodman&#39;, &#39;Soderberg&#39;,&quot;</span>
+                                 <span class="s2">&quot;&#39;Gerber&#39;, &#39;ASME-elliptic&#39;&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># stress is in the second quadrant of the alternating-mean stress plan</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NOTE: The mean stress = </span><span class="si">{</span><span class="n">mean_eq_stress</span><span class="si">}</span><span class="s2"> &quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;is negative, using alternative calculation&quot;</span><span class="p">)</span>
+            <span class="n">nF</span> <span class="o">=</span> <span class="n">endurance_limit</span> <span class="o">/</span> <span class="n">alt_eq_stress</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="s1">&#39;fatigue&#39;</span>
+
+        <span class="n">nl</span> <span class="o">=</span> <span class="n">FailureCriteria</span><span class="o">.</span><span class="n">langer_static_yield</span><span class="p">(</span><span class="n">yield_strength</span><span class="p">,</span> <span class="n">alt_eq_stress</span><span class="p">,</span> <span class="n">mean_eq_stress</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t calculate Langer static safety factor,&quot;</span>
+                      <span class="s2">&quot;the yield_strength is None&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">nF</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">yield_strength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Couldn&#39;t calculate </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2"> static safety factor, &quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;the yield_strength is None&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">ultimate_strength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Couldn&#39;t calculate </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2"> static safety factor, &quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;the ultimate_strength is None&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">nF</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2"> safety factor is: </span><span class="si">{</span><span class="n">nF</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;the Langer static safety factor is: </span><span class="si">{</span><span class="n">nl</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">nF</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the Langer static safety factor is: </span><span class="si">{</span><span class="n">nl</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">nl</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nF</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2"> safety factor is: </span><span class="si">{</span><span class="n">nF</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">nF</span><span class="p">,</span> <span class="n">nl</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Omri Stein.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

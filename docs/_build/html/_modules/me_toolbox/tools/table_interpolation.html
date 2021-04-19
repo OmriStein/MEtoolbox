@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>me_toolbox.tools.table_interpolation &mdash; me_toolbox  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> me_toolbox
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">me_toolbox</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">me_toolbox</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>me_toolbox.tools.table_interpolation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for me_toolbox.tools.table_interpolation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;module containing the table interpolation function&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="NotInRangeError"><a class="viewcode-back" href="../../../source/me_toolbox.tools.html#me_toolbox.tools.table_interpolation.NotInRangeError">[docs]</a><span class="k">class</span> <span class="nc">NotInRangeError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">range_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Error for when value is not in the specified range</span>
+
+<span class="sd">        :param str var: var assigned to</span>
+<span class="sd">        :param float num: num to assign</span>
+<span class="sd">        :param tuple range_: permitted range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">range_</span> <span class="o">=</span> <span class="n">range_</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">num</span><span class="si">}</span><span class="s2"> not in range </span><span class="si">{</span><span class="n">range_</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="table_interpolation"><a class="viewcode-back" href="../../../source/me_toolbox.tools.html#me_toolbox.tools.table_interpolation.table_interpolation">[docs]</a><span class="k">def</span> <span class="nf">table_interpolation</span><span class="p">(</span><span class="n">x_row</span><span class="p">,</span> <span class="n">x_col</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get table in a numpy array form and two coordinates and</span>
+<span class="sd">    Interpolate the value in the table corresponding to those coordinates</span>
+
+<span class="sd">    :keyword x_row: the x row from which to retrieve the value</span>
+<span class="sd">    :type x_row: float</span>
+<span class="sd">    :keyword x_col: the x col from which to retrieve the value</span>
+<span class="sd">    :type x_col: float</span>
+<span class="sd">    :keyword data: the table as numpy array</span>
+<span class="sd">    :type data: np.ndarray</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># first gear number of known teeth values</span>
+    <span class="n">first_column</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># second gear number of known teeth values</span>
+    <span class="n">first_row</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="k">if</span> <span class="n">x_col</span> <span class="o">&gt;</span> <span class="n">first_row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">x_col</span> <span class="o">&lt;</span> <span class="n">first_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">NotInRangeError</span><span class="p">(</span><span class="s2">&quot;x_col&quot;</span><span class="p">,</span> <span class="n">x_col</span><span class="p">,</span> <span class="p">(</span><span class="n">first_row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">first_row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">x_row</span> <span class="o">&gt;</span> <span class="n">first_column</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">x_row</span> <span class="o">&lt;</span> <span class="n">first_column</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">NotInRangeError</span><span class="p">(</span><span class="s2">&quot;x_row&quot;</span><span class="p">,</span> <span class="n">x_row</span><span class="p">,</span> <span class="p">(</span><span class="n">first_column</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">first_column</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="c1"># upper bounds indexes of x_row and x_col</span>
+    <span class="n">index1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">first_column</span><span class="p">,</span> <span class="n">x_row</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+    <span class="n">index2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">first_row</span><span class="p">,</span> <span class="n">x_col</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># get x_row neighbors</span>
+        <span class="n">x_row_low</span><span class="p">,</span> <span class="n">x_row_high</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">index1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="c1"># if x_row upper neighbor is out of the table range</span>
+        <span class="n">x_row_low</span><span class="p">,</span> <span class="n">x_row_high</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># get x_col neighbors</span>
+        <span class="n">x_col_low</span><span class="p">,</span> <span class="n">x_col_high</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">index2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">index2</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="c1"># if x_col upper neighbor is out of the table range</span>
+        <span class="n">x_col_low</span><span class="p">,</span> <span class="n">x_col_high</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">index2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># if gear teeth number is not in the table do an</span>
+    <span class="c1"># interpolation on closest values inside the table</span>
+    <span class="k">if</span> <span class="n">x_row</span> <span class="o">==</span> <span class="n">x_row_low</span> <span class="ow">and</span> <span class="n">x_col</span> <span class="o">==</span> <span class="n">x_col_low</span><span class="p">:</span>
+        <span class="c1"># x_row and x_col are known no need to interpolate</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">index2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">x_row</span> <span class="o">==</span> <span class="n">x_row_low</span><span class="p">:</span>
+        <span class="c1"># x_row is known and x_col is interpolated</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">x_col</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">data</span><span class="p">[</span><span class="n">index1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="k">elif</span> <span class="n">x_col</span> <span class="o">==</span> <span class="n">x_col_low</span><span class="p">:</span>
+        <span class="c1"># x_col is known and x_row is interpolated</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">x_row</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">index2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># both are unknown and interpolated</span>
+        <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">x_row</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">index2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">x_row</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">index2</span><span class="p">])</span>
+        <span class="n">range_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">index2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">index2</span><span class="p">]])</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">x_col</span><span class="p">,</span> <span class="n">range_</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Omri Stein.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

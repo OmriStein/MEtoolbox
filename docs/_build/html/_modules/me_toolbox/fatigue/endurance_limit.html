@@ -1,0 +1,371 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>me_toolbox.fatigue.endurance_limit &mdash; me_toolbox  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> me_toolbox
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">me_toolbox</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">me_toolbox</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>me_toolbox.fatigue.endurance_limit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for me_toolbox.fatigue.endurance_limit</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;a module containing the EnduranceLimit class&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+
+
+<div class="viewcode-block" id="EnduranceLimit"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.endurance_limit.EnduranceLimit">[docs]</a><span class="k">class</span> <span class="nc">EnduranceLimit</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;calculates Marin modification factors and return modified endurance limit&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Sut</span><span class="p">,</span> <span class="n">surface_finish</span><span class="p">,</span> <span class="n">rotating</span><span class="p">,</span> <span class="n">max_normal_stress</span><span class="p">,</span> <span class="n">max_bending_stress</span><span class="p">,</span> <span class="n">stress_type</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span>
+                 <span class="n">reliability</span><span class="p">,</span> <span class="n">material</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unmodified_endurance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">A95</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Instantiating EnduranceLimit Object</span>
+
+<span class="sd">        :param float Sut: ultimate tensile strength</span>
+<span class="sd">        :param str surface_finish: &#39;ground&#39; / &#39;machined&#39; / &#39;cold-drawn&#39; / &#39;hot-rolled&#39; / &#39;as forged&#39;</span>
+<span class="sd">        :param bool rotating: rotating mode (True/False)</span>
+<span class="sd">        :param float max_normal_stress: (for axial loading check)</span>
+<span class="sd">        :param float max_bending_stress: (for axial loading check)</span>
+<span class="sd">        :param str stress_type: &#39;bending&#39; / &#39;axial&#39; / &#39;torsion&#39; / &#39;shear&#39; / &#39;multiple&#39;</span>
+<span class="sd">        :param float temp: temperature</span>
+<span class="sd">        :param float reliability: reliability</span>
+<span class="sd">        :param str material:</span>
+<span class="sd">        :param float unmodified_endurance:</span>
+<span class="sd">        :param float A95: Area containing over 95% of maximum periodic stress in the cross section</span>
+<span class="sd">        :param float diameter:</span>
+<span class="sd">        :param float height:</span>
+<span class="sd">        :param float width:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span> <span class="o">=</span> <span class="n">Sut</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surface_finish</span> <span class="o">=</span> <span class="n">surface_finish</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotating</span> <span class="o">=</span> <span class="n">rotating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_normal_stress</span> <span class="o">=</span> <span class="n">max_normal_stress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_bending_stress</span> <span class="o">=</span> <span class="n">max_bending_stress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diameter</span> <span class="o">=</span> <span class="n">diameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stress_type</span> <span class="o">=</span> <span class="n">stress_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reliability</span> <span class="o">=</span> <span class="n">reliability</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">material</span> <span class="o">=</span> <span class="n">material</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unmodified_endurance</span> <span class="o">=</span> <span class="n">unmodified_endurance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A95</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_A95</span><span class="p">(</span><span class="n">A95</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EnduranceLimit.calc_A95"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.endurance_limit.EnduranceLimit.calc_A95">[docs]</a>    <span class="k">def</span> <span class="nf">calc_A95</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A95</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">A95</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">A95</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diameter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.01046</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">diameter</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;A95 is None and no parameters (diameter/width/height)&#39;</span>
+                             <span class="s1">&#39;were given in order to calculate it&#39;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Ka</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Surface condition modification factor</span>
+
+<span class="sd">        :returns: Ka - surface finish factor</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ground&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.58</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.085</span><span class="p">),</span>
+                <span class="s1">&#39;machined&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">4.51</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.265</span><span class="p">),</span>
+                <span class="s1">&#39;cold-drawn&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">4.51</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.265</span><span class="p">),</span>
+                <span class="s1">&#39;hot-rolled&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">57.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.718</span><span class="p">),</span>
+                <span class="s1">&#39;as forged&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">272</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.995</span><span class="p">)}</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">surface_finish</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Sut</span> <span class="o">**</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Kb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># FIXME: fix Kb its badly writen</span>
+        <span class="sd">&quot;&quot;&quot;Size modification factor</span>
+
+<span class="sd">        :returns: Kb - size factor</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_normal_stress</span> <span class="o">&gt;</span> <span class="mf">0.85</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_bending_stress</span><span class="p">:</span>
+            <span class="c1"># if axial loading accrue</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotating</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">diameter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># rotating and round</span>
+            <span class="n">de</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diameter</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># not rotating or not round</span>
+            <span class="n">de</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A95</span> <span class="o">/</span> <span class="mf">0.07658</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="mf">2.79</span> <span class="o">&lt;=</span> <span class="n">de</span> <span class="o">&lt;=</span> <span class="mi">51</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.24</span> <span class="o">*</span> <span class="p">(</span><span class="n">de</span> <span class="o">**</span> <span class="o">-</span><span class="mf">0.107</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="mi">51</span> <span class="o">&lt;</span> <span class="n">de</span> <span class="o">&lt;=</span> <span class="mi">254</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.51</span> <span class="o">*</span> <span class="p">(</span><span class="n">de</span> <span class="o">**</span> <span class="o">-</span><span class="mf">0.157</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Kc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Load modification factor</span>
+
+<span class="sd">        :returns Kc - stress type factor</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bending&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axial&#39;</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span> <span class="s1">&#39;torsion&#39;</span><span class="p">:</span> <span class="mf">0.59</span><span class="p">,</span> <span class="s1">&#39;shear&#39;</span><span class="p">:</span> <span class="mf">0.59</span><span class="p">,</span> <span class="s1">&#39;multiple&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">types</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">stress_type</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Kd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Temperature modification factor</span>
+
+<span class="sd">        :returns: factor_Ks - temperature factor</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+        <span class="n">percentage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">450</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">550</span><span class="p">,</span> <span class="mi">600</span><span class="p">])</span>
+        <span class="n">reliability_factors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.01</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.025</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.943</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.843</span><span class="p">,</span> <span class="mf">0.768</span><span class="p">,</span> <span class="mf">0.672</span><span class="p">,</span> <span class="mf">0.549</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp</span><span class="p">,</span> <span class="n">percentage</span><span class="p">,</span> <span class="n">reliability_factors</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Ke</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Reliability factor</span>
+
+<span class="sd">        :returns: Ke - reliability factor</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+        <span class="n">percentage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mf">99.9</span><span class="p">,</span> <span class="mf">99.99</span><span class="p">,</span> <span class="mf">99.999</span><span class="p">,</span> <span class="mf">99.9999</span><span class="p">])</span>
+        <span class="n">reliability_factors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.897</span><span class="p">,</span> <span class="mf">0.868</span><span class="p">,</span> <span class="mf">0.814</span><span class="p">,</span> <span class="mf">0.753</span><span class="p">,</span> <span class="mf">0.702</span><span class="p">,</span> <span class="mf">0.659</span><span class="p">,</span> <span class="mf">0.620</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reliability</span><span class="p">,</span> <span class="n">percentage</span><span class="p">,</span> <span class="n">reliability_factors</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Kf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Miscellaneous effects factor&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">unmodified</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the unmodified endurance limit based on the material and ultimate_tensile_strength</span>
+
+<span class="sd">        :returns: Unmodified endurance limit</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">material</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">unmodified_endurance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;material and unmodified endurance can&#39;t both be None&quot;</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;steel&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;divider&#39;</span><span class="p">:</span> <span class="mi">1400</span><span class="p">,</span> <span class="s1">&#39;lesser&#39;</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span><span class="p">,</span> <span class="s1">&#39;grater&#39;</span><span class="p">:</span> <span class="mi">700</span><span class="p">},</span>
+                <span class="s1">&#39;iron&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;divider&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;lesser&#39;</span><span class="p">:</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span><span class="p">,</span> <span class="s1">&#39;grater&#39;</span><span class="p">:</span> <span class="mi">160</span><span class="p">},</span>
+                <span class="s1">&#39;aluminium&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;divider&#39;</span><span class="p">:</span> <span class="mi">330</span><span class="p">,</span> <span class="s1">&#39;lesser&#39;</span><span class="p">:</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span><span class="p">,</span> <span class="s1">&#39;grater&#39;</span><span class="p">:</span> <span class="mi">130</span><span class="p">},</span>
+                <span class="s1">&#39;copper alloy&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;divider&#39;</span><span class="p">:</span> <span class="mi">280</span><span class="p">,</span> <span class="s1">&#39;lesser&#39;</span><span class="p">:</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span><span class="p">,</span> <span class="s1">&#39;grater&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">}}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unmodified_endurance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sut</span> <span class="o">&lt;</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">][</span><span class="s1">&#39;divider&#39;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">][</span><span class="s1">&#39;lesser&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">][</span><span class="s1">&#39;grater&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unmodified_endurance</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modified</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the endurance limit modified by the Marin factors</span>
+
+<span class="sd">        :returns: Modified endurance limit</span>
+<span class="sd">        :type: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ka</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kb</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kc</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kd</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ke</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kf</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unmodified</span>
+
+<div class="viewcode-block" id="EnduranceLimit.get_factors"><a class="viewcode-back" href="../../../source/me_toolbox.fatigue.html#me_toolbox.fatigue.endurance_limit.EnduranceLimit.get_factors">[docs]</a>    <span class="k">def</span> <span class="nf">get_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;print Marine factors&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Ka=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Ka</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Kb=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Kb</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Kc=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Kc</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, factor_Ks=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Ke=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Ke</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Kf=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Kf</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Omri Stein.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
