@@ -5,13 +5,14 @@ calculations of mechanical design and help speed up the design
 process. This library contains general fatigue analysis tools
 and gears and springs design tools.
 
+<!--
 ## Installation
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install me_toolbox.
-
 ```bash
-pip install me_toolbox
+ pip install me_toolbox 
 ```
+--->
 
 ## Usage
 

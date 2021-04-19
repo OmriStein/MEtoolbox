@@ -3,11 +3,4 @@
 /build/
 /dist/
 /me_toolbox.egg-info/
-/docs/_build/doctrees
-/docs/_static/
-/docs/_templates/
-/docs/source
-/docs/conf.py
-/docs/index.rst
-/docs/make.bat
-/docs/Makefile
+/docs/
