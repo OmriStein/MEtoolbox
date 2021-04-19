@@ -4,7 +4,7 @@
 def print_atributes(obj):
     """prints all of the attributes of an object
     excluding the dunder attributes and attributes
-     with a single leading underscore
+    with a single leading underscore
 
     :param obj: any object
     """
@@ -64,7 +64,7 @@ def parse_input(obj, fields, kwargs):
 def pound_force_to_newtons(val):
     """convert pound max_force to newtons
 
-    :param float or list or tuple val: value to convert
+    :param float or list val: value to convert
 
     :returns: converted value
     :rtype: float or tuple
@@ -78,7 +78,7 @@ def pound_force_to_newtons(val):
 def newtons_to_pound_force(val):
     """convert newtons to pound max_force
 
-    :param float or list or tuple val: value to convert
+    :param float or list val: value to convert
 
     :returns: converted value
     :rtype: float or tuple
@@ -92,7 +92,7 @@ def newtons_to_pound_force(val):
 def inch_to_millimetre(val):
     """convert inches in to millimeters
 
-    :param float or list or tuple val: value to convert
+    :param float or list val: value to convert
 
     :returns: converted value
     :rtype: float or tuple
@@ -106,7 +106,7 @@ def inch_to_millimetre(val):
 def millimetre_to_inch(val):
     """convert millimetres to inches
 
-    :param float or list or tuple val: value to convert
+    :param float or list val: value to convert
 
     :returns: converted value
     :rtype: float or tuple

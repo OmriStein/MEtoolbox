@@ -92,7 +92,7 @@ class FatigueAnalysis:
         """Returns the mean equivalent stress according to the load type indicated by Kc
 
         :returns: Mean equivalent stress
-        :rtype:float
+        :rtype: float
         """
         if self.ductile:
             # if the material is ductile no correction is needed
@@ -332,10 +332,10 @@ class FatigueAnalysis:
         """ calculate number of cycles until failure
 
         Note: zeta = log(N1) - log(N2), N1 - number of cycles at Sm_stress,
-        N2 - Number of cycles at Se for steel N1=1e3 and N2 = 1e6
+            N2 - Number of cycles at Se for steel N1=1e3 and N2 = 1e6
 
-        :keyword z: -3 for steel where N=1e6, -5 for a metal where N=1e8,
-        -5.69 for a metal where N=5e8
+        :param float z: -3 for steel where N=1e6, -5 for a metal where N=1e8,
+            -5.69 for a metal where N=5e8
 
         :returns: The Number of cycles and the fatigue stress at failure
         :rtype: tuple[float, float]
@@ -395,7 +395,7 @@ class FatigueAnalysis:
             where N=5e8
         :param bool verbose: printing the groups
             [number_of_repetitions,maximum_stress, minimum_stress, reversible_stress, Number of
-                cycles]
+            cycles]
         :param bool freq: if the input is frequency instead of number of repetition
         :param bool alt_mean: if True the stress_group structure contains
             alternating and mean stresses: [number_of_repetitions, alternating_stress, mean_stress]
