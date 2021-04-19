@@ -12,6 +12,10 @@ class SpurGear:
     # TODO: YN - add solution for low cycle of material not in the graph
     # TODO: Qv - add a way to calculate the Qv value as in AGMA 2001-D04
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(m={self.modulus}, N={self.teeth_num}, " \
+               f"\N{GREEK SMALL LETTER PHI}={self.pressure_angle}, b={self.width})"
+
     def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
                  enclosure, hardness, pressure_angle, grade, work_hours=0, number_of_cycles=0,
                  crowned=False, adjusted=False, sensitive_use=False, nitriding=False,
