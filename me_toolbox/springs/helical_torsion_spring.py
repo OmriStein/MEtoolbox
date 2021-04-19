@@ -2,9 +2,9 @@
 from math import pi, sqrt
 from sympy import Symbol  # pylint: disable=unused-import
 
-from fatigue import FailureCriteria
+from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import Spring
-from tools import percent_to_decimal
+from me_toolbox.tools import percent_to_decimal
 
 
 class HelicalTorsionSpring(Spring):
