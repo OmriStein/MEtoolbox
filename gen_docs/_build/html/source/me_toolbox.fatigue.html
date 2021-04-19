@@ -1,0 +1,842 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="me_toolbox.gears package" href="me_toolbox.gears.html" /><link rel="prev" title="me_toolbox package" href="me_toolbox.html" />
+
+    <meta name="generator" content="sphinx-3.3.1, furo 2021.04.11.beta34"/>
+        <title>me_toolbox.fatigue package - me-toolbox documentation</title>
+      <link rel="stylesheet" href="../_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">me-toolbox  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">me-toolbox  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">me_toolbox</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="me_toolbox.html">me_toolbox package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">me_toolbox.fatigue package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="me_toolbox.gears.html">me_toolbox.gears package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="me_toolbox.springs.html">me_toolbox.springs package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="me_toolbox.tools.html">me_toolbox.tools package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="me-toolbox-fatigue-package">
+<h1>me_toolbox.fatigue package<a class="headerlink" href="#me-toolbox-fatigue-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-me_toolbox.fatigue.endurance_limit">
+<span id="me-toolbox-fatigue-endurance-limit-module"></span><h2>me_toolbox.fatigue.endurance_limit module<a class="headerlink" href="#module-me_toolbox.fatigue.endurance_limit" title="Permalink to this headline">¶</a></h2>
+<p>a module containing the EnduranceLimit class</p>
+<dl class="py class">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit">
+<em class="property">class </em><code class="sig-prename descclassname">me_toolbox.fatigue.endurance_limit.</code><code class="sig-name descname">EnduranceLimit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Sut</span></em>, <em class="sig-param"><span class="n">surface_finish</span></em>, <em class="sig-param"><span class="n">rotating</span></em>, <em class="sig-param"><span class="n">max_normal_stress</span></em>, <em class="sig-param"><span class="n">max_bending_stress</span></em>, <em class="sig-param"><span class="n">stress_type</span></em>, <em class="sig-param"><span class="n">temp</span></em>, <em class="sig-param"><span class="n">reliability</span></em>, <em class="sig-param"><span class="n">material</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">unmodified_endurance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">A95</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">diameter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">height</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">width</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/endurance_limit.html#EnduranceLimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>calculates Marin modification factors and return modified endurance limit</p>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.Ka">
+<em class="property">property </em><code class="sig-name descname">Ka</code><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.Ka" title="Permalink to this definition">¶</a></dt>
+<dd><p>Surface condition modification factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Ka - surface finish factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.Kb">
+<em class="property">property </em><code class="sig-name descname">Kb</code><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.Kb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Size modification factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Kb - size factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.Kc">
+<em class="property">property </em><code class="sig-name descname">Kc</code><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.Kc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load modification factor</p>
+<p>:returns Kc - stress type factor
+:rtype: float</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.Kd">
+<em class="property">property </em><code class="sig-name descname">Kd</code><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.Kd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temperature modification factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>factor_Ks - temperature factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.Ke">
+<em class="property">property </em><code class="sig-name descname">Ke</code><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.Ke" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reliability factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Ke - reliability factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.Kf">
+<em class="property">property </em><code class="sig-name descname">Kf</code><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.Kf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Miscellaneous effects factor</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.calc_A95">
+<code class="sig-name descname">calc_A95</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">A95</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/endurance_limit.html#EnduranceLimit.calc_A95"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.calc_A95" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.get_factors">
+<code class="sig-name descname">get_factors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/endurance_limit.html#EnduranceLimit.get_factors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.get_factors" title="Permalink to this definition">¶</a></dt>
+<dd><p>print Marine factors</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.modified">
+<em class="property">property </em><code class="sig-name descname">modified</code><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.modified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the endurance limit modified by the Marin factors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Modified endurance limit</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.endurance_limit.EnduranceLimit.unmodified">
+<em class="property">property </em><code class="sig-name descname">unmodified</code><a class="headerlink" href="#me_toolbox.fatigue.endurance_limit.EnduranceLimit.unmodified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the unmodified endurance limit based on the material and ultimate_tensile_strength</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Unmodified endurance limit</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</div>
+<div class="section" id="module-me_toolbox.fatigue.failure_criteria">
+<span id="me-toolbox-fatigue-failure-criteria-module"></span><h2>me_toolbox.fatigue.failure_criteria module<a class="headerlink" href="#module-me_toolbox.fatigue.failure_criteria" title="Permalink to this headline">¶</a></h2>
+<p>a module containing the FatigueCriteria class
+containing the Failure criteria as described in
+Shigley’s Mechanical Engineering design</p>
+<dl class="py class">
+<dt id="me_toolbox.fatigue.failure_criteria.FailureCriteria">
+<em class="property">class </em><code class="sig-prename descclassname">me_toolbox.fatigue.failure_criteria.</code><code class="sig-name descname">FailureCriteria</code><a class="reference internal" href="../_modules/me_toolbox/fatigue/failure_criteria.html#FailureCriteria"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.failure_criteria.FailureCriteria" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Bundling the fatigue criteria together</p>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.failure_criteria.FailureCriteria.asme_elliptic">
+<em class="property">static </em><code class="sig-name descname">asme_elliptic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yield_strength</span></em>, <em class="sig-param"><span class="n">endurance_limit</span></em>, <em class="sig-param"><span class="n">alt_eq_stress</span></em>, <em class="sig-param"><span class="n">mean_eq_stress</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/failure_criteria.html#FailureCriteria.asme_elliptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.failure_criteria.FailureCriteria.asme_elliptic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safety factor according to ASME Failure criterion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if ultimate_tensile_strength is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.failure_criteria.FailureCriteria.gerber">
+<em class="property">static </em><code class="sig-name descname">gerber</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ultimate_strength</span></em>, <em class="sig-param"><span class="n">endurance_limit</span></em>, <em class="sig-param"><span class="n">alt_eq_stress</span></em>, <em class="sig-param"><span class="n">mean_eq_stress</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/failure_criteria.html#FailureCriteria.gerber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.failure_criteria.FailureCriteria.gerber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safety factor according to Gerber failure criterion
+(the most lenient criterion)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if ultimate_tensile_strength is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.failure_criteria.FailureCriteria.get_safety_factor">
+<em class="property">static </em><code class="sig-name descname">get_safety_factor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yield_strength</span></em>, <em class="sig-param"><span class="n">ultimate_strength</span></em>, <em class="sig-param"><span class="n">endurance_limit</span></em>, <em class="sig-param"><span class="n">alt_eq_stress</span></em>, <em class="sig-param"><span class="n">mean_eq_stress</span></em>, <em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/failure_criteria.html#FailureCriteria.get_safety_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.failure_criteria.FailureCriteria.get_safety_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dynamic and static safety factors
+according to the quadrant in the alternating-mean
+stress plain where the stresses are in</p>
+<p>Note: Should always be used instead of accessing the
+individual safety factors properties directly</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>criterion</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The criterion to use</p></li>
+<li><p><strong>yield_strength</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The yield strength (Sy or Ssy)</p></li>
+<li><p><strong>ultimate_strength</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The yield strength (Sut or Ssu)</p></li>
+<li><p><strong>endurance_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Modified endurance limit (Se)</p></li>
+<li><p><strong>alt_eq_stress</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – alternating stresses</p></li>
+<li><p><strong>mean_eq_stress</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – mean stresses</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Print the result</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dynamic and static safety factors</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.failure_criteria.FailureCriteria.langer_static_yield">
+<em class="property">static </em><code class="sig-name descname">langer_static_yield</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yield_strength</span></em>, <em class="sig-param"><span class="n">alt_eq_stress</span></em>, <em class="sig-param"><span class="n">mean_eq_stress</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/failure_criteria.html#FailureCriteria.langer_static_yield"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.failure_criteria.FailureCriteria.langer_static_yield" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static safety factor according to Langer Failure criterion
+it’s customary to use Langer, as an assessment to yielding in the first cycle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if Sy is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.failure_criteria.FailureCriteria.modified_goodman">
+<em class="property">static </em><code class="sig-name descname">modified_goodman</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ultimate_strength</span></em>, <em class="sig-param"><span class="n">endurance_limit</span></em>, <em class="sig-param"><span class="n">alt_eq_stress</span></em>, <em class="sig-param"><span class="n">mean_eq_stress</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/failure_criteria.html#FailureCriteria.modified_goodman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.failure_criteria.FailureCriteria.modified_goodman" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safety factor according to modified Goodman failure criterion
+(a very common criterion)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if ultimate_tensile_strength is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.failure_criteria.FailureCriteria.soderberg">
+<em class="property">static </em><code class="sig-name descname">soderberg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yield_strength</span></em>, <em class="sig-param"><span class="n">endurance_limit</span></em>, <em class="sig-param"><span class="n">alt_eq_stress</span></em>, <em class="sig-param"><span class="n">mean_eq_stress</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/failure_criteria.html#FailureCriteria.soderberg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.failure_criteria.FailureCriteria.soderberg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safety factor according to Soderberg failure criterion
+(the safest criterion)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if Sy is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</div>
+<div class="section" id="module-me_toolbox.fatigue.fatigue_analysis">
+<span id="me-toolbox-fatigue-fatigue-analysis-module"></span><h2>me_toolbox.fatigue.fatigue_analysis module<a class="headerlink" href="#module-me_toolbox.fatigue.fatigue_analysis" title="Permalink to this headline">¶</a></h2>
+<p>module containing the FatigueAnalysis class and
+calc_kf for calculating dynamic stress concentration factor</p>
+<dl class="py class">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis">
+<em class="property">class </em><code class="sig-prename descclassname">me_toolbox.fatigue.fatigue_analysis.</code><code class="sig-name descname">FatigueAnalysis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">endurance_limit</span></em>, <em class="sig-param"><span class="n">ductile</span></em>, <em class="sig-param"><span class="n">Sy</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Kf_bending</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">Kf_normal</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">Kf_torsion</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">alt_bending_stress</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">alt_normal_stress</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">alt_torsion_stress</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">mean_bending_stress</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">mean_normal_stress</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">mean_torsion_stress</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#FatigueAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Perform fatigue analysis</p>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.ASME_elliptic">
+<em class="property">property </em><code class="sig-name descname">ASME_elliptic</code><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.ASME_elliptic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safety factor according to ASME Failure criterion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if ultimate_tensile_strength is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.Sm_stress">
+<em class="property">property </em><code class="sig-name descname">Sm_stress</code><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.Sm_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for the Sm_stress property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Sm - stress at 1e3 cycles</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_Sm">
+<em class="property">static </em><code class="sig-name descname">calc_Sm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Sut</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#FatigueAnalysis.calc_Sm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_Sm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate Sm_stress which is the stress at 1e3 cycles, the boundary
+dividing Low cycle fatigue and high cycle fatigue</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>Sut</strong> – Ultimate tensile strength</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sm_stress stress</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_alt_eq_stress">
+<code class="sig-name descname">calc_alt_eq_stress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#FatigueAnalysis.calc_alt_eq_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_alt_eq_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the alternating equivalent stress according to the load type indicated by Kc</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Alternating equivalent stress</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_mean_eq_stress">
+<code class="sig-name descname">calc_mean_eq_stress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#FatigueAnalysis.calc_mean_eq_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.calc_mean_eq_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mean equivalent stress according to the load type indicated by Kc</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mean equivalent stress</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.gerber">
+<em class="property">property </em><code class="sig-name descname">gerber</code><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.gerber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safety factor according to Gerber failure criterion
+(the most lenient criterion)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if ultimate_tensile_strength is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.get_info">
+<code class="sig-name descname">get_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#FatigueAnalysis.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>print object attributes</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.get_safety_factor">
+<code class="sig-name descname">get_safety_factor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#FatigueAnalysis.get_safety_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.get_safety_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dynamic and static safety factors
+according to the quadrant in the alternating-mean
+stress plain where the stresses are in</p>
+<p>Note: Should always be used instead of accessing the
+individual safety factors properties directly</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>criterion</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The criterion to use</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Print the result</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dynamic and static safety factors</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.langer_static_yield">
+<em class="property">property </em><code class="sig-name descname">langer_static_yield</code><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.langer_static_yield" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static safety factor according to Langer Failure criterion
+it’s customary to use Langer, as an assessment to yielding in the first cycle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if Sy is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.miner_rule">
+<code class="sig-name descname">miner_rule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stress_groups</span></em>, <em class="sig-param"><span class="n">Sut</span></em>, <em class="sig-param"><span class="n">Se</span></em>, <em class="sig-param"><span class="n">Sy</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">- 3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">alt_mean</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">freq</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#FatigueAnalysis.miner_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.miner_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates total number of cycles for multiple periodic loads,
+the stress_groups format is as follows:
+[number_of_repetitions, maximum_stress, minimum_stress]</p>
+<p>Note: number_of_repetitions = frequency [Hz] * time</p>
+<p>Note: if the material don’t have fatigue limit use the fatigue strength at Se=Sf(N=1e8)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stress_groups</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – a list containing the pick stresses and number of repetition</p></li>
+<li><p><strong>Sut</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Ultimate tensile strength [MPa]</p></li>
+<li><p><strong>Sy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – yield strength [MPa], if None only HCF is checked</p></li>
+<li><p><strong>Se</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – endurance limit [MPa]</p></li>
+<li><p><strong>z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – -3 for steel where N=1e6, -5 for a metal where N=1e8, -5.69 for a metal
+where N=5e8</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – printing the groups
+[number_of_repetitions,maximum_stress, minimum_stress, reversible_stress, Number of
+cycles]</p></li>
+<li><p><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – if the input is frequency instead of number of repetition</p></li>
+<li><p><strong>alt_mean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – if True the stress_group structure contains
+alternating and mean stresses: [number_of_repetitions, alternating_stress, mean_stress]
+instead of the max and min stresses:
+[number_of_repetitions, maximum_stress, minimum_stress]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Total number of cycles</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.modified_goodman">
+<em class="property">property </em><code class="sig-name descname">modified_goodman</code><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.modified_goodman" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safety factor according to modified Goodman failure criterion
+(a very common criterion)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if ultimate_tensile_strength is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.num_of_cycle">
+<code class="sig-name descname">num_of_cycle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">- 3</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#FatigueAnalysis.num_of_cycle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.num_of_cycle" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate number of cycles until failure</p>
+<dl class="simple">
+<dt>Note: zeta = log(N1) - log(N2), N1 - number of cycles at Sm_stress,</dt><dd><p>N2 - Number of cycles at Se for steel N1=1e3 and N2 = 1e6</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – -3 for steel where N=1e6, -5 for a metal where N=1e8,
+-5.69 for a metal where N=5e8</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The Number of cycles and the fatigue stress at failure</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.shear_ultimate_strength">
+<em class="property">property </em><code class="sig-name descname">shear_ultimate_strength</code><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.shear_ultimate_strength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns shear_ultimate_strength which is the
+ultimate_tensile_strength correction for shear stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Sst - ultimate shear tensile strength</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.shear_yield_stress">
+<em class="property">property </em><code class="sig-name descname">shear_yield_stress</code><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.shear_yield_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns shear_yield_strength which is the Sy correction for shear stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>shear_yield_strength - yield stress for shear</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.soderberg">
+<em class="property">property </em><code class="sig-name descname">soderberg</code><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.FatigueAnalysis.soderberg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safety factor according to Soderberg failure criterion
+(the safest criterion)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>any</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if Sy is not in the fatigue call</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py function">
+<dt id="me_toolbox.fatigue.fatigue_analysis.calc_kf">
+<code class="sig-prename descclassname">me_toolbox.fatigue.fatigue_analysis.</code><code class="sig-name descname">calc_kf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em>, <em class="sig-param"><span class="n">Kt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/fatigue_analysis.html#calc_kf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.fatigue_analysis.calc_kf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kf - dynamic stress concentration factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Kt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – stress concentration theoretical factor</p></li>
+<li><p><strong>q</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – notch Sensitivity</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dynamic stress concentration factor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+</div>
+<div class="section" id="module-me_toolbox.fatigue.stress">
+<span id="me-toolbox-fatigue-stress-module"></span><h2>me_toolbox.fatigue.stress module<a class="headerlink" href="#module-me_toolbox.fatigue.stress" title="Permalink to this headline">¶</a></h2>
+<p>A module containing stress calculation functions</p>
+<dl class="py function">
+<dt id="me_toolbox.fatigue.stress.bending_stress">
+<code class="sig-prename descclassname">me_toolbox.fatigue.stress.</code><code class="sig-name descname">bending_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">My</span></em>, <em class="sig-param"><span class="n">Iy</span></em>, <em class="sig-param"><span class="n">z</span></em>, <em class="sig-param"><span class="n">Mz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Iz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/stress.html#bending_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.stress.bending_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bending stress in a principle system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>My</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Moment in the y direction</p></li>
+<li><p><strong>Mz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Moment in the y direction</p></li>
+<li><p><strong>Iy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Area moment of inertia for the y direction</p></li>
+<li><p><strong>Iz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Area moment of inertia for the zeta direction</p></li>
+<li><p><strong>z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Coordinate</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Coordinate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bending Stress in a cross section</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt id="me_toolbox.fatigue.stress.max_shear_stress">
+<code class="sig-prename descclassname">me_toolbox.fatigue.stress.</code><code class="sig-name descname">max_shear_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">V</span></em>, <em class="sig-param"><span class="n">A</span></em>, <em class="sig-param"><span class="n">shape</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/stress.html#max_shear_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.stress.max_shear_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns The maximum shear stress for known shapes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>V</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Shear Stress</p></li>
+<li><p><strong>A</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Cross section area</p></li>
+<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Cross section shape</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Maximum shear Stress</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt id="me_toolbox.fatigue.stress.shear_bending_stress">
+<code class="sig-prename descclassname">me_toolbox.fatigue.stress.</code><code class="sig-name descname">shear_bending_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">V</span></em>, <em class="sig-param"><span class="n">Q</span></em>, <em class="sig-param"><span class="n">I</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/stress.html#shear_bending_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.stress.shear_bending_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shear stresses due to bending</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>V</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Shear max_force in y direction</p></li>
+<li><p><strong>Q</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – first moment of in cross section in y direction</p></li>
+<li><p><strong>I</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Area moment of inertia around the y axis</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – thickness</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Shear stress resulting from bending</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt id="me_toolbox.fatigue.stress.torsion_stress">
+<code class="sig-prename descclassname">me_toolbox.fatigue.stress.</code><code class="sig-name descname">torsion_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">r</span></em>, <em class="sig-param"><span class="n">J</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/stress.html#torsion_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.stress.torsion_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Torsion stresses</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Cross section torque</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Stress radius coordinate</p></li>
+<li><p><strong>J</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Cross section polar moment of inertia</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Torsion Stress at r</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt id="me_toolbox.fatigue.stress.uniform_stress">
+<code class="sig-prename descclassname">me_toolbox.fatigue.stress.</code><code class="sig-name descname">uniform_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">F</span></em>, <em class="sig-param"><span class="n">A</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/fatigue/stress.html#uniform_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.fatigue.stress.uniform_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns stress assuming uniform distribution in cross section</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>F</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Force</p></li>
+<li><p><strong>A</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Cross section area</p></li>
+</ul>
+</dd>
+</dl>
+<p>:returns Stress
+:rtype: float</p>
+</dd></dl>
+</div>
+<div class="section" id="module-me_toolbox.fatigue">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-me_toolbox.fatigue" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="me_toolbox.gears.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">me_toolbox.gears package</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="me_toolbox.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">me_toolbox package</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Omri Stein
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="../_sources/source/me_toolbox.fatigue.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">me_toolbox.fatigue package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.fatigue.endurance_limit">me_toolbox.fatigue.endurance_limit module</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.fatigue.failure_criteria">me_toolbox.fatigue.failure_criteria module</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.fatigue.fatigue_analysis">me_toolbox.fatigue.fatigue_analysis module</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.fatigue.stress">me_toolbox.fatigue.stress module</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.fatigue">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>

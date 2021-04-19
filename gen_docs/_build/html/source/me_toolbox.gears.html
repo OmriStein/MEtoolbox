@@ -1,0 +1,1025 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="me_toolbox.springs package" href="me_toolbox.springs.html" /><link rel="prev" title="me_toolbox.fatigue package" href="me_toolbox.fatigue.html" />
+
+    <meta name="generator" content="sphinx-3.3.1, furo 2021.04.11.beta34"/>
+        <title>me_toolbox.gears package - me-toolbox documentation</title>
+      <link rel="stylesheet" href="../_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">me-toolbox  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">me-toolbox  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">me_toolbox</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="me_toolbox.html">me_toolbox package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="me_toolbox.fatigue.html">me_toolbox.fatigue package</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">me_toolbox.gears package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="me_toolbox.springs.html">me_toolbox.springs package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="me_toolbox.tools.html">me_toolbox.tools package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="me-toolbox-gears-package">
+<h1>me_toolbox.gears package<a class="headerlink" href="#me-toolbox-gears-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-me_toolbox.gears.helical_gear">
+<span id="me-toolbox-gears-helical-gear-module"></span><h2>me_toolbox.gears.helical_gear module<a class="headerlink" href="#module-me_toolbox.gears.helical_gear" title="Permalink to this headline">¶</a></h2>
+<p>Module containing the HelicalGear class</p>
+<dl class="py class">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear">
+<em class="property">class </em><code class="sig-prename descclassname">me_toolbox.gears.helical_gear.</code><code class="sig-name descname">HelicalGear</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">modulus</span></em>, <em class="sig-param"><span class="n">teeth_num</span></em>, <em class="sig-param"><span class="n">rpm</span></em>, <em class="sig-param"><span class="n">Qv</span></em>, <em class="sig-param"><span class="n">width</span></em>, <em class="sig-param"><span class="n">bearing_span</span></em>, <em class="sig-param"><span class="n">pinion_offset</span></em>, <em class="sig-param"><span class="n">enclosure</span></em>, <em class="sig-param"><span class="n">hardness</span></em>, <em class="sig-param"><span class="n">pressure_angle</span></em>, <em class="sig-param"><span class="n">helix_angle</span></em>, <em class="sig-param"><span class="n">grade</span></em>, <em class="sig-param"><span class="n">work_hours</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">number_of_cycles</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">crowned</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">adjusted</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sensitive_use</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">nitriding</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">case_carb</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">material</span><span class="o">=</span><span class="default_value">'steel'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><code class="xref py py-class docutils literal notranslate"><span class="pre">me_toolbox.gears.spur_gear.SpurGear</span></code></a></p>
+<p>A gear object that contains all of its design parameters (AGMA 2001-D04)</p>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.Y_j">
+<em class="property">static </em><code class="sig-name descname">Y_j</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear1</span></em>, <em class="sig-param"><span class="n">gear2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear.Y_j"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.Y_j" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return Geometry factors for helical gear and pinion
+Yj is dependent on the gear ratio, helix angle and both gears teeth numbers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gear1</strong> (<a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a>) – Helical gear object</p></li>
+<li><p><strong>gear2</strong> (<a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a>) – Helical gear object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Yj - Geometric factor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.ZI">
+<em class="property">static </em><code class="sig-name descname">ZI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear1</span></em>, <em class="sig-param"><span class="n">gear2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear.ZI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.ZI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return geometric factor for contact failure
+ZI is dependent on the gear ratio, pressure angle, modulus and both gears teeth numbers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gear1</strong> (<a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a>) – gear object</p></li>
+<li><p><strong>gear2</strong> (<a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a>) – gear object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ZI - geometric factor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.axial_modulus">
+<em class="property">property </em><code class="sig-name descname">axial_modulus</code><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.axial_modulus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate axial modulus</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s axial modulus</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.axial_pitch">
+<em class="property">property </em><code class="sig-name descname">axial_pitch</code><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.axial_pitch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate axial pitch</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s axial pitch</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.calc_centers_distance">
+<code class="sig-name descname">calc_centers_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear_ratio</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear.calc_centers_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.calc_centers_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the distance between the centers of the gears</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – transmissions gear ratio</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the distance between the transmissions gears centers in [mm]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.calc_forces">
+<em class="property">static </em><code class="sig-name descname">calc_forces</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em>, <em class="sig-param"><span class="n">power</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear.calc_forces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.calc_forces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate forces on helical gear</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gear</strong> (<a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a>) – gear object</p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – power</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Wt - tangent max_force in [N], Wr - radial max_force in [N], Wx - axial max_force in [N]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.check_compatibility">
+<code class="sig-name descname">check_compatibility</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear.check_compatibility"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.check_compatibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise error if the pressure angle, helix angle or modulus of the gears don’t match</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear</strong> (<a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a>) – gear object</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a><strong>(</strong><strong>"gear1 and gear2 have mismatch pressure_angle"</strong><strong>)</strong> – </p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a><strong>(</strong><strong>"gear1 and gear2 have mismatch Helix_angle"</strong><strong>)</strong> – </p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a><strong>(</strong><strong>"gear1 and gear2 are not the same type</strong><strong>, </strong><strong>they are no compatible"</strong><strong>)</strong> – </p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a><strong>(</strong><strong>"gear1 and gear2 have mismatch modulus"</strong><strong>)</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.create_new_gear">
+<em class="property">static </em><code class="sig-name descname">create_new_gear</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear2_prop</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear.create_new_gear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.create_new_gear" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a new instance of HelicalGear</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear2_prop</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – gear properties</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HelicalGear object</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear">HelicalGear</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.format_properties">
+<em class="property">static </em><code class="sig-name descname">format_properties</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">properties</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear.format_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.format_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove excess attributes form properties</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – a list of gear properties</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary of properties</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.optimization">
+<code class="sig-name descname">optimization</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmission</span></em>, <em class="sig-param"><span class="n">optimize_feature</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/helical_gear.html#HelicalGear.optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.optimization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform gear optimization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transmission</strong> (<a class="reference internal" href="#me_toolbox.gears.transmission.Transmission" title="me_toolbox.gears.transmission.Transmission"><em>gears.transmission.Transmission</em></a>) – Transmission object
+associated with the gear</p></li>
+<li><p><strong>optimize_feature</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – property to optimize for (‘width’/’volume’/’center’)</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – print optimization stages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>optimized result (width in mm, volume in mm^3, center distance in mm)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.pitch_diameter">
+<em class="property">property </em><code class="sig-name descname">pitch_diameter</code><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.pitch_diameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate pitch diameter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s pitch diameter</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.tangent_modulus">
+<em class="property">property </em><code class="sig-name descname">tangent_modulus</code><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.tangent_modulus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate tangent modulus</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s tangent modulus</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.tangent_pitch">
+<em class="property">property </em><code class="sig-name descname">tangent_pitch</code><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.tangent_pitch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate tangent pitch</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s tangent pitch</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.helical_gear.HelicalGear.tangent_pressure_angle">
+<em class="property">property </em><code class="sig-name descname">tangent_pressure_angle</code><a class="headerlink" href="#me_toolbox.gears.helical_gear.HelicalGear.tangent_pressure_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate tangent pressure angle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s tangent pressure angle</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</div>
+<div class="section" id="module-me_toolbox.gears.spur_gear">
+<span id="me-toolbox-gears-spur-gear-module"></span><h2>me_toolbox.gears.spur_gear module<a class="headerlink" href="#module-me_toolbox.gears.spur_gear" title="Permalink to this headline">¶</a></h2>
+<p>Module containing the SpurGear class</p>
+<dl class="py class">
+<dt id="me_toolbox.gears.spur_gear.SpurGear">
+<em class="property">class </em><code class="sig-prename descclassname">me_toolbox.gears.spur_gear.</code><code class="sig-name descname">SpurGear</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">modulus</span></em>, <em class="sig-param"><span class="n">teeth_num</span></em>, <em class="sig-param"><span class="n">rpm</span></em>, <em class="sig-param"><span class="n">Qv</span></em>, <em class="sig-param"><span class="n">width</span></em>, <em class="sig-param"><span class="n">bearing_span</span></em>, <em class="sig-param"><span class="n">pinion_offset</span></em>, <em class="sig-param"><span class="n">enclosure</span></em>, <em class="sig-param"><span class="n">hardness</span></em>, <em class="sig-param"><span class="n">pressure_angle</span></em>, <em class="sig-param"><span class="n">grade</span></em>, <em class="sig-param"><span class="n">work_hours</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">number_of_cycles</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">crowned</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">adjusted</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sensitive_use</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">nitriding</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">case_carb</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">material</span><span class="o">=</span><span class="default_value">'steel'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A gear object that contains all of its design parameters (AGMA 2001-D04)</p>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.KB">
+<em class="property">property </em><code class="sig-name descname">KB</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.KB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rim thickness factor, factor_KB is dependent on the number of teeth</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s Rim thickness factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.KH">
+<em class="property">property </em><code class="sig-name descname">KH</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.KH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load distribution factor, KH is dependent on: the shape of teeth (crowned),
+if teeth are adjusted after assembly (adjusted), the gear width in [mm],
+pitch diameter in [mm], bearing span (the distance between the bearings center lines)
+pinion offset (the distance from the bearing span center to the pinion mid-face)
+enclosure type (open gearing, commercial enclosed, precision enclosed,
+extra precision enclosed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s load distribution factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.Ks">
+<em class="property">property </em><code class="sig-name descname">Ks</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.Ks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Size factor, factor_Ks is dependent on the circular
+pitch (p=πm) which in turn depends on the modulus</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s size factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.Kv">
+<em class="property">property </em><code class="sig-name descname">Kv</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.Kv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamic factor, Kv is dependent on the pitch diameter in [mm],
+the angular velocity in [rpm] and Qv (transmission accuracy grade number)</p>
+<dl class="simple">
+<dt>note: the equations here are from “Shigley’s Mechanical Engineering Design”</dt><dd><p>in the AGMA standard the transmission accuracy grade number is Av instead of Qv
+and its value is inverted, high Qv is more accurate and high Av is less accurate</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s Dynamic factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.Sc">
+<em class="property">property </em><code class="sig-name descname">Sc</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.Sc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contact safety factor, Sc is dependent on the gear
+hardness in [HBN] and on the material grade
+(material grade of the gear 1 for regular use 2 for military and sensitive uses)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s contact safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.St">
+<em class="property">property </em><code class="sig-name descname">St</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.St" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Bending safety factor, St is dependent on the gear’s</dt><dd><p>hardness in [HBN] and the material grade
+(material grade of the gear 1 for regular use 2 for military and sensitive uses)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s bending safety factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.YN">
+<em class="property">property </em><code class="sig-name descname">YN</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.YN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bending strength stress cycle factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s bending strength stress cycle factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.Y_j">
+<em class="property">static </em><code class="sig-name descname">Y_j</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear1</span></em>, <em class="sig-param"><span class="n">gear2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.Y_j"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.Y_j" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return Geometry factors for spur gear and pinion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s geometry factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.ZI">
+<em class="property">static </em><code class="sig-name descname">ZI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear1</span></em>, <em class="sig-param"><span class="n">gear2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.ZI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.ZI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Geometric factor for contact failure,
+ZI is dependent on the gear ratio and pressure angel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gear1</strong> (<a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a>) – gear object</p></li>
+<li><p><strong>gear2</strong> (<a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a>) – gear object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ZI - geometric factor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.ZN">
+<em class="property">property </em><code class="sig-name descname">ZN</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.ZN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculating contact strength stress cycle factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s contact strength stress cycle</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.ZR">
+<em class="property">property </em><code class="sig-name descname">ZR</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.ZR" title="Permalink to this definition">¶</a></dt>
+<dd><p>For now ZR is 1 according to the AGMA standard
+:rtype: int</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.calc_centers_distance">
+<code class="sig-name descname">calc_centers_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear_ratio</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.calc_centers_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.calc_centers_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the distance between the centers of the gears
+:param float gear_ratio: transmissions gear ratio</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the distance between the transmissions gears centers  in [mm]</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.calc_forces">
+<em class="property">static </em><code class="sig-name descname">calc_forces</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em>, <em class="sig-param"><span class="n">power</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.calc_forces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.calc_forces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate forces on the gear</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gear</strong> (<a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a>) – gear object</p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – power</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Wt - tangent max_force in [N], Wr - radial max_force in [N]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.check_compatibility">
+<code class="sig-name descname">check_compatibility</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.check_compatibility"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.check_compatibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise error if the pressure angle, helix angle or modulus of the gears don’t match</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear</strong> (<a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a>) – gear object</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a><strong>(</strong><strong>"gear1 and gear2 have mismatch pressure_angle"</strong><strong>)</strong> – </p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a><strong>(</strong><strong>"gear1 and gear2 have mismatch Helix_angle"</strong><strong>)</strong> – </p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a><strong>(</strong><strong>"gear1 and gear2 are not the same type</strong><strong>, </strong><strong>they are no compatible"</strong><strong>)</strong> – </p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a><strong>(</strong><strong>"gear1 and gear2 have mismatch modulus"</strong><strong>)</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.create_new_gear">
+<em class="property">static </em><code class="sig-name descname">create_new_gear</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear2_prop</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.create_new_gear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.create_new_gear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new instance of SpurGear</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear2_prop</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – gear properties</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>SpurGear object</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear">SpurGear</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.cycles_or_hours">
+<code class="sig-name descname">cycles_or_hours</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.cycles_or_hours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.cycles_or_hours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the gear number of cycles or work hours
+were input and return the number of cycle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s Dynamic factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – number of cycles and work hours entered but they’re not matching
+or no number of cycles or work hours entered</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.format_properties">
+<em class="property">static </em><code class="sig-name descname">format_properties</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">properties</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.format_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.format_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove excess attributes form properties</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – a list of gear properties</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary of properties</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.get_factors">
+<code class="sig-name descname">get_factors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.get_factors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.get_factors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print correction factors for gear strength analysis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Print factors</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.get_info">
+<code class="sig-name descname">get_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print all the class fields with values</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.optimization">
+<code class="sig-name descname">optimization</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmission</span></em>, <em class="sig-param"><span class="n">optimize_feature</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/spur_gear.html#SpurGear.optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.optimization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform gear optimization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transmission</strong> (<a class="reference internal" href="#me_toolbox.gears.transmission.Transmission" title="me_toolbox.gears.transmission.Transmission"><em>gears.transmission.Transmission</em></a>) – Transmission object
+associated with the gears</p></li>
+<li><p><strong>optimize_feature</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – property to optimize for (‘width’/’volume’/’center’)</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – print optimization stages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>optimized result (width in mm, volume in mm^3, center distance in mm)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.pitch">
+<em class="property">property </em><code class="sig-name descname">pitch</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.pitch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate circular pitch</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s circular pitch</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.pitch_diameter">
+<em class="property">property </em><code class="sig-name descname">pitch_diameter</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.pitch_diameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate pitch diameter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s pitch diameter</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.spur_gear.SpurGear.tangent_velocity">
+<em class="property">property </em><code class="sig-name descname">tangent_velocity</code><a class="headerlink" href="#me_toolbox.gears.spur_gear.SpurGear.tangent_velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert tangent velocity to [m/s] from [rpm]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gear’s tangent velocity</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</div>
+<div class="section" id="module-me_toolbox.gears.transmission">
+<span id="me-toolbox-gears-transmission-module"></span><h2>me_toolbox.gears.transmission module<a class="headerlink" href="#module-me_toolbox.gears.transmission" title="Permalink to this headline">¶</a></h2>
+<p>Module containing the Transmission Class</p>
+<dl class="py exception">
+<dt id="me_toolbox.gears.transmission.GearTypeError">
+<em class="property">exception </em><code class="sig-prename descclassname">me_toolbox.gears.transmission.</code><code class="sig-name descname">GearTypeError</code><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#GearTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.GearTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a></p>
+<p>Error class, inherits from ValueError</p>
+</dd></dl>
+<dl class="py class">
+<dt id="me_toolbox.gears.transmission.Transmission">
+<em class="property">class </em><code class="sig-prename descclassname">me_toolbox.gears.transmission.</code><code class="sig-name descname">Transmission</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driving_machine</span></em>, <em class="sig-param"><span class="n">driven_machine</span></em>, <em class="sig-param"><span class="n">oil_temp</span></em>, <em class="sig-param"><span class="n">reliability</span></em>, <em class="sig-param"><span class="n">power</span></em>, <em class="sig-param"><span class="n">SF</span></em>, <em class="sig-param"><span class="n">gear1</span></em>, <em class="sig-param"><span class="n">gear2</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gear_ratio</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">SH</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Transmission object containing the transmission design parameters
+and methods to perform strength analysis on its gears. (AGMA 2001-D04)</p>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.Ko">
+<em class="property">property </em><code class="sig-name descname">Ko</code><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.Ko" title="Permalink to this definition">¶</a></dt>
+<dd><p>overload factor
+Ko is dependent on the type of driving motor type (Electric Motor/Turbine - uniform,
+multi-cylinder engine - light shock, single-cylinder engine - medium shock)
+and on the driven machine type (uniform, moderate shock, heavy shock)</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.Ytheta">
+<em class="property">property </em><code class="sig-name descname">Ytheta</code><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.Ytheta" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculating Temperature factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>y_theta - The temperature factor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.Yz">
+<em class="property">property </em><code class="sig-name descname">Yz</code><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.Yz" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculating Reliability factor
+input: reliability_num - reliability percentage
+output: Y_z - Reliability factor</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.ZE">
+<em class="property">property </em><code class="sig-name descname">ZE</code><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.ZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Elastic coefficient
+ZE is dependent on the gears material</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.allowed_bending_stress">
+<code class="sig-name descname">allowed_bending_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.allowed_bending_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.allowed_bending_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculating allowed bending stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a><em>, </em><a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a><em>]</em>) – gear object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.allowed_contact_stress">
+<code class="sig-name descname">allowed_contact_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.allowed_contact_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.allowed_contact_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculating allowed contact stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a><em>, </em><a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a><em>]</em>) – gear object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.bending_stress">
+<code class="sig-name descname">bending_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.bending_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.bending_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculating bending stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a><em>, </em><a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a><em>]</em>) – gear object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.centers_distance">
+<em class="property">property </em><code class="sig-name descname">centers_distance</code><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.centers_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the distance between the centers of the gears</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the distance between the transmissions gears centers in [mm]</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.check_undercut">
+<code class="sig-name descname">check_undercut</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.check_undercut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.check_undercut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks undercut state</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.contact_stress">
+<code class="sig-name descname">contact_stress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.contact_stress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.contact_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculating contact stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a><em>, </em><a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a><em>]</em>) – gear object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.get_factors">
+<code class="sig-name descname">get_factors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.get_factors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.get_factors" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieve transmission analysis factors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – print factors</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.get_info">
+<code class="sig-name descname">get_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>print all the class fields with values</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.life_expectency">
+<code class="sig-name descname">life_expectency</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em>, <em class="sig-param"><span class="n">in_hours</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.life_expectency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.life_expectency" title="Permalink to this definition">¶</a></dt>
+<dd><p>try calculating expected life span of the gear if not
+possible return  stress cycle factors (YN/ZN)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p>helical = HelicalGear(gear_properties)
+gearbox = Transmission(transmission_properties)
+gearbox.LifeExpectency(helical, in_hours=True)</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>gear</strong> (<em>Gear</em>) – gear object</p></li>
+<li><p><strong>in_hours</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – return gears life expectency in hours</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Number of cycles / work hours</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.minimal_hardness">
+<code class="sig-name descname">minimal_hardness</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.minimal_hardness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.minimal_hardness" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the minimum hardness of the gear to avoid failure</p>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.minimum_width_for_bending">
+<code class="sig-name descname">minimum_width_for_bending</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.minimum_width_for_bending"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.minimum_width_for_bending" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculating minimum gear width to withstand bending stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a><em>, </em><a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a><em>]</em>) – gear object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.minimum_width_for_contact">
+<code class="sig-name descname">minimum_width_for_contact</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.minimum_width_for_contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.minimum_width_for_contact" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculating minimum gear width to withstand contact stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gear</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a><em>, </em><a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a><em>]</em>) – gear object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="me_toolbox.gears.transmission.Transmission.optimize">
+<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gear</span></em>, <em class="sig-param"><span class="n">optimize_feature</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/me_toolbox/gears/transmission.html#Transmission.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#me_toolbox.gears.transmission.Transmission.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>perform gear optimization</p>
+<p>example: result, results_list = gearbox.Optimize(pinion, optimize_feature=’volume’, verbose=True)</p>
+<p>note: result of width in [mm], volume in [mm^3] and center distance in [mm]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gear</strong> (<a class="reference internal" href="#me_toolbox.gears.spur_gear.SpurGear" title="me_toolbox.gears.spur_gear.SpurGear"><em>SpurGear</em></a><em>, </em><a class="reference internal" href="#me_toolbox.gears.helical_gear.HelicalGear" title="me_toolbox.gears.helical_gear.HelicalGear"><em>HelicalGear</em></a>) – gear object</p></li>
+<li><p><strong>optimize_feature</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – property to optimize for (‘width’/’volume’/’center’)</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – print optimization stages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>optimized result and list of other viable options</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</div>
+<div class="section" id="module-me_toolbox.gears">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-me_toolbox.gears" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="me_toolbox.springs.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">me_toolbox.springs package</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="me_toolbox.fatigue.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">me_toolbox.fatigue package</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Omri Stein
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="../_sources/source/me_toolbox.gears.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">me_toolbox.gears package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.gears.helical_gear">me_toolbox.gears.helical_gear module</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.gears.spur_gear">me_toolbox.gears.spur_gear module</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.gears.transmission">me_toolbox.gears.transmission module</a></li>
+<li><a class="reference internal" href="#module-me_toolbox.gears">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>
