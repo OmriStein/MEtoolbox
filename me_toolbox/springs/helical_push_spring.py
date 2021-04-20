@@ -1,6 +1,6 @@
 """A module containing the helical push spring class"""
 from math import pi, sqrt
-from sympy import Symbol  # pylint: disable=unused-import
+from sympy import Symbol, symbols
 
 from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import Spring
@@ -78,6 +78,11 @@ class HelicalPushSpring(Spring):
 
         self.check_design()
 
+    # @classmethod
+    # def symbolic_spring(cls, end_type='plain'):
+    #     F, d, D, G, E, yield_percent, Ap, m, k, rho = symbols('F, d, D, G, E, yield_percent, Ap, m, k, rho')
+    #     return HelicalPushSpring(F, d, D, end_type, G, E, yield_percent, Ap, m, spring_constant=k,density=None)
+
     def check_design(self):
         """Check if the spring index,active_coils,zeta and free_length
         are in acceptable range for good design
@@ -141,7 +146,10 @@ class HelicalPushSpring(Spring):
         :returns: yield strength for shear stress
         :rtype: float
         """
-        return percent_to_decimal(self.shear_yield_percent) * self.ultimate_tensile_strength
+        try:
+            return percent_to_decimal(self.shear_yield_percent) * self.ultimate_tensile_strength
+        except TypeError:
+            return self.shear_yield_percent * self.ultimate_tensile_strength
 
     @property
     def wire_diameter(self):
@@ -405,7 +413,8 @@ class HelicalPushSpring(Spring):
                                                   k_factor) if solid else self.max_shear_stress
         return self.shear_yield_strength / shear_stress
 
-    def min_wire_diameter(self, safety_factor, spring_diameter=None, spring_index=None, solid=False):
+    def min_wire_diameter(self, safety_factor, spring_diameter=None, spring_index=None,
+                          solid=False):
         """The minimal wire diameter for given
         safety factor in order to avoid failure,
         according to the spring parameters.
