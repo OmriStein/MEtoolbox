@@ -1,9 +1,9 @@
 # third party
 import csv
 import os
-from math import pi, sqrt
+from math import pi
 import numpy as np
-from sympy import Symbol
+from sympy import Symbol, symbols, sqrt
 
 # internal package
 from me_toolbox.tools import print_atributes
@@ -11,6 +11,14 @@ from me_toolbox.tools import print_atributes
 
 # TODO: add optimization based on cost and other needs
 class Spring:
+
+    def __repr__(self):
+        try:
+            return f"{self.__class__.__name__}(K={self.spring_constant}, d={self.wire_diameter}, " \
+                   f"D={self.spring_diameter})"
+        except AttributeError:
+            return f"{self.__class__.__name__}(d={self.wire_diameter}, D={self.spring_diameter})"
+
     def __init__(self, max_force, wire_diameter, spring_diameter,
                  shear_modulus, elastic_modulus, shot_peened, density, working_frequency, Ap, m):
         self.max_force = max_force
@@ -26,6 +34,12 @@ class Spring:
         self._active_coils = None
         self._body_coils = None
         self._spring_constant = None
+
+    @classmethod
+    def symbolic_spring(cls, shot_peened=False):
+        F, d, D, G, E, yield_percent, density, working_frequency, Ap, m = symbols(
+            'F, d, D, G, E, yield_percent, rho, omega, Ap, m')
+        return Spring(F, d, D, G, E, shot_peened, density, working_frequency, Ap, m)
 
     def get_info(self):
         """print all of the spring properties"""
@@ -104,7 +118,8 @@ class Spring:
         """
         return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
 
-    def natural_frequency(self, density):
+    @property
+    def natural_frequency(self,):
         """Figures out what is the natural frequency of the spring
 
         :param float density: spring material density
@@ -116,12 +131,14 @@ class Spring:
         D = self.spring_diameter
         Na = self.active_coils
         G = self.shear_modulus
-        return (d / (2 * D ** 2 * Na * pi)) * sqrt(G / (2 * density))
+        try:
+            return (d / (2 * D ** 2 * Na * pi)) * sqrt(G / (2 * self.density))
+        except TypeError:
+            return None
 
-    def weight(self, density):
+    @property
+    def weight(self):
         """Return's the spring *active coils* weight according to the specified density
-
-        :param float density: The material density
 
         :returns: Spring weight
         :type: float or Symbol
@@ -129,7 +146,10 @@ class Spring:
         area = 0.25 * pi * self.wire_diameter ** 2  # cross section area
         length = pi * self.spring_diameter  # the circumference of the spring
         volume = area * length
-        return volume * self.active_coils * density
+        try:
+            return volume * self.active_coils * self.density
+        except TypeError:
+            return None
 
     def calc_spring_constant(self):
         """Calculate spring constant (using Castigliano's theorem)
@@ -179,13 +199,3 @@ class Spring:
             raise KeyError("The material is unknown")
         else:
             raise ValueError("The diameter don't match any of the values in the table")
-
-    # def calc_min_diam(self, d_fun, k_fun, static_safety_factor, spring_diameter, initial_k=1.1):
-    #     factor_k, temp_k = initial_k, 0
-    #     diam = 0
-    #     while abs(factor_k - temp_k) > 1e-4:
-    #         # waiting for k to converge
-    #         diam = d_fun(self, factor_k, static_safety_factor)
-    #         temp_k = factor_k
-    #         factor_k = k_fun(spring_diameter, diam)
-    #     return diam
