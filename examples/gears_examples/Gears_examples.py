@@ -16,5 +16,3 @@ helical = HelicalGear(modulus=2, pressure_angle=20, teeth_num=37, rpm=2500, grad
 helical_gearbox = Transmission(gear1=helical, oil_temp=100, reliability=0.999, power=50e3,
                                gear_ratio=2.5, driving_machine='uniform', driven_machine='uniform',
                                SF=1, SH=1)
-
-print(gearbox.train_value((10, 20), (5, 10)))
