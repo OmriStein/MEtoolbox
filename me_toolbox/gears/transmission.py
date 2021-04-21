@@ -436,12 +436,22 @@ class Transmission:
     def train_value(*gear_pairs):
         """Returns transmission train value
         (which is the inverse of the transmission value)
+        the input should be an iterable of two gears
+        each of them can be either int or Gear obj
+
+        Note: A negative sign indicates direction change of rotation
+
+        Example:
+            >> N1, N2, N3, N4 = 10, 20, 50, 10
+            >> e = gearbox.train_value((N1, N2), (N3, N4)))
+
+        :param gear_pairs: iterable of two gears
         """
         t_val = 1
         for gears in gear_pairs:
             if hasattr(gears, '__iter__'):
-                N1 = gears[0].teet_num if isinstance(gears[0], Gear) else gears[0]
-                N2 = gears[0].teet_num if isinstance(gears[0], Gear) else gears[0]
+                N1 = gears[0].teeth_num if isinstance(gears[0], Gear) else gears[0]
+                N2 = gears[1].teeth_num if isinstance(gears[1], Gear) else gears[1]
                 t_val *= -(N1 / N2)
             else:
                 raise TypeError("Gear pair can only be iterables")

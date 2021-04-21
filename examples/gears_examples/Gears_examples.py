@@ -17,5 +17,4 @@ helical_gearbox = Transmission(gear1=helical, oil_temp=100, reliability=0.999, p
                                gear_ratio=2.5, driving_machine='uniform', driven_machine='uniform',
                                SF=1, SH=1)
 
-print(pinion)
-print(helical)
+print(gearbox.train_value((10, 20), (5, 10)))
