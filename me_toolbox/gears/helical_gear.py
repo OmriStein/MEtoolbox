@@ -9,7 +9,12 @@ from me_toolbox.tools import table_interpolation
 
 class HelicalGear(SpurGear):
     """A gear object that contains all of its design parameters (AGMA 2001-D04)"""
-    def __init__(self, name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
+    def __repr__(self):
+        return f"{self.__class__.__name__}(m={self.modulus}, N={self.teeth_num}, " \
+               f"\N{GREEK SMALL LETTER PHI}={self.pressure_angle}, " \
+               f"\N{GREEK SMALL LETTER PSI}={self.helix_angle}, b={self.width})"
+
+    def __init__(self, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
                  enclosure, hardness, pressure_angle, helix_angle, grade, work_hours=0,
                  number_of_cycles=0, crowned=False, adjusted=False, sensitive_use=False,
                  nitriding=False, case_carb=False, material='steel'):
@@ -20,7 +25,7 @@ class HelicalGear(SpurGear):
         :returns: HelicalGear object
         :rtype: HelicalGear
         """
-        super().__init__(name, modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
+        super().__init__(modulus, teeth_num, rpm, Qv, width, bearing_span, pinion_offset,
                          enclosure, hardness, pressure_angle, grade, work_hours, number_of_cycles,
                          crowned, adjusted, sensitive_use, nitriding, case_carb, material)
 
@@ -99,7 +104,8 @@ class HelicalGear(SpurGear):
 
         # files path
         j75_path = os.path.dirname(__file__) + "\\tables\\J75 - helix gear geometry factors.csv"
-        jPrime_path = os.path.dirname(__file__) + "\\tables\\JPrime - helix gear geometry factors.csv"
+        jPrime_path = os.path.dirname(
+            __file__) + "\\tables\\JPrime - helix gear geometry factors.csv"
 
         # load data
         j75_data = np.genfromtxt(j75_path, delimiter=',')
@@ -131,12 +137,12 @@ class HelicalGear(SpurGear):
         phi_t = radians(gear1.tangent_pressure_angle)
         phi_n = radians(gear1.pressure_angle)
         modulus = gear1.modulus
-        tangent_modulus = gear1.tangent_modulus
+        tan_mod = gear1.tangent_modulus
         Np = gear1.teeth_num
         Ng = gear2.teeth_num
-        z1 = sqrt((0.5 * tangent_modulus * Np + modulus) ** 2 - (0.5 * tangent_modulus * Np * cos(phi_t)) ** 2)
-        z2 = sqrt((0.5 * tangent_modulus * Ng + modulus) ** 2 - (0.5 * tangent_modulus * Ng * cos(phi_t)) ** 2)
-        z3 = 0.5 * tangent_modulus * Np * (1 + mG) * sin(phi_t)
+        z1 = sqrt((0.5 * tan_mod * Np + modulus) ** 2 - (0.5 * tan_mod * Np * cos(phi_t)) ** 2)
+        z2 = sqrt((0.5 * tan_mod * Ng + modulus) ** 2 - (0.5 * tan_mod * Ng * cos(phi_t)) ** 2)
+        z3 = 0.5 * tan_mod * Np * (1 + mG) * sin(phi_t)
 
         if z1 > z3 and z2 > z3:
             z = z3
@@ -162,7 +168,7 @@ class HelicalGear(SpurGear):
         :param HelicalGear gear: gear object
         :param float power: power
 
-        :returns: Wt - tangent max_force in [N], Wr - radial max_force in [N], Wx - axial max_force in [N]
+        :returns: Wt - tangent max_force, Wr - radial max_force, Wx - axial max_force in [N]
         :rtype: tuple[float, float, float]
         """
 
@@ -256,7 +262,8 @@ class HelicalGear(SpurGear):
                     break
 
                 alpha = contact_minimum_width / bending_minimum_width
-                centers_distance = 0.5 * gear.modulus * gear.teeth_num * (transmission.gear_ratio + 1)
+                mG = transmission.gear_ratio
+                centers_distance = 0.5 * gear.modulus * gear.teeth_num * (mG + 1)
                 volume = 0.25 * pi * (gear.pitch_diameter ** 2) * gear.width
                 f_string = f"m={gear.modulus}, N={gear.teeth_num}, b={gear.width:.2f}," \
                            f"spring_index={centers_distance:.2f}, V={volume:.2f}, α={alpha:.4f}"
@@ -275,8 +282,10 @@ class HelicalGear(SpurGear):
 
                     if verbose:
                         # printing step result
-                        if not isinstance(gear.maximum_velocity, str):
-                            msg = "b<2Px" if gear.tangent_velocity < gear.maximum_velocity else "b<2Px, v>v_max"
+                        v = gear.tangent_velocity
+                        v_max = gear.maximum_velocity
+                        if not isinstance(v_max, str):
+                            msg = "b<2Px" if v < v_max else "b<2Px, v>v_max"
                         else:
                             msg = "b<2Px"
                         print(f_string, ',', msg)
@@ -290,14 +299,17 @@ class HelicalGear(SpurGear):
 
                     if verbose:
                         # print step result
-                        if not isinstance(gear.maximum_velocity, str):
-                            msg = "b>Pd" if gear.tangent_velocity < gear.maximum_velocity else "b>Pd, v>v_max"
+                        v = gear.tangent_velocity
+                        v_max = gear.maximum_velocity
+                        if not isinstance(v_max, str):
+                            msg = "b>Pd" if v < v_max else "b>Pd, v>v_max"
                         else:
                             msg = "b>Pd"
                         print(f_string, ',', msg)
 
                     # increasing teeth number by one
-                    # (note: the gear teeth number can't exceed the biggest number specified in the Yj factor tables
+                    # (note: the gear teeth number can't exceed the biggest number specified
+                    # in the Yj factor tables
                     # and for pinion a number that will make its gear pass this number.
                     # this error is handled at the Yj function)
                     gear.teeth_num += 1
@@ -307,9 +319,11 @@ class HelicalGear(SpurGear):
                         # if α>1 increase number of teeth
                         if verbose:
                             # print step result
-                            if not isinstance(gear.maximum_velocity, str):
-                                print(f"{f_string}, 2Px<b<Pd, α>1"
-                                      if gear.tangent_velocity < gear.maximum_velocity else "2Px<b<Pd, α>1, v>v_max")
+                            v = gear.tangent_velocity
+                            v_max = gear.maximum_velocity
+                            if not isinstance(v_max, str):
+                                print(f"{f_string}, 2Px<b<Pd, α>1" if v < v_max
+                                      else "2Px<b<Pd, α>1, v>v_max")
                             else:
                                 print(f"{f_string}, 2Px<b<Pd, α>1")
                         # add result to least of viable results
@@ -325,9 +339,11 @@ class HelicalGear(SpurGear):
                         # print optimization progress
                         if verbose:
                             # print step result
-                            if not isinstance(gear.maximum_velocity, str):
-                                print(f"{f_string}, 2Px<b<Pd, α<=1"
-                                      if gear.tangent_velocity < gear.maximum_velocity else "2Px<b<Pd, α<=1, v>v_max")
+                            v = gear.tangent_velocity
+                            v_max = gear.maximum_velocity
+                            if not isinstance(v_max, str):
+                                print(f"{f_string}, 2Px<b<Pd, α<=1" if v < v_max
+                                      else "2Px<b<Pd, α<=1, v>v_max")
                             else:
                                 print(f"{f_string}, 2Px<b<Pd, α<=1")
 
@@ -335,35 +351,41 @@ class HelicalGear(SpurGear):
                         # optimize by width
                         if optimize_feature == 'width':
                             # create list of widths
-                            width_list = [(dic['b'], index) for index, dic in enumerate(results_list)]
+                            width_list = [(dic['b'], index) for index, dic in
+                                          enumerate(results_list)]
                             # get minimum width index
                             result_index = min(width_list)[1]
-                            optimized_result = results_list[result_index]
+                            opt_res = results_list[result_index]
 
                         # optimize by volume
                         elif optimize_feature == 'volume':
                             # create list of volumes
-                            volume_list = [(dic['V'], index) for index, dic in enumerate(results_list)]
+                            volume_list = [(dic['V'], index) for index, dic in
+                                           enumerate(results_list)]
                             # get minimum volume index
                             result_index = min(volume_list)[1]
-                            optimized_result = results_list[result_index]
+                            opt_res = results_list[result_index]
 
                         # optimize by center distance
                         elif optimize_feature == 'center':
                             # create list of center distances
-                            center_list = [(dic['spring_index'], index) for index, dic in enumerate(results_list)]
+                            center_list = [(dic['spring_index'], index) for index, dic in
+                                           enumerate(results_list)]
                             # get minimum center distance index
                             result_index = min(center_list)[1]
-                            optimized_result = results_list[result_index]
+                            opt_res = results_list[result_index]
 
                         elif optimize_feature == 'all':
-                            width_list = [(dic['b'], index) for index, dic in enumerate(results_list)]
-                            volume_list = [(dic['V'], index) for index, dic in enumerate(results_list)]
-                            center_list = [(dic['spring_index'], index) for index, dic in enumerate(results_list)]
+                            width_list = [(dic['b'], index) for index, dic in
+                                          enumerate(results_list)]
+                            volume_list = [(dic['V'], index) for index, dic in
+                                           enumerate(results_list)]
+                            center_list = [(dic['spring_index'], index) for index, dic in
+                                           enumerate(results_list)]
 
-                            optimized_result = {'optimized width': results_list[min(width_list)[1]],
-                                                'optimized volume': results_list[min(volume_list)[1]],
-                                                'optimized center': results_list[min(center_list)[1]]}
+                            opt_res = {'optimized width': results_list[min(width_list)[1]],
+                                       'optimized volume': results_list[min(volume_list)[1]],
+                                       'optimized center': results_list[min(center_list)[1]]}
                         else:
                             raise Exception(f"optimize_feature={optimize_feature} is invalid")
 
@@ -372,7 +394,7 @@ class HelicalGear(SpurGear):
                         gear.width = original_width
                         gear.modulus = original_modulus
 
-                        return optimized_result, results_list
+                        return opt_res, results_list
 
     def calc_centers_distance(self, gear_ratio):
         """ calculate the distance between the centers of the gears
@@ -394,7 +416,6 @@ class HelicalGear(SpurGear):
         :returns: HelicalGear object
         :type: HelicalGear
         """
-        gear2_prop['name'] = 'helical_gear'
         return HelicalGear(**gear2_prop)
 
     @staticmethod
@@ -436,7 +457,7 @@ class HelicalGear(SpurGear):
                 # if pressure angles are different raise error
                 raise ValueError("gear1 and gear2 have mismatch Helix_angle")
         except AttributeError as err:
-            raise ValueError("gear1 and gear2 are not the same type, they are no compatible")\
+            raise ValueError("gear1 and gear2 are not the same type, they are no compatible") \
                 from err
 
         # check modulus
