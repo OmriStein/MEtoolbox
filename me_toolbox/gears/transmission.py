@@ -2,7 +2,7 @@
 # I want the variables names to be the same as in AGMA pylint: disable=invalid-name
 from math import cos, sin, log, sqrt, radians, pi
 
-from me_toolbox.gears.gear import Gear
+from me_toolbox.gears import Gear
 from me_toolbox.tools import print_atributes
 
 
