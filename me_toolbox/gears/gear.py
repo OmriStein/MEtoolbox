@@ -381,3 +381,16 @@ class Gear:
     @staticmethod
     def format_properties(properties):
         pass
+
+    def check_compatibility(self, gear):
+        pass
+
+    @staticmethod
+    def ZI(gear1, gear2):
+        pass
+
+    def calc_centers_distance(self, gear_ratio):
+        pass
+
+    def optimization(self, transmission, optimize_feature='all', verbose=False):
+        pass
