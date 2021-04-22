@@ -1,35 +1,42 @@
 """module containing the ThreadedFastener class used for strength analysis"""
 from math import tan, radians, pi, log
-import numpy as np
+from numpy import array
 
-from me_toolbox.fasteners import Bolt
+from me_toolbox.fasteners import MetricBolt, UnBolt
 from me_toolbox.tools import print_atributes
 
 
 class ThreadedFastener:
-    def __init__(self, bolt, grip_length, layers):
+    def __init__(self, bolt, griped_length, layers):
         """Initialize threaded fastener with a nut
-        :param Bolt bolt: A bolt object
-        :param float grip_length: Length of all material squeezed
+        :param MetricBolt or UnBolt bolt: A bolt object
+        :param float griped_length: Length of all material squeezed
             between face of bolt and face of nut
-        :param tuple[tuple or list] or list[tuple or list] layers: a tuple (or list)
+        :param tuple[tuple or list] or list[tuple or list] layers: tuple (or list)
             containing a tuple (or list) of layer thickness and material
         """
         self.bolt = bolt
-        self.grip_length = grip_length
+        self.grip_length = griped_length
         self.layers = layers
 
+        # FIXME: make this note less annoying
+        unit = 'mm' if isinstance(bolt, MetricBolt) else 'in'
+        print(f"Note: the space left for the nut is: {len(bolt) - griped_length}{unit}")
+        self.griped_threads
+
     @classmethod
-    def threaded_plate(cls, bolt, plate_thickness, h):
+    def threaded_plate(cls, bolt, plate_thickness, h, layers):
         """Create threaded fastener with threaded plate
-        :param Bolt bolt: Bolt object
+        :param MetricBolt or UnBolt bolt: Bolt object
         :param float plate_thickness: threaded section length
         :param float h: thickness of all materials squeezed between
             the face of the bolt and the face of the threaded plate
+        :param tuple[tuple or list] or list[tuple or list] layers: tuple (or list)
+            containing a tuple (or list) of layer thickness and material
         """
         t2 = plate_thickness
         grip_length = h + 0.5 * t2 if t2 < bolt.diameter else h + 0.5 * bolt.diameter
-        return ThreadedFastener(bolt, grip_length)
+        return ThreadedFastener(bolt, grip_length, layers)
 
     def get_info(self):
         """print all of the spring properties"""
@@ -37,12 +44,16 @@ class ThreadedFastener:
 
     @property
     def griped_threads(self):
-        """threaded section in grip"""
-        return self.grip_length - self.bolt.unthreaded_length
+        """threaded section in grip (lt)"""
+        lt = self.grip_length - self.bolt.unthreaded_length
+        if lt <= 0:
+            raise ValueError("the unthreaded_length (the shank) "
+                             "is larger than the griped_length, Tip: use shorter bolt")
+        return lt
 
     @property
-    def fastener_stiffness(self):
-        """fastener stiffness (Kb)"""
+    def bolt_stiffness(self):
+        """bolt stiffness (Kb)"""
         bolt = self.bolt
         Ad = bolt.nominal_area
         At = bolt.stress_area
@@ -53,6 +64,7 @@ class ThreadedFastener:
 
     @property
     def substrate_stiffness(self):
+        """substrate stiffness (Kb)"""
         angle = self.bolt.angle
         alpha = radians(angle / 2)
 
@@ -61,6 +73,7 @@ class ThreadedFastener:
 
         # finding the layer divided by the center line
         half_grip_len = 0.5 * self.grip_length
+        middle_index = 0
         for index in range(len(thicknesses)):
             tot = 0
             for k in range(index + 1):
@@ -92,5 +105,10 @@ class ThreadedFastener:
         for D, t, E in zip(diam, thicknesses, elastic_modulus):
             ln = log(((1.115 * t + D - d) * (D + d)) / ((1.115 * t + D + d) * (D - d)))
             stiffness.append(0.5774 * pi * E * d / ln)
-        km_inv = sum(1 / np.array(stiffness))
+        km_inv = sum(1 / array(stiffness))
         return 1 / km_inv
+
+    @property
+    def fastener_stiffness(self):
+        """Fastener stiffness (C)"""
+        return self.bolt_stiffness / (self.substrate_stiffness + self.bolt_stiffness)

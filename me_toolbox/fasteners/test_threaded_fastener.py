@@ -33,8 +33,8 @@ class TestThreadedFastener(TestCase):
     def test_griped_thread(self):
         self.assertAlmostEqual(self.fastener.griped_threads, 19)
 
-    def test_fastener_stiffness(self):
-        self.assertAlmostEqual(self.fastener.fastener_stiffness, 796017.9937058988)
+    def test_bolt_stiffness(self):
+        self.assertAlmostEqual(self.fastener.bolt_stiffness, 796017.9937058988)
 
     def test_substrate_stiffness_1(self):
         # test if the first substrate is smaller than half the material
@@ -114,3 +114,5 @@ class TestThreadedFastener(TestCase):
         self.fastener.layers = layers
         self.assertAlmostEqual(self.fastener.substrate_stiffness, km)
 
+    def test_fastener_stiffness(self):
+        self.assertAlmostEqual(self.fastener.fastener_stiffness, 0.23125784419019646)

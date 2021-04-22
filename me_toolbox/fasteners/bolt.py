@@ -32,17 +32,17 @@ class Bolt:
 
     @property
     def height(self):
-        """Height of fundamental triangle"""
+        """Height of fundamental triangle (H)"""
         return self.pitch * sqrt(3) / 2
 
     @property
     def mean_diam(self):
-        """גצ - Mean diameter(dm) of the nominal and root diameters"""
+        "Mean diameter(dm) of the nominal and root diameters(dr)"""
         return self.diameter - (5 / 8) * self.height
 
     @property
     def root_diam(self):
-        """Minor diameter(dr)"""
+        """Minor diameter (dr)"""
         return self.diameter - (5 / 4) * self.height
 
     @property
@@ -56,14 +56,15 @@ class Bolt:
         return 1.5 * self.diameter
 
     @property
+    def thread_length(self):
+        """place holder"""
+        return
+
+    @property
     def unthreaded_length(self):
         """the unthreaded section of the bolt (ld)
         Note: the unthreaded length can be zero"""
-        try:
-            return self.length - self.thread_length
-        except AttributeError as err:
-            raise NotImplementedError("thread length is dependent on the type of bolt,"
-                                      "it's implemented only in the child classes") from err
+        return self.length - self.thread_length
 
     @property
     def nominal_area(self):
