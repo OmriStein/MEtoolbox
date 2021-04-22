@@ -1,7 +1,7 @@
 """module containing the MetricBolt class"""
 from math import pi
 
-from me_toolbox.bolts import Bolt
+from me_toolbox.fasteners import Bolt
 
 
 class MetricBolt(Bolt):

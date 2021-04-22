@@ -1,6 +1,8 @@
 """module containing the bolts base class Bolt"""
 from math import sqrt, pi
 
+from me_toolbox.tools import print_atributes
+
 
 class Bolt:
     """Bolt class containing basic geometry attributes
@@ -23,6 +25,10 @@ class Bolt:
         self.pitch = pitch
         self.length = length
         self.elastic_modulus = elastic_modulus
+
+    def get_info(self):
+        """print all of the spring properties"""
+        print_atributes(self)
 
     @property
     def height(self):
