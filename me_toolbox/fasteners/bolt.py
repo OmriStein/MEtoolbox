@@ -15,7 +15,7 @@ class Bolt:
     def __len__(self):
         return self.length
 
-    def __init__(self, diameter, pitch, length, elastic_modulus=200e3):
+    def __init__(self, diameter, pitch, length, elastic_modulus):
         """Initialise Bolt object
 
         :param float diameter: nominal diameter

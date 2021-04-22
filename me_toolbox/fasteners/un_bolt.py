@@ -12,7 +12,7 @@ class UnBolt(Bolt):
                f"{'UNF' if self.fine else 'UNC'} {self.fit}" \
                f"{'B' if self.bolt else 'A'})"
 
-    def __init__(self, diameter, tpi, fine, fit, bolt, length):
+    def __init__(self, diameter, tpi, fine, fit, bolt, length, elastic_modulus=30):
         """Initializing a UnBolt object
 
         :param float diameter: major nominal diameter
@@ -21,7 +21,7 @@ class UnBolt(Bolt):
         :param int fit: the fit between the nut and bolt (1/2/3)
         :param bool bolt: True if bolt False if nut
         """
-        super().__init__(diameter, 1 / tpi, length)
+        super().__init__(diameter, 1 / tpi, length, elastic_modulus)
         self.tpi = tpi
         self.fine = fine
         self.fit = fit

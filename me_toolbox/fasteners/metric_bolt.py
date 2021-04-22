@@ -9,7 +9,7 @@ class MetricBolt(Bolt):
     def __repr__(self):
         return f"MetricBolt(M{self.diameter}x{self.pitch} {self.fit} {self.tolerance})"
 
-    def __init__(self, diameter, pitch, fit, tolerance, length):
+    def __init__(self, diameter, pitch, fit, tolerance, length, elastic_modulus=210e3):
         """Initializing a UnBolt object
 
         :param float diameter: Major nominal diameter
@@ -17,7 +17,7 @@ class MetricBolt(Bolt):
         :param str fit: the fit between the nut and bolt
         :param int tolerance: The fit tolerance
         """
-        super().__init__(diameter, pitch, length)
+        super().__init__(diameter, pitch, length, elastic_modulus)
         self.fit = fit
         self.tolerance = tolerance
 
