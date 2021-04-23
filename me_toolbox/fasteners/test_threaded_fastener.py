@@ -21,8 +21,8 @@ class TestThreadedFastener(TestCase):
     tan_alpha = tan(radians(30))
 
     def setUp(self):
-        self.bolt = MetricBolt(10, 1.5, 'e', 3, 20)
-        # self.bolt = UnBolt(3/8, 24, True, 3, True,  1)
+        self.bolt = MetricBolt(10, 1.5, 'e', 3, 20, '8.8')
+        # self.bolt = UnBolt(3/8, 24, True, 3, True,  1, '1')
 
         thickness = [2, 3, 3, 2, 3]
         Elastic = [200e3, 70e3, 200e3, 200e3, 200e3]

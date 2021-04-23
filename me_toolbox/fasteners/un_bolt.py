@@ -14,7 +14,8 @@ class UnBolt(Bolt):
                   '5': (grade(0.25, 1, 85, 120, 92), grade(9 / 8, 1.5, 74, 105, 81)),
                   '5.2': grade(0.25, 1, 85, 120, 92),
                   '7': grade(0.25, 1.5, 105, 133, 115),
-                  '8': grade(0.25, 1, 120, 150, 130)}
+                  '8': grade(0.25, 1, 120, 150, 130),
+                  '8.2': grade(0.25, 1, 120, 150, 130)}
 
     def __repr__(self):
         return f"UnBolt({self.diameter}\"-{self.tpi} " \

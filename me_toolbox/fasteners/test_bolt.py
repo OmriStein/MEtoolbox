@@ -7,8 +7,8 @@ from me_toolbox.fasteners import MetricBolt, UnBolt
 class TestThreadedFastener(TestCase):
 
     def setUp(self):
-        self.metric_bolt = MetricBolt(10, 1.5, 'e', 3, 20)
-        self.un_bolt = UnBolt(3 / 8, 24, True, 3, True, 1)
+        self.metric_bolt = MetricBolt(10, 1.5, 'e', 3, 20, '8.8')
+        self.un_bolt = UnBolt(3 / 8, 24, True, 3, True, 1, '1')
 
     def test_height(self):
         self.assertAlmostEqual(self.metric_bolt.height, self.metric_bolt.pitch * sqrt(3) / 2)

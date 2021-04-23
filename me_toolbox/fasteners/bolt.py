@@ -12,9 +12,6 @@ class Bolt:
     def __repr__(self):
         return f"Bolt({self.diameter}, {self.pitch}, {self.length})"
 
-    def __len__(self):
-        return self.length
-
     def __init__(self, diameter, pitch, length, elastic_modulus):
         """Initialise Bolt object
 

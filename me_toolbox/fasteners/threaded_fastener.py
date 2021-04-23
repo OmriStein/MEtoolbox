@@ -22,7 +22,7 @@ class ThreadedFastener:
 
         # FIXME: make this note less annoying
         unit = 'mm' if isinstance(bolt, MetricBolt) else 'in'
-        print(f"Note: the space left for the nut is: {len(bolt) - griped_length}{unit}")
+        print(f"Note: the space left for the nut is: {bolt.length - griped_length}{unit}")
         lt = self.griped_threads
 
     @classmethod
