@@ -1,5 +1,6 @@
 """module containing the ThreadedFastener class used for strength analysis"""
 from math import tan, radians, pi, log
+
 from numpy import array
 
 from me_toolbox.fasteners import MetricBolt, UnBolt
@@ -22,7 +23,7 @@ class ThreadedFastener:
         # FIXME: make this note less annoying
         unit = 'mm' if isinstance(bolt, MetricBolt) else 'in'
         print(f"Note: the space left for the nut is: {len(bolt) - griped_length}{unit}")
-        self.griped_threads
+        lt = self.griped_threads
 
     @classmethod
     def threaded_plate(cls, bolt, plate_thickness, h, layers):
@@ -64,15 +65,34 @@ class ThreadedFastener:
 
     @property
     def substrate_stiffness(self):
-        """substrate stiffness (Kb)"""
+        """Substrate stiffness (Kb)"""
         angle = self.bolt.angle
+        layers = self.layers
+        grip_length = self.grip_length
+        diameter = self.bolt.diameter
+        return self.calc_substrate_stiffness(diameter, grip_length, layers, angle)
+
+    @staticmethod
+    def calc_substrate_stiffness(diameter, grip_length, layers, angle, verbose=False):
+        """Calculates substrate stiffness (Kb)
+
+        :param float diameter: Bolt's nominal diameter
+        :param float grip_length: Length of gripped material
+        :param tuple[tuple or list] or list[tuple or list] layers: tuple (or list)
+            containing a tuple (or list) of layer thickness and material
+        :param int angle: Thread angle
+        :param bool verbose: print details for each layer
+        
+        :returns: Substrate stiffness
+        :rtype: float
+        """
         alpha = radians(angle / 2)
 
-        thicknesses = [layer[0] for layer in self.layers]
-        elastic_modulus = [layer[1] for layer in self.layers]
+        thicknesses = [layer[0] for layer in layers]
+        elastic_modulus = [layer[1] for layer in layers]
 
         # finding the layer divided by the center line
-        half_grip_len = 0.5 * self.grip_length
+        half_grip_len = 0.5 * grip_length
         middle_index = 0
         for index in range(len(thicknesses)):
             tot = 0
@@ -90,8 +110,9 @@ class ThreadedFastener:
             # to the sum layers composing it split the middle layer to two
             thicknesses[middle_index] = (half_grip_len - thickness_before_center_layer)
             thicknesses.insert(middle_index + 1, thickness_including_center_layer - half_grip_len)
+            elastic_modulus.insert(middle_index + 1, elastic_modulus[middle_index])
 
-        diam = [self.bolt.head_diam]
+        diam = [1.5 * diameter]
         for index, thickness in enumerate(thicknesses):
             if index <= middle_index:
                 diam.append(diam[index] + 2 * thickness * tan(alpha))
@@ -100,15 +121,22 @@ class ThreadedFastener:
 
         diam.pop(middle_index + 1)
 
-        d = self.bolt.diameter
         stiffness = []
+        d = diameter
         for D, t, E in zip(diam, thicknesses, elastic_modulus):
-            ln = log(((1.115 * t + D - d) * (D + d)) / ((1.115 * t + D + d) * (D - d)))
-            stiffness.append(0.5774 * pi * E * d / ln)
+            ln = log(((1.155 * t + D - d) * (D + d)) / ((1.155 * t + D + d) * (D - d)))
+            ki = (0.5774 * pi * E * d) / ln
+            stiffness.append(ki)
+
+            if verbose:
+                print(f"d={d}, D={D}, t={t}, E={E}, ki={ki}")
+
         km_inv = sum(1 / array(stiffness))
         return 1 / km_inv
 
     @property
     def fastener_stiffness(self):
-        """Fastener stiffness (C)"""
+        """Fastener stiffness const (C),
+        the fraction of external load carried by bolt
+        """
         return self.bolt_stiffness / (self.substrate_stiffness + self.bolt_stiffness)

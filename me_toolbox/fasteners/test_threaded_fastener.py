@@ -2,14 +2,14 @@ from unittest import TestCase
 from math import log, pi, tan, radians
 import numpy as np
 
-from me_toolbox.fasteners import MetricBolt, UnBolt
+from me_toolbox.fasteners import MetricBolt
 from me_toolbox.fasteners import ThreadedFastener
 
 
 def stiffness(d, Diam, thickness, Elastic):
     stiff = []
     for D, t, E in zip(Diam, thickness, Elastic):
-        ln = log(((1.115 * t + D - d) * (D + d)) / ((1.115 * t + D + d) * (D - d)))
+        ln = log(((1.155 * t + D - d) * (D + d)) / ((1.155 * t + D + d) * (D - d)))
         stiff.append(0.5774 * pi * E * d / ln)
     km_inv = sum(1 / np.array(stiff))
     return 1 / km_inv
@@ -26,15 +26,15 @@ class TestThreadedFastener(TestCase):
 
         thickness = [2, 3, 3, 2, 3]
         Elastic = [200e3, 70e3, 200e3, 200e3, 200e3]
-        layers = [(t, E) for t, E in zip(thickness, Elastic)]
-        grip_len = (sum([layer[0] for layer in layers]))
-        self.fastener = ThreadedFastener(self.bolt, grip_len, layers)
+        self.layers = [(t, E) for t, E in zip(thickness, Elastic)]
+        self.grip_len = (sum([layer[0] for layer in self.layers]))
+        self.fastener = ThreadedFastener(self.bolt, self.grip_len, self.layers)
 
     def test_griped_thread(self):
         self.assertAlmostEqual(self.fastener.griped_threads, 19)
 
     def test_bolt_stiffness(self):
-        self.assertAlmostEqual(self.fastener.bolt_stiffness, 796017.9937058988)
+        self.assertAlmostEqual(self.fastener.bolt_stiffness, 835818.8933911937)
 
     def test_substrate_stiffness_1(self):
         # test if the first substrate is smaller than half the material
@@ -49,7 +49,8 @@ class TestThreadedFastener(TestCase):
         D4 = D5 + 2 * thickness[3] * self.tan_alpha
         Diam = [D1, D2, D3, D4, D5, D6]
         grip_len = (sum([layer[0] for layer in layers]))
-        km = stiffness(self.bolt.diameter, Diam, [2, 3, 1.5, 1.5, 2, 3], Elastic)
+        km = stiffness(self.bolt.diameter, Diam, [2, 3, 1.5, 1.5, 2, 3],
+                       [200e3, 70e3, 200e3, 200e3, 200e3, 200e3])
         self.fastener.grip_length = grip_len
         self.fastener.layers = layers
         self.assertAlmostEqual(self.fastener.substrate_stiffness, km)
@@ -64,7 +65,7 @@ class TestThreadedFastener(TestCase):
         D3 = D4 + 2 * thickness[2] * self.tan_alpha
         Diam = [D1, D2, D3, D4]
         grip_len = (sum([layer[0] for layer in layers]))
-        km = stiffness(self.bolt.diameter, Diam, [2, 3, 1, 4], Elastic)
+        km = stiffness(self.bolt.diameter, Diam, [2, 3, 1, 4], [200e3, 70e3, 70e3, 200e3])
         self.fastener.grip_length = grip_len
         self.fastener.layers = layers
         self.assertAlmostEqual(self.fastener.substrate_stiffness, km)
@@ -79,7 +80,7 @@ class TestThreadedFastener(TestCase):
         D2 = D3 + 2 * thickness[1] * self.tan_alpha
         Diam = [D1, D2, D3, D4]
         grip_len = (sum([layer[0] for layer in layers]))
-        km = stiffness(self.bolt.diameter, Diam, [4, 1, 1, 2], Elastic)
+        km = stiffness(self.bolt.diameter, Diam, [4, 1, 1, 2], [200e3, 200e3, 70e3, 200e3])
         self.fastener.grip_length = grip_len
         self.fastener.layers = layers
         self.assertAlmostEqual(self.fastener.substrate_stiffness, km)
@@ -94,7 +95,7 @@ class TestThreadedFastener(TestCase):
         D3 = D4 + 2 * thickness[2] * self.tan_alpha
         Diam = [D1, D2, D3, D4]
         grip_len = (sum([layer[0] for layer in layers]))
-        km = stiffness(self.bolt.diameter, Diam, [2, 2, 2, 2], Elastic)
+        km = stiffness(self.bolt.diameter, Diam, [2, 2, 2, 2], [200e3, 70e3, 70e3, 200e3])
         self.fastener.grip_length = grip_len
         self.fastener.layers = layers
         self.assertAlmostEqual(self.fastener.substrate_stiffness, km)
@@ -115,4 +116,9 @@ class TestThreadedFastener(TestCase):
         self.assertAlmostEqual(self.fastener.substrate_stiffness, km)
 
     def test_fastener_stiffness(self):
-        self.assertAlmostEqual(self.fastener.fastener_stiffness, 0.23125784419019646)
+        self.assertAlmostEqual(self.fastener.fastener_stiffness, 0.2939868475853202)
+
+    def test_values(self):
+        self.fastener.bolt.length = 100
+        with self.assertRaises(ValueError):
+            lt = self.fastener.griped_threads
