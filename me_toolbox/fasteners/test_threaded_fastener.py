@@ -28,7 +28,7 @@ class TestThreadedFastener(TestCase):
         Elastic = [200e3, 70e3, 200e3, 200e3, 200e3]
         self.layers = [(t, E) for t, E in zip(thickness, Elastic)]
         self.grip_len = (sum([layer[0] for layer in self.layers]))
-        self.fastener = ThreadedFastener(self.bolt, self.grip_len, self.layers)
+        self.fastener = ThreadedFastener(self.bolt, self.grip_len, self.layers, 25e3, 18.12e3)
 
     def test_griped_thread(self):
         self.assertAlmostEqual(self.fastener.griped_threads, 19)
@@ -116,7 +116,7 @@ class TestThreadedFastener(TestCase):
         self.assertAlmostEqual(self.fastener.substrate_stiffness, km)
 
     def test_fastener_stiffness(self):
-        self.assertAlmostEqual(self.fastener.fastener_stiffness, 0.2939868475853202)
+        self.assertAlmostEqual(self.fastener.stiffness_constant, 0.2939868475853202)
 
     def test_values(self):
         self.fastener.bolt.length = 100
