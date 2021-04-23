@@ -53,11 +53,6 @@ class Bolt:
         return 1.5 * self.diameter
 
     @property
-    def thread_length(self):
-        """place holder"""
-        return
-
-    @property
     def unthreaded_length(self):
         """the unthreaded section of the bolt (ld)
         Note: the unthreaded length can be zero"""
@@ -67,3 +62,9 @@ class Bolt:
     def nominal_area(self):
         """area of the bolt's nominal diameter (Ad)"""
         return 0.25 * pi * self.diameter ** 2
+
+    @property
+    def proof_load(self):
+        """The proof load (Fp) the bolt can withstand"""
+        return self.proof_strength * self.stress_area
+
