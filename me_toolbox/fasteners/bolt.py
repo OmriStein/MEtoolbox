@@ -66,5 +66,16 @@ class Bolt:
     @property
     def proof_load(self):
         """The proof load (Fp) the bolt can withstand"""
-        return self.proof_strength * self.stress_area
+        try:
+            return self.proof_strength * self.stress_area
+        except AttributeError as err:
+            raise NotImplementedError("proof load is only implemented in child class") from err
 
+    def estimate_pre_load(self):
+        try:  # TODO: add force units
+            print(f"For both static and fatigue loading:\n"
+                  f"for reused fasteners Fi = 0.75 * Fp = {0.75*self.proof_load:.2f}\n" 
+                  f"for permanent connections Fi = 0.90 * Fp = {0.90 * self.proof_load:.2f}")
+        except NotImplementedError as err:
+            raise NotImplementedError("estimate_pre_load is using proof_load which"
+                                      "is only implemented in child class")
