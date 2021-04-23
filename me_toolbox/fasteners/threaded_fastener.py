@@ -8,17 +8,21 @@ from me_toolbox.tools import print_atributes
 
 
 class ThreadedFastener:
-    def __init__(self, bolt, griped_length, layers):
+    def __init__(self, bolt, griped_length, layers, pre_load, load):
         """Initialize threaded fastener with a nut
         :param MetricBolt or UnBolt bolt: A bolt object
         :param float griped_length: Length of all material squeezed
             between face of bolt and face of nut
         :param tuple[tuple or list] or list[tuple or list] layers: tuple (or list)
             containing a tuple (or list) of layer thickness and material
+        :param float pre_load: the initial loading of the bolt
+        :param float load: the load on the fastener
         """
         self.bolt = bolt
         self.grip_length = griped_length
         self.layers = layers
+        self.pre_load = pre_load
+        self.load = load
 
         # FIXME: make this note less annoying
         unit = 'mm' if isinstance(bolt, MetricBolt) else 'in'
@@ -26,7 +30,7 @@ class ThreadedFastener:
         lt = self.griped_threads
 
     @classmethod
-    def threaded_plate(cls, bolt, plate_thickness, h, layers):
+    def threaded_plate(cls, bolt, plate_thickness, h, layers, pre_load, load):
         """Create threaded fastener with threaded plate
         :param MetricBolt or UnBolt bolt: Bolt object
         :param float plate_thickness: threaded section length
@@ -34,10 +38,12 @@ class ThreadedFastener:
             the face of the bolt and the face of the threaded plate
         :param tuple[tuple or list] or list[tuple or list] layers: tuple (or list)
             containing a tuple (or list) of layer thickness and material
+        :param float pre_load: the initial loading of the bolt
+        :param float load: the load on the fastener
         """
         t2 = plate_thickness
         grip_length = h + 0.5 * t2 if t2 < bolt.diameter else h + 0.5 * bolt.diameter
-        return ThreadedFastener(bolt, grip_length, layers)
+        return ThreadedFastener(bolt, grip_length, layers, pre_load, load)
 
     def get_info(self):
         """print all of the spring properties"""
@@ -135,8 +141,39 @@ class ThreadedFastener:
         return 1 / km_inv
 
     @property
-    def fastener_stiffness(self):
-        """Fastener stiffness const (C),
+    def stiffness_constant(self):
+        """Stiffness constant of the joint (C),
         the fraction of external load carried by bolt
         """
         return self.bolt_stiffness / (self.substrate_stiffness + self.bolt_stiffness)
+
+    @property
+    def bolt_load(self):
+        """The load on the bolt (Fb)"""
+        return self.stiffness_constant * self.load + self.pre_load
+
+    @property
+    def substrate_load(self):
+        """The load on the substrate (Fm)"""
+        return (1 - self.stiffness_constant) * self.load - self.pre_load
+
+    @property
+    def separation_safety_factor(self):
+        """Safety factor against joint separation"""
+        return self.pre_load / (self.load * (1 - self.stiffness_constant))
+
+    def calc_pre_load(self, n0):
+        """calculating pre load using
+        Safety factor against joint separation
+        """
+        return n0 * self.load * (1 - self.stiffness_constant)
+
+    @property
+    def load_safety_factor(self):
+        """Safety factor for load (nL)"""
+        return (self.bolt.proof_load - self.pre_load) / (self.stiffness_constant * self.load)
+
+    @property
+    def proof_safety_factor(self):
+        """Safety factor for proof stress (np)"""
+        return self.bolt.proof_load / self.bolt_load
