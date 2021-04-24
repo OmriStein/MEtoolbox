@@ -68,3 +68,8 @@ class MetricBolt(Bolt):
     def tensile_strength(self):
         """Minimum tensile strength"""
         return self.grade_list[self.grade].Sut
+
+    @property
+    def yield_strength(self):
+        """Minimum tensile strength"""
+        return self.grade_list[self.grade].Sy
