@@ -119,14 +119,8 @@ class Spring:
         return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
 
     @property
-    def natural_frequency(self,):
-        """Figures out what is the natural frequency of the spring
-
-        :param float density: spring material density
-
-        :returns: Natural frequency
-        :rtype: float
-        """
+    def natural_frequency(self):
+        """Figures out what is the natural frequency of the spring"""
         d = self.wire_diameter
         D = self.spring_diameter
         Na = self.active_coils

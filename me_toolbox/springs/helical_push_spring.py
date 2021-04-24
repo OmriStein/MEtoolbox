@@ -129,7 +129,7 @@ class HelicalPushSpring(Spring):
                 good_design = False
 
         if (self.density is not None) and (self.working_frequency is not None):
-            natural_freq = self.natural_frequency(self.density)
+            natural_freq = self.natural_frequency
             if natural_freq <= 20 * self.working_frequency:
                 print(
                     f"Note: the natural frequency={natural_freq} is less than 20*working"
