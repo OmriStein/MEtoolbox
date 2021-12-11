@@ -20,7 +20,7 @@ class MetricBolt(Bolt):
     def __repr__(self):
         return f"MetricBolt(M{self.diameter}x{self.pitch}x{self.length})"
 
-    def __init__(self, diameter, pitch, length, grade, elastic_modulus=210e3):
+    def __init__(self, diameter, pitch, length, grade, elastic_modulus=210e3, Sy=0):
         """Initializing a Bolt object
 
         :param float diameter: Nominal diameter
@@ -28,9 +28,12 @@ class MetricBolt(Bolt):
         :param float length: Bolt's length
         :param str grade: Bolt's grade
         :param float elastic_modulus: Bolt's elastic modulus
+        :param float Sy: yield strength for non-steel bolt in order to approximate proof strength
         """
         super().__init__(diameter, pitch, length, elastic_modulus)
         self.grade = grade
+        self.yield_strength = self.grade_list[self.grade].Sy if Sy == 0 else Sy
+        self._is_yield = False if Sy == 0 else True
 
     @property
     def thread_length(self):
@@ -60,7 +63,12 @@ class MetricBolt(Bolt):
     @property
     def proof_strength(self):
         """Minimum proof strength"""
-        return self.grade_list[self.grade].Sp
+        if not self._is_yield:
+            # if steel
+            return self.grade_list[self.grade].Sp
+        else:
+            # other materials
+            return 0.85*self.yield_strength
 
     @property
     def tensile_strength(self):
@@ -69,5 +77,10 @@ class MetricBolt(Bolt):
 
     @property
     def yield_strength(self):
-        """Minimum tensile strength"""
-        return self.grade_list[self.grade].Sy
+        """Yield strength"""
+        return self._yield_strength
+
+    @yield_strength.setter
+    def yield_strength(self, Sy):
+        """Yield strength setter"""
+        self._yield_strength = Sy

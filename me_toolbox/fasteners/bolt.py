@@ -75,6 +75,6 @@ class Bolt:
         try:  # TODO: add force units
             print(f"For both static and fatigue loading:\n"
                   f"for reused fasteners Fi = 0.75 * Fp = {0.75*self.proof_load:.2f} [N]\n" 
-                  f"for permanent connections Fi = 0.90 * Fp = {0.90 * self.proof_load:.2f} [N]")
+                  f"for permanent connections Fi = 0.90 * Fp = {0.90 * self.proof_load:.2f} [N]\n")
         except NotImplementedError:
             raise NotImplementedError("estimate_pre_load is only implemented in child class")

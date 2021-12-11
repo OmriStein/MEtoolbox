@@ -9,6 +9,7 @@ from me_toolbox.tools import print_atributes
 
 
 class ThreadedFastener:
+    # TODO: add pre-torque calculation
     def __init__(self, bolt, layers, pre_load, load, nut=True,
                  endurance_limit=None, reliability=50, temp=25, surface_finish='hot-rolled'):
         """Initialize threaded fastener with a nut

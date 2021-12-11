@@ -9,7 +9,7 @@ M12 = MetricBolt(12, 1.75, 75, '8.8')
 
 thickness = [25, 7, 25]
 elastic = [153e3, 128e3, 207e3]
-layers = [[t, E] for t, E in zip(thickness, elastic)]  # [(25,153e3), (7,128e3), (25,207e3)]
+layers = [[t, E] for t, E in zip(thickness, elastic)]  # [[25,153e3, [7,128e3], [25,207e3]]
 fastener = ThreadedFastener(M12, layers, pre_load=25e3, load=18.12e3)
 
 km = fastener.substrate_stiffness
@@ -24,5 +24,3 @@ M12.estimate_pre_load()
 print(f"n0={fastener.separation_safety_factor:.2f}")
 print(f"nL={fastener.load_safety_factor:.2f}")
 print(f"np={fastener.proof_safety_factor:.2f}")
-
-print(f"np={fastener.pre_load:.2f}")
