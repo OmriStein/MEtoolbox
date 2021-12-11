@@ -6,7 +6,8 @@ from me_toolbox.fasteners import Bolt
 
 
 class MetricBolt(Bolt):
-    """MetricBolt contains the attributes for a metric bolt"""
+    """MetricBolt contains the attributes for a metric bolt
+        (stresses are in MPa, sizes are in mm)"""
     grade = namedtuple('Grade', ['low', 'high', 'Sp', 'Sut', 'Sy'])
     grade_list = {'4.6': grade(5, 36, 225, 400, 240),
                   '4.8': grade(1.6, 16, 310, 420, 340),
@@ -17,21 +18,18 @@ class MetricBolt(Bolt):
                   '12.9': grade(1.6, 36, 970, 1220, 1100)}
 
     def __repr__(self):
-        return f"MetricBolt(M{self.diameter}x{self.pitch} {self.fit} {self.tolerance})"
+        return f"MetricBolt(M{self.diameter}x{self.pitch}x{self.length})"
 
-    def __init__(self, diameter, pitch, fit, tolerance, length, grade, elastic_modulus=210e3):
-        """Initializing a UnBolt object
+    def __init__(self, diameter, pitch, length, grade, elastic_modulus=210e3):
+        """Initializing a Bolt object
 
-        :param float diameter: Major nominal diameter
+        :param float diameter: Nominal diameter
         :param float pitch: Thread's pitch
-        :param str fit: The fit between the nut and bolt
-        :param int tolerance: Bolt's fit tolerance
         :param float length: Bolt's length
         :param str grade: Bolt's grade
+        :param float elastic_modulus: Bolt's elastic modulus
         """
         super().__init__(diameter, pitch, length, elastic_modulus)
-        self.fit = fit
-        self.tolerance = tolerance
         self.grade = grade
 
     @property
@@ -55,7 +53,7 @@ class MetricBolt(Bolt):
 
     @property
     def minor_area(self):
-        """Minor diameter area (Ar)"""
+        """Root diameter area (Ar)"""
         dr = self.diameter - 1.226869 * self.pitch
         return 0.25 * pi * dr ** 2
 

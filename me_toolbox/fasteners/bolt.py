@@ -6,7 +6,7 @@ from me_toolbox.tools import print_atributes
 
 class Bolt:
     """Bolt class containing basic geometry attributes
-    that are identical in metric and unified national(NU)"""
+    that are identical in metric and unified national(NU) standard"""
     angle = 60
 
     def __repr__(self):
@@ -74,8 +74,7 @@ class Bolt:
     def estimate_pre_load(self):
         try:  # TODO: add force units
             print(f"For both static and fatigue loading:\n"
-                  f"for reused fasteners Fi = 0.75 * Fp = {0.75*self.proof_load:.2f}\n" 
-                  f"for permanent connections Fi = 0.90 * Fp = {0.90 * self.proof_load:.2f}")
-        except NotImplementedError as err:
-            raise NotImplementedError("estimate_pre_load is using proof_load which"
-                                      "is only implemented in child class")
+                  f"for reused fasteners Fi = 0.75 * Fp = {0.75*self.proof_load:.2f} [N]\n" 
+                  f"for permanent connections Fi = 0.90 * Fp = {0.90 * self.proof_load:.2f} [N]")
+        except NotImplementedError:
+            raise NotImplementedError("estimate_pre_load is only implemented in child class")

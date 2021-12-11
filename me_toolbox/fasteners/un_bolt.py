@@ -1,12 +1,12 @@
-"""module containing the UnBolt class"""
+"""module containing the UNBolt class"""
 from collections import namedtuple
 from math import pi
 
 from me_toolbox.fasteners import Bolt
 
 
-class UnBolt(Bolt):
-    """UnBolt contains the attributes for a Unified National(UN) bolt"""
+class UNBolt(Bolt):
+    """UNBolt contains the attributes for a Unified National(UN) bolt"""
     grade = namedtuple('Grade', ['low', 'high', 'Sp', 'Sut', 'Sy'])
     grade_list = {'1': grade(0.25, 1.5, 33, 60, 36),
                   '2': (grade(0.25, 0.75, 55, 74, 57), grade(7 / 8, 1.5, 33, 60, 36)),
@@ -18,12 +18,12 @@ class UnBolt(Bolt):
                   '8.2': grade(0.25, 1, 120, 150, 130)}
 
     def __repr__(self):
-        return f"UnBolt({self.diameter}\"-{self.tpi} " \
+        return f"UNBolt({self.diameter}\"-{self.tpi} " \
                f"{'UNF' if self.fine else 'UNC'} {self.fit}" \
                f"{'B' if self.bolt else 'A'})"
 
     def __init__(self, diameter, tpi, fine, fit, bolt, length, grade, elastic_modulus=30):
-        """Initializing a UnBolt object
+        """Initializing a UNBolt object
 
         :param float diameter: major nominal diameter
         :param float tpi: Tooth per inch
