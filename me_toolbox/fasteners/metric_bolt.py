@@ -62,7 +62,7 @@ class MetricBolt(Bolt):
 
     @property
     def proof_strength(self):
-        """Minimum proof strength"""
+        """The minimum proof strength (Sp)"""
         if not self._is_yield:
             # if steel
             return self.grade_list[self.grade].Sp
@@ -72,7 +72,7 @@ class MetricBolt(Bolt):
 
     @property
     def tensile_strength(self):
-        """Minimum tensile strength"""
+        """Minimum tensile strength (Sut)"""
         return self.grade_list[self.grade].Sut
 
     @property

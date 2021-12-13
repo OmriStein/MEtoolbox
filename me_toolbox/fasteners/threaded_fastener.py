@@ -39,24 +39,8 @@ class ThreadedFastener:
         # print(f"Note: the space left for the nut is: {bolt.length - griped_length}{unit}")
         # lt = self.griped_threads
 
-    @classmethod
-    def threaded_plate(cls, bolt, plate_thickness, h, layers, pre_load, load):
-        """Create threaded fastener with threaded plate
-        :param MetricBolt or UNBolt bolt: Bolt object
-        :param float plate_thickness: threaded section length
-        :param float h: thickness of all materials squeezed between
-            the face of the bolt and the face of the threaded plate
-        :param tuple[tuple or list] or list[tuple or list] layers: tuple (or list)
-            containing a tuple (or list) of layer thickness and material
-        :param float pre_load: the initial loading of the bolt
-        :param float load: the load on the fastener
-        """
-        t2 = plate_thickness
-        grip_length = h + 0.5 * t2 if t2 < bolt.diameter else h + 0.5 * bolt.diameter
-        return ThreadedFastener(bolt, grip_length, layers, pre_load, load)
-
     def get_info(self):
-        """print all of the spring properties"""
+        """print all the spring properties"""
         print_atributes(self)
 
     @property
@@ -103,7 +87,6 @@ class ThreadedFastener:
     @staticmethod
     def calc_substrate_stiffness(diameter, head_diam, grip_length, layers, angle, verbose=False):
         """Calculates substrate stiffness (Kb)
-
         :param float diameter: Bolt's nominal diameter
         :param float head_diam: Bolt's head diameter
         :param float grip_length: Length of gripped material
@@ -123,6 +106,7 @@ class ThreadedFastener:
         # finding the layer divided by the center line
         half_grip_len = 0.5 * grip_length
         tot = 0
+        middle_index = 0
         for index, width in enumerate(thicknesses):
             tot += width
             if tot >= half_grip_len:
@@ -186,8 +170,9 @@ class ThreadedFastener:
         return self.pre_load / (self.load * (1 - self.fastener_stiffness))
 
     def calc_pre_load(self, n0):
-        """calculating pre load using
+        """calculating preload using
         Safety factor against joint separation
+        :param float n0: joint separation safety factor
         """
         return n0 * self.load * (1 - self.fastener_stiffness)
 
@@ -200,6 +185,16 @@ class ThreadedFastener:
     def proof_safety_factor(self):
         """Safety factor for proof stress (np)"""
         return self.bolt.proof_load / self.bolt_load
+
+    def calc_number_of_bolts(self, total_force, load_safety_factor, preload):
+        """Returns the number of bolts needed for a given load factor, total force and preload
+         on the fastener
+         :param float total_force: Total force on the fastener
+         :param float load_safety_factor: The fastener load safety factor
+         :param float preload: Preload of the bolt
+         """
+        return (load_safety_factor*self.fastener_stiffness*total_force) / \
+               (self.bolt.proof_strength-preload)
 
     @property
     def endurance_limit(self):
@@ -241,7 +236,6 @@ class ThreadedFastener:
                          criterion='modified goodman', verbose=False, metric=True):
         """ Returns safety factors for fatigue and
         for first cycle according to Langer
-
         :param float max_force: Maximal max_force acting on the spring
         :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
