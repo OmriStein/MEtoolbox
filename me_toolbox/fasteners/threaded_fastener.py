@@ -40,7 +40,7 @@ class ThreadedFastener:
         # lt = self.griped_threads
 
     def get_info(self):
-        """print all the spring properties"""
+        """print all the fastener properties"""
         print_atributes(self)
 
     @property
