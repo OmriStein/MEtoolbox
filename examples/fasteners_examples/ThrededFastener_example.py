@@ -1,4 +1,3 @@
-from math import exp
 from me_toolbox.fasteners import ThreadedFastener
 from me_toolbox.fasteners import MetricBolt
 from me_toolbox.fasteners import Bolt, UNBolt
@@ -24,3 +23,4 @@ M12.estimate_pre_load()
 print(f"n0={fastener.separation_safety_factor:.2f}")
 print(f"nL={fastener.load_safety_factor:.2f}")
 print(f"np={fastener.proof_safety_factor:.2f}")
+

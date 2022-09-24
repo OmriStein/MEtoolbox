@@ -48,4 +48,4 @@ print(f"minimum wire diameter for n=2: {spring2.min_wire_diameter(2)}")
 buckling = spring2.buckling
 print(f"buckling: {buckling[0]}, max free length (L0) = {buckling[1]} , L0= {spring2.free_length}")
 
-print(f"the natural frequency = {spring2.natural_frequency(8050):.2e} [Hz]")
+print(f"the natural frequency = {spring2.natural_frequency} [Hz]")

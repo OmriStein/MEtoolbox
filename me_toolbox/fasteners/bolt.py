@@ -73,7 +73,7 @@ class Bolt:
 
     def estimate_pre_load(self):
         try:  # TODO: add force units
-            print(f"For both static and fatigue loading:\n"
+            print(f"Estimated Pre-Load(Fi) for both static and fatigue loading:\n"
                   f"for reused fasteners Fi = 0.75 * Fp = {0.75*self.proof_load:.2f} [N]\n" 
                   f"for permanent connections Fi = 0.90 * Fp = {0.90 * self.proof_load:.2f} [N]\n")
         except NotImplementedError:

@@ -38,6 +38,7 @@ class MetricBolt(Bolt):
     @property
     def thread_length(self):
         """length of the threaded (L_T) section in [mm]"""
+        # TODO add option to enter the thread length manually (may differ by standard)
         if self.length <= 125 and self.diameter <= 48:
             return 2 * self.diameter + 6
         elif 125 < self.length <= 200:
