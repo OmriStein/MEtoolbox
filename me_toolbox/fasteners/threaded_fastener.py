@@ -10,7 +10,7 @@ from me_toolbox.tools import print_atributes
 
 class ThreadedFastener:
     # TODO: add pre-torque calculation
-    def __init__(self, bolt, layers, pre_load, load, nut=True,
+    def __init__(self, bolt, layers, pre_load=None, load=None, nut=True,
                  endurance_limit=None, reliability=50, temp=25, surface_finish='hot-rolled'):
         """Initialize threaded fastener with a nut
         :param MetricBolt or UNBolt bolt: A bolt object
@@ -157,34 +157,52 @@ class ThreadedFastener:
     @property
     def bolt_load(self):
         """The load on the bolt (Fb)"""
-        return self.fastener_stiffness * self.load + self.pre_load
+        if self.load is None or self.pre_load is None:
+            return None
+        else:
+            return self.fastener_stiffness * self.load + self.pre_load
 
     @property
     def substrate_load(self):
         """The load on the substrate (Fm)"""
-        return (1 - self.fastener_stiffness) * self.load - self.pre_load
+        if self.load is None or self.pre_load is None:
+            return None
+        else:
+            return (1 - self.fastener_stiffness) * self.load - self.pre_load
 
     @property
     def separation_safety_factor(self):
         """Safety factor against joint separation"""
-        return self.pre_load / (self.load * (1 - self.fastener_stiffness))
+        if self.load is None or self.pre_load is None:
+            return None
+        else:
+            return self.pre_load / (self.load * (1 - self.fastener_stiffness))
 
     def calc_pre_load(self, n0):
         """calculating preload using
         Safety factor against joint separation
         :param float n0: joint separation safety factor
         """
-        return n0 * self.load * (1 - self.fastener_stiffness)
+        if self.load is None:
+            return None
+        else:
+            return n0 * self.load * (1 - self.fastener_stiffness)
 
     @property
     def load_safety_factor(self):
         """Safety factor for load (nL)"""
-        return (self.bolt.proof_load - self.pre_load) / (self.fastener_stiffness * self.load)
+        if self.load is None or self.pre_load is None:
+            return None
+        else:
+            return (self.bolt.proof_load - self.pre_load) / (self.fastener_stiffness * self.load)
 
     @property
     def proof_safety_factor(self):
         """Safety factor for proof stress (np)"""
-        return self.bolt.proof_load / self.bolt_load
+        if self.load is None or self.pre_load is None:
+            return None
+        else:
+            return self.bolt.proof_load / self.bolt_load
 
     def calc_number_of_bolts(self, total_force, load_safety_factor, preload):
         """Returns the number of bolts needed for a given load factor, total force and preload
@@ -202,6 +220,8 @@ class ThreadedFastener:
 
     @endurance_limit.setter
     def endurance_limit(self, Se):
+        if self.load is None or self.pre_load is None:
+            return None
         if Se is None:
             self._endurance_limit = self.calc_endurance_limit()
         else:
@@ -246,6 +266,9 @@ class ThreadedFastener:
         :returns: static and dynamic safety factor
         :rtype: tuple[float, float]
         """
+        # check if load and preload are given
+        if self.load is None or self.pre_load is None:
+            return None
         # calculating mean and alternating forces
         alt_force = abs(max_force - min_force) / 2
         mean_force = (max_force + min_force) / 2
