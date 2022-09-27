@@ -20,7 +20,9 @@ class MetricBolt(Bolt):
     def __repr__(self):
         return f"MetricBolt(M{self.diameter}x{self.pitch}x{self.length})"
 
-    def __init__(self, diameter, pitch, length, grade, elastic_modulus=210e3, Sy=0):
+    def __init__(self, diameter, pitch, length, grade, elastic_modulus=210e3, endurance_limit=None,
+                 reliability=50, temp=25, surface_finish='hot-rolled', Sy=None,
+                 preload=None, reused=True):
         """Initializing a Bolt object
 
         :param float diameter: Nominal diameter
@@ -29,11 +31,17 @@ class MetricBolt(Bolt):
         :param str grade: Bolt's grade
         :param float elastic_modulus: Bolt's elastic modulus
         :param float Sy: yield strength for non-steel bolt in order to approximate proof strength
+        :param float endurance_limit: Bolt's endurance limit
+        :param float reliability: Bolt's reliability (for Se calc)
+        :param float temp: Working temp (for Se calc)
+        :param str surface_finish: 'machined' or 'hot-rolled' (for Se calc)
+        :param float preload: Preload of the bolt
+        :param bool reused: is the bolt ment to be reused or permanent
         """
-        super().__init__(diameter, pitch, length, elastic_modulus)
-        self.grade = grade
-        self.yield_strength = self.grade_list[self.grade].Sy if Sy == 0 else Sy
-        self._is_yield = False if Sy == 0 else True
+        self.yield_strength = self.grade_list[grade].Sy if Sy is None else Sy
+        self._is_yield = False if Sy is None else True
+        super().__init__(diameter, pitch, length, grade, elastic_modulus, endurance_limit,
+                         reliability, temp, surface_finish, preload, reused)
 
     @property
     def thread_length(self):

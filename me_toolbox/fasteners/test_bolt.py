@@ -37,9 +37,9 @@ class TestThreadedFastener(TestCase):
         self.assertAlmostEqual(self.un_bolt.head_diam, 1.5 * self.un_bolt.diameter)
 
     def test_unthreaded_length(self):
-        self.assertAlmostEqual(self.metric_bolt.unthreaded_length,
+        self.assertAlmostEqual(self.metric_bolt.shank_length,
                                self.metric_bolt.length - self.metric_bolt.thread_length)
-        self.assertAlmostEqual(self.un_bolt.unthreaded_length,
+        self.assertAlmostEqual(self.un_bolt.shank_length,
                                self.un_bolt.length - self.un_bolt.thread_length)
 
     def test_nominal_area(self):

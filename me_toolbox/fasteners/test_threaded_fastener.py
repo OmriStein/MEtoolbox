@@ -31,7 +31,7 @@ class TestThreadedFastener(TestCase):
         self.fastener = ThreadedFastener(self.bolt, self.layers, 25e3, 18.12e3)
 
     def test_griped_thread(self):
-        self.assertAlmostEqual(self.fastener.griped_threads, 19)
+        self.assertAlmostEqual(self.fastener.griped_thread_length, 19)
 
     def test_bolt_stiffness(self):
         self.assertAlmostEqual(self.fastener.bolt_stiffness, 835818.8933911937)
@@ -121,4 +121,4 @@ class TestThreadedFastener(TestCase):
     def test_values(self):
         self.fastener.bolt.length = 100
         with self.assertRaises(ValueError):
-            lt = self.fastener.griped_threads
+            lt = self.fastener.griped_thread_length

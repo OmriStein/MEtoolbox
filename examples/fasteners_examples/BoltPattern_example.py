@@ -1,51 +1,39 @@
-# from me_toolbox.fasteners import ThreadedFastener
 from me_toolbox.fasteners import MetricBolt
+from me_toolbox.fasteners import ThreadedFastener
 from me_toolbox.fasteners import BoltPattern
-# from me_toolbox.fasteners import Bolt, UNBolt
-# from me_toolbox.fatigue import EnduranceLimit, FatigueAnalysis
-# import numpy as np
-import sympy
 
-M16 = MetricBolt(16, 2, 30, '8.8')
-#
-# print(f"Sp={M16.proof_strength}, At={M16.stress_area:.2f}, Fp={M16.proof_load:.2f}\n")
-#
-# M16.estimate_pre_load()
-#
-# thickness = [10, 15]
-# elastic = [207e3, 207e3]
-# layers = [[t, E] for t, E in zip(thickness, elastic)]  # [[10,207e3], [15,207e3]]
-# fastener = ThreadedFastener(M16, layers, pre_load=0.75*M16.proof_load, load=1e-3)
-#
-# km = fastener.substrate_stiffness
-# kb = fastener.bolt_stiffness
-# C = fastener.fastener_stiffness
-#
-# print(f"km={km*1e-3:.2f}[kN/mm]\nkb={kb*1e-3:.2f}[kN/mm]\nC={C:.2f}\n")
-#
-# print(f"n0={fastener.separation_safety_factor:.2f}")
-# print(f"nL={fastener.load_safety_factor:.2f}")
-# print(f"np={fastener.proof_safety_factor:.2f}")
+M10 = MetricBolt(10, 1.5, 33, '9.8', elastic_modulus=207e3, preload=32062.5)
+M10_fastener = ThreadedFastener(M10, [[5, 207e3], [10, 207e3]])
+M5 = MetricBolt(5, 0.8, 23, '9.8', elastic_modulus=207e3, preload=7850)
+M5_fastener = ThreadedFastener(M5, [[5, 207e3], [10, 207e3]])
+fasteners = [M10_fastener, M10_fastener, M5_fastener]
+fasteners_locations = [[20, 45, 0], [-20, 45, 0], [0, 15, 0]]
+force = [0, -8500, 0]  # [N]
+force_location = [0, 0, 100]
+tilting_edge = [0, -0.000001, 0]
+pattern = BoltPattern(fasteners, fasteners_locations, force, force_location, tilting_edge)
 
-# bolts type and location
-# bolts = [[M16, [75, -60, 0]],
-#          [M16, [75, 60, 0]],
-#          [M16, [-75, 60, 0]],
-#          [M16, [-75, -60, 0]]]  # [mm]
-# # force and location
-# force = [0, -16, 0]  # [KN]
-# force_location = [425, 0, 0]
-# pattern = BoltPattern(bolts, force, force_location)
+print(f"M5 bolt stiffness = {M5_fastener.bolt_stiffness}")
+print(f"M5 sub stiffness = {M5_fastener.substrate_stiffness}")
+print(f"M5 fastener stiffness = {M5_fastener.fastener_stiffness}")
 
+print(f"M10 bolt stiffness = {M10_fastener.bolt_stiffness}")
+print(f"M10 sub stiffness = {M10_fastener.substrate_stiffness}")
+print(f"M10 fastener stiffness = {M10_fastener.fastener_stiffness}")
+print("----")
+print(f"shear force = {pattern.shear_force}")
+print(f"shear stress = {pattern.shear_stress}")
+print("----")
+print(f"normal force = {pattern.normal_force}")
+print(f"bolt tension = {pattern.bolt_tension}")
+print(f"normal stress = {pattern.normal_stress}")
+print("----")
+print(f"equivalent_stresses = {pattern.equivalent_stresses}")
+print("----")
+print(f"load safety factor = {pattern.load_safety_factor(minimal=False)}")
+print(f"separation safety factor = {pattern.separation_safety_factor(minimal=False)}")
+print(f"proof safety factor = {pattern.proof_safety_factor(minimal=False)}")
 
-M20 = MetricBolt(20, 2.5, 30, '8.8')
-bolts2 = [[M20, [-100, 0, 0]],
-          [M20, [0, 0, 0]],
-          [M20, [100, 0, 0]],
-          [M20, [200, 0, 0]]]
-
-p = sympy.Symbol('p')
-force2 = [0, 1, 0]
-force_location2 = [0, 0, 0]
-pattern2 = BoltPattern(bolts2, force2, force_location2)
-# pattern2.get_info()
+print(M10_fastener.load_safety_factor(pattern.equivalent_stresses[0]))
+print(M5_fastener.separation_safety_factor(pattern.normal_force[2]))
+print(M5_fastener.proof_safety_factor(pattern.equivalent_stresses[2]))
