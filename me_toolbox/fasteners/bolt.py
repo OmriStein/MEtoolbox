@@ -14,7 +14,7 @@ class Bolt:
         return f"Bolt({self.diameter}, {self.pitch}, {self.length})"
 
     def __init__(self, diameter, pitch, length, grade, elastic_modulus, endurance_limit,
-                 reliability, temp, surface_finish):
+                 reliability, temp, surface_finish, preload, reused):
         """Initialise Bolt object
 
         :param float diameter: nominal diameter
@@ -25,7 +25,8 @@ class Bolt:
         :param float reliability: Bolt's reliability (for Se calc)
         :param float temp: Working temp (for Se calc)
         :param str surface_finish: 'machined' or 'hot-rolled' (for Se calc)
-
+        :param float preload: Preload of the bolt
+        :param bool reused: is the bolt ment to be reused or permanent
         """
         self.diameter = diameter
         self.pitch = pitch
@@ -36,6 +37,8 @@ class Bolt:
         self.temp = temp
         self.surface_finish = surface_finish
         self.endurance_limit = endurance_limit
+        self.reused = reused
+        self.preload = preload
 
     def get_info(self):
         """print all the bolt's properties"""
@@ -85,13 +88,23 @@ class Bolt:
         except AttributeError as err:
             raise NotImplementedError("proof load is only implemented in child class") from err
 
-    def estimate_pre_load(self):
-        try:  # TODO: add force units
-            print(f"Estimated Pre-Load(Fi) for both static and fatigue loading:\n"
-                  f"for reused fasteners Fi = 0.75 * Fp = {0.75 * self.proof_load:.2f} [N]\n"
-                  f"for permanent connections Fi = 0.90 * Fp = {0.90 * self.proof_load:.2f} [N]\n")
-        except NotImplementedError:
-            raise NotImplementedError("estimate_pre_load is only implemented in child class")
+    @property
+    def preload(self):
+        return self._preload
+
+    @preload.setter
+    def preload(self, preload):
+        if preload is not None:
+            try:
+                # Estimated Pre-Load(Fi) for both static and fatigue loading
+                if self.reused is True:
+                    self._preload = 0.75 * self.proof_load  # for reused fasteners
+                else:
+                    self._preload = 0.90 * self.proof_load  # for permanent connections
+            except NotImplementedError:
+                raise NotImplementedError("preload *estimation* is only implemented in child class")
+        else:
+            self._preload = preload
 
     @property
     def endurance_limit(self):
@@ -106,11 +119,15 @@ class Bolt:
 
     def calc_endurance_limit(self):
         """Calculate endurance limit"""
-        Se = EnduranceLimit(Sut=self.tensile_strength, surface_finish=self.surface_finish,
-                            rotating=False, max_normal_stress=1, max_bending_stress=0,
-                            stress_type='multiple', temp=self.temp,
-                            reliability=self.reliability, material='steel',
-                            diameter=self.stress_area)
+
+        try:
+            Se = EnduranceLimit(Sut=self.tensile_strength, surface_finish=self.surface_finish,
+                                rotating=False, max_normal_stress=1, max_bending_stress=0,
+                                stress_type='multiple', temp=self.temp,
+                                reliability=self.reliability, material='steel',
+                                diameter=self.stress_area)
+        except NotImplementedError:
+            raise NotImplementedError("calc_endurance_limit is only implemented in child class")
 
         se_vals = {'5': (18.6, 16.3), '7': 20.6, '8': 23.2, '8.8': 129, '9.8': 140, '10.9': 162,
                    '12.9': 190}
