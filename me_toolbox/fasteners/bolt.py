@@ -16,7 +16,6 @@ class Bolt:
     def __init__(self, diameter, pitch, length, grade, elastic_modulus, endurance_limit,
                  reliability, temp, surface_finish, preload, reused):
         """Initialise Bolt object
-
         :param float diameter: nominal diameter
         :param float pitch: Thread's pitch
         :param float length: bolt's length
@@ -94,7 +93,7 @@ class Bolt:
 
     @preload.setter
     def preload(self, preload):
-        if preload is not None:
+        if preload is None:
             try:
                 # Estimated Pre-Load(Fi) for both static and fatigue loading
                 if self.reused is True:
