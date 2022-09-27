@@ -2,6 +2,7 @@
 from math import sqrt, pi
 
 from me_toolbox.tools import print_atributes
+from me_toolbox.fatigue import EnduranceLimit
 
 
 class Bolt:
@@ -12,19 +13,32 @@ class Bolt:
     def __repr__(self):
         return f"Bolt({self.diameter}, {self.pitch}, {self.length})"
 
-    def __init__(self, diameter, pitch, length, elastic_modulus):
+    def __init__(self, diameter, pitch, length, grade, elastic_modulus, endurance_limit,
+                 reliability, temp, surface_finish):
         """Initialise Bolt object
 
         :param float diameter: nominal diameter
         :param float pitch: Thread's pitch
+        :param float length: bolt's length
+        :param float elastic_modulus: Bolt's elastic modulus
+        :param float endurance_limit: Bolt's endurance limit
+        :param float reliability: Bolt's reliability (for Se calc)
+        :param float temp: Working temp (for Se calc)
+        :param str surface_finish: 'machined' or 'hot-rolled' (for Se calc)
+
         """
         self.diameter = diameter
         self.pitch = pitch
         self.length = length
+        self.grade = grade
         self.elastic_modulus = elastic_modulus
+        self.reliability = reliability
+        self.temp = temp
+        self.surface_finish = surface_finish
+        self.endurance_limit = endurance_limit
 
     def get_info(self):
-        """print all of the spring properties"""
+        """print all the bolt's properties"""
         print_atributes(self)
 
     @property
@@ -53,7 +67,7 @@ class Bolt:
         return 1.5 * self.diameter
 
     @property
-    def unthreaded_length(self):
+    def shank_length(self):
         """the unthreaded section of the bolt (ld)
         Note: the unthreaded length can be zero"""
         return self.length - self.thread_length
@@ -74,7 +88,42 @@ class Bolt:
     def estimate_pre_load(self):
         try:  # TODO: add force units
             print(f"Estimated Pre-Load(Fi) for both static and fatigue loading:\n"
-                  f"for reused fasteners Fi = 0.75 * Fp = {0.75*self.proof_load:.2f} [N]\n" 
+                  f"for reused fasteners Fi = 0.75 * Fp = {0.75 * self.proof_load:.2f} [N]\n"
                   f"for permanent connections Fi = 0.90 * Fp = {0.90 * self.proof_load:.2f} [N]\n")
         except NotImplementedError:
             raise NotImplementedError("estimate_pre_load is only implemented in child class")
+
+    @property
+    def endurance_limit(self):
+        return self._endurance_limit
+
+    @endurance_limit.setter
+    def endurance_limit(self, Se):
+        if Se is None:
+            self._endurance_limit = self.calc_endurance_limit()
+        else:
+            self._endurance_limit = Se
+
+    def calc_endurance_limit(self):
+        """Calculate endurance limit"""
+        Se = EnduranceLimit(Sut=self.tensile_strength, surface_finish=self.surface_finish,
+                            rotating=False, max_normal_stress=1, max_bending_stress=0,
+                            stress_type='multiple', temp=self.temp,
+                            reliability=self.reliability, material='steel',
+                            diameter=self.stress_area)
+
+        se_vals = {'5': (18.6, 16.3), '7': 20.6, '8': 23.2, '8.8': 129, '9.8': 140, '10.9': 162,
+                   '12.9': 190}
+
+        grade = self.grade
+
+        if grade in se_vals:
+            if grade == '5':
+                if 0.25 < self.diameter < 1:
+                    return se_vals['5'][0] * Se.Kd * Se.Ke
+                else:
+                    return se_vals['5'][1] * Se.Kd * Se.Ke
+            else:
+                return se_vals[grade] * Se.Kd * Se.Ke
+        else:
+            return Se.modified
