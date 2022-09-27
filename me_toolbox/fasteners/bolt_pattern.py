@@ -18,8 +18,11 @@ class BoltPattern:
         self.bolts_y_locations = [bolt[1] for bolt in self.fasteners_locations]
         self.bolts_z_locations = [bolt[2] for bolt in self.fasteners_locations]
         self.bolts_stiffness = [fastener.bolt_stiffness for fastener in fasteners]
+        # print(f"bolts_stiffness{self.bolts_stiffness}")
         self.substrates_stiffness = [fastener.substrate_stiffness for fastener in fasteners]
+        # print(f"substrates_stiffness{self.substrates_stiffness}")
         self.fasteners_stiffness = [fastener.fastener_stiffness for fastener in fasteners]
+        # print(f"fasteners_stiffness{self.fasteners_stiffness}")
         self.total_stiffness = [i + j for i, j in
                                 zip(self.substrates_stiffness, self.bolts_stiffness)]
         self.force = force
@@ -93,12 +96,12 @@ class BoltPattern:
     @property
     def bolt_tension(self):
         """tension force in the bolt (Fbj)"""
-        return array(self.normal_force) * array(self.fasteners_stiffness) + array(self.preloads)
+        return array(self.preloads) + (array(self.normal_force) * array(self.fasteners_stiffness))
 
     @property
     def normal_force(self):
         """the total shear force on bolt from the external force and resulting moments (Pj)"""
-        return [i[2] + j[2] for i, j in zip(self.external_normal_force, self.bending_normal_force)]
+        return [i[2] + j[2] if i[2] > 0 else j[2] for i, j in zip(self.external_normal_force, self.bending_normal_force)]
 
     @property
     def external_normal_force(self):
@@ -110,6 +113,7 @@ class BoltPattern:
     @property
     def bending_normal_force(self):
         """normal force resulting from the bending moment (PjTvV0M0)"""
+        # TODO: FIX
         # location of the neutral center of tension
         Hx, Hy, Hz = 0, 0, 0
         for stiffness, location in zip(self.total_stiffness, self.bolts_x_locations):
@@ -148,8 +152,7 @@ class BoltPattern:
     def load_safety_factor(self, minimal=True):
         """Safety factor for loading (nL)"""
         proof_loads = array([bolt.proof_load for bolt in self.bolts])
-        nL = (proof_loads - array(self.preloads)) / (
-                    self.equivalent_stresses * array(self.bolt_stress_area) - array(self.preloads))
+        nL = (proof_loads - array(self.preloads)) / (self.bolt_tension - array(self.preloads))
         return min(nL) if minimal else nL
 
     def separation_safety_factor(self, minimal=True):

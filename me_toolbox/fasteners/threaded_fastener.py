@@ -1,4 +1,6 @@
 """module containing the ThreadedFastener class used for strength analysis"""
+from copy import deepcopy
+
 from math import tan, radians, pi, log
 
 from numpy import array
@@ -19,13 +21,14 @@ class ThreadedFastener:
         :param list[list] layers: list containing lists of layers thicknesses and elastic modulus
         :param float pre_load: the initial loading of the bolt
         :param float load: the load on the fastener
-        :param Boolean nut: True if a nut is used, False if the last layer is threaded
+        :param bool nut: True if a nut is used, False if the last layer is threaded
         """
         self.bolt = bolt
         self.layers = layers
         self.pre_load = pre_load
         self.load = load
         self.nut = nut
+        self.substrate_stiffness = None
 
         # FIXME: make this note less annoying
         # unit = 'mm' if isinstance(bolt, MetricBolt) else 'in'
@@ -43,13 +46,9 @@ class ThreadedFastener:
             return sum([layer[0] for layer in self.layers])
         else:
             if self.layers[-1][0] < self.bolt.diameter:
-                grip_length = sum([layer[0] for layer in self.layers[:-1]]) + 0.5*self.layers[-1][0]
-                # replace the last layer for half its size
-                self.layers[-1][0] *= 0.5
+                grip_length = sum([layer[0] for layer in self.layers[:-1]]) + 0.5 * self.layers[-1][0]
             else:
                 grip_length = sum([layer[0] for layer in self.layers[:-1]]) + 0.5 * self.bolt.diameter
-                # replace the last layer for half the nominal diameter size
-                self.layers[-1][0] = 0.5 * self.bolt.diameter
             return grip_length
 
     @property
@@ -70,31 +69,27 @@ class ThreadedFastener:
         E = bolt.elastic_modulus
         ld = bolt.shank_length
         lt = self.griped_thread_length
+        # print(f"Ad={Ad},At={At},E={E},ld={ld},lt={lt},L={bolt.length},LT={bolt.thread_length},l={self.grip_length}")
         return (Ad * At * E) / ((Ad * lt) + (At * ld))
 
     @property
     def substrate_stiffness(self):
-        """Substrate stiffness (Kb)"""
+        """Substrate stiffness (Kb) getter"""
+        return self.__substrate_stiffness
+
+    @substrate_stiffness.setter
+    def substrate_stiffness(self, __):
+        """Substrate stiffness (Kb) setter"""
         angle = self.bolt.angle
-        layers = self.layers
+        layers = deepcopy(self.layers)
         grip_length = self.grip_length
         diameter = self.bolt.diameter
         head_diam = self.bolt.head_diam
-        # if not self.nut:
-        #     # if the fastener has no nut, i.e. the last layer is threaded.
-        #     if layers[-1][0] < self.bolt.diameter:
-        #         grip_length = sum([layer[0] for layer in layers[:-1]]) + 0.5*layers[-1][0]
-        #         # replace the last layer for half its size
-        #         layers[-1][0] *= 0.5
-        #     else:
-        #         grip_length = sum([layer[0] for layer in layers[:-1]]) + 0.5 * self.bolt.diameter
-        #         # replace the last layer for half the nominal diameter size
-        #         layers[-1][0] = 0.5 * self.bolt.diameter
-
-        return self.calc_substrate_stiffness(diameter, head_diam, grip_length, layers, angle)
+        nut = self.nut
+        self.__substrate_stiffness = self.calc_substrate_stiffness(diameter, head_diam, grip_length, layers, angle, nut)
 
     @staticmethod
-    def calc_substrate_stiffness(diameter, head_diam, grip_length, layers, angle, verbose=False):
+    def calc_substrate_stiffness(diameter, head_diam, grip_length, layers, angle, nut=True, verbose=False):
         """Calculates substrate stiffness (Kb)
         :param float diameter: Bolt's nominal diameter
         :param float head_diam: Bolt's head diameter
@@ -102,12 +97,21 @@ class ThreadedFastener:
         :param tuple[tuple or list] or list[tuple or list] layers: tuple (or list)
             containing a tuple (or list) of layer thickness and material
         :param int angle: Thread angle
+        :param bool nut: True if fastener has a nut, False if the last layer is threaded
         :param bool verbose: print details for each layer
-        
+
         :returns: Substrate stiffness
         :rtype: float
         """
         alpha = radians(angle / 2)  # angle of the approximated stress shape
+
+        if not nut:
+            if layers[-1][0] < diameter:
+                # replace the last layer for a layer half its size
+                layers[-1][0] *= 0.5
+            else:
+                # replace the last layer for a layer half the nominal diameter size
+                layers[-1][0] = 0.5 * diameter
 
         thicknesses = [layer[0] for layer in layers]
         elastic_modulus = [layer[1] for layer in layers]
