@@ -1,4 +1,5 @@
 """module containing the bolts base class Bolt"""
+from collections import namedtuple
 from math import sqrt, pi
 
 from me_toolbox.tools import print_atributes
@@ -11,33 +12,29 @@ class Bolt:
     angle = 60
 
     def __repr__(self):
-        return f"Bolt({self.diameter}, {self.pitch}, {self.length})"
+        return f"Bolt({self.diameter}x{self.pitch}x{self.length})"
 
-    def __init__(self, diameter, pitch, length, grade, elastic_modulus, endurance_limit,
-                 reliability, temp, surface_finish, preload, reused):
+    def __init__(self, diameter, pitch, length, thread_length,
+                 yield_strength, tensile_strength, proof_strength, elastic_modulus,):
         """Initialise Bolt object
         :param float diameter: nominal diameter
         :param float pitch: Thread's pitch
         :param float length: bolt's length
+        :param float thread_length: bolt's length
+        :param float yield_strength: Bolt's yield strength
+        :param float tensile_strength: Bolt's tensile strength
+        :param float proof_strength: bolt's proof strength (if unknown use 85% of yield strength)
         :param float elastic_modulus: Bolt's elastic modulus
-        :param float endurance_limit: Bolt's endurance limit
-        :param float reliability: Bolt's reliability (for Se calc)
-        :param float temp: Working temp (for Se calc)
-        :param str surface_finish: 'machined' or 'hot-rolled' (for Se calc)
-        :param float preload: Preload of the bolt
-        :param bool reused: is the bolt ment to be reused or permanent
         """
         self.diameter = diameter
         self.pitch = pitch
         self.length = length
-        self.grade = grade
+        self.thread_length = thread_length
+
+        self.yield_strength = yield_strength
+        self.tensile_strength = tensile_strength
+        self.proof_strength = proof_strength
         self.elastic_modulus = elastic_modulus
-        self.reliability = reliability
-        self.temp = temp
-        self.surface_finish = surface_finish
-        self.endurance_limit = endurance_limit
-        self.reused = reused
-        self.preload = preload
 
     def get_info(self):
         """print all the bolt's properties"""
@@ -49,89 +46,86 @@ class Bolt:
         return self.pitch * sqrt(3) / 2
 
     @property
-    def mean_diam(self):
-        "Mean diameter(dm) of the nominal and root diameters(dr)"""
+    def mean_diameter(self):
+        """Mean diameter(dm) of the nominal and root diameters(dr)"""
         return self.diameter - (5 / 8) * self.height
 
     @property
-    def root_diam(self):
-        """Minor diameter (dr)"""
-        return self.diameter - (5 / 4) * self.height
+    def minor_diameter(self):
+        """Minor diameter (dr) as calculated in Table 8-1 of Shigley"""
+        return self.diameter - 1.226869 * self.pitch
 
     @property
-    def pitch_diam(self):
-        """Pitch diameter(dp)"""
-        return self.diameter - (3 / 8) * self.height
+    def pitch_diameter(self):
+        """Pitch diameter(dp) as calculated in Table 8-1 of Shigley"""
+        return self.diameter - 0.649519 * self.pitch
 
     @property
-    def head_diam(self):
-        """Contact area diameter of bolt head (D)"""
+    def head_diameter(self):
+        """Estimated diameter of bolt head (D)"""
         return 1.5 * self.diameter
 
     @property
     def shank_length(self):
-        """the unthreaded section of the bolt (ld)
-        Note: the unthreaded length can be zero"""
+        """The unthreaded section of the bolt (ld)"""
         return self.length - self.thread_length
 
     @property
     def nominal_area(self):
-        """area of the bolt's nominal diameter (Ad)"""
+        """Area of the bolt's nominal diameter (Ad)"""
         return 0.25 * pi * self.diameter ** 2
 
     @property
+    def minor_area(self):
+        """Area of the bolt's root or minor diameter (Ar)"""
+        return 0.25 * pi * self.minor_diameter ** 2
+
+    @property
     def proof_load(self):
-        """The proof load (Fp) the bolt can withstand"""
-        try:
-            return self.proof_strength * self.stress_area
-        except AttributeError as err:
-            raise NotImplementedError("proof load is only implemented in child class") from err
+        """Proof load of the bolt (Fp)"""
+        return self.proof_strength * self.stress_area
 
     @property
-    def preload(self):
-        return self._preload
+    def stress_area(self):
+        """Tensile stress area (At)"""
+        dt = 0.5 * (self.minor_diameter + self.pitch_diameter)
+        return 0.25 * pi * dt ** 2
 
-    @preload.setter
-    def preload(self, preload):
-        if preload is None:
-            try:
-                # Estimated Pre-Load(Fi) for both static and fatigue loading
-                if self.reused is True:
-                    self._preload = 0.75 * self.proof_load  # for reused fasteners
-                else:
-                    self._preload = 0.90 * self.proof_load  # for permanent connections
-            except NotImplementedError:
-                raise NotImplementedError("preload *estimation* is only implemented in child class")
-        else:
-            self._preload = preload
+    def estimate_preload(self, reused):
+        """Estimated Pre-Load(Fi) for both static and fatigue loading
+                :param bool reused: True for reused fastener or False for a permanent joint
+                """
+        return 0.75 * self.proof_load if reused else 0.90 * self.proof_load
 
-    @property
-    def endurance_limit(self):
-        return self._endurance_limit
+    def endurance_limit(self, grade, material, surface_finish, temp, reliability):
+        """Calculate the endurance limit
+        :param string grade: the grade or class of the bolt
+        :param string material: the bolt's material
+            options:['steel', 'iron', 'aluminium', 'copper alloy']
+        :param string surface_finish: the bolt's surface finish
+            options:['ground', 'machined', 'cold-drawn', 'hot-rolled', 'as forged']
+        :param float temp: The bolt's operating temperature in deg C
+        :param float reliability: bolt's reliability
+        """
+        materials = ['steel', 'iron', 'aluminium', 'copper alloy']
+        finishes = ['ground', 'machined', 'cold-drawn', 'hot-rolled', 'as forged']
 
-    @endurance_limit.setter
-    def endurance_limit(self, Se):
-        if Se is None:
-            self._endurance_limit = self.calc_endurance_limit()
-        else:
-            self._endurance_limit = Se
+        if material not in materials:
+            raise Exception(f"The material({material}) is not one of the acceptable"
+                            f"materials[{materials}]")
 
-    def calc_endurance_limit(self):
-        """Calculate endurance limit"""
+        if material not in materials:
+            raise Exception(f"The surface finish({surface_finish}) is not one of the acceptable"
+                            f"surface finishes[{finishes}]")
 
-        try:
-            Se = EnduranceLimit(Sut=self.tensile_strength, surface_finish=self.surface_finish,
-                                rotating=False, max_normal_stress=1, max_bending_stress=0,
-                                stress_type='multiple', temp=self.temp,
-                                reliability=self.reliability, material='steel',
-                                diameter=self.stress_area)
-        except NotImplementedError:
-            raise NotImplementedError("calc_endurance_limit is only implemented in child class")
+        Se = EnduranceLimit(Sut=self.tensile_strength, surface_finish=surface_finish,
+                            rotating=False, max_normal_stress=1, max_bending_stress=0,
+                            stress_type='multiple', temp=temp,
+                            reliability=reliability, material=material,
+                            diameter=self.stress_area)
 
         se_vals = {'5': (18.6, 16.3), '7': 20.6, '8': 23.2, '8.8': 129, '9.8': 140, '10.9': 162,
                    '12.9': 190}
-
-        grade = self.grade
 
         if grade in se_vals:
             if grade == '5':
@@ -143,3 +137,28 @@ class Bolt:
                 return se_vals[grade] * Se.Kd * Se.Ke
         else:
             return Se.modified
+
+    @staticmethod
+    def get_strength_prop(diameter, grade):
+        """Returns the proof strength, tensile strength and yield strength
+            of the bolt in accordance with its grade
+            :param float diameter: Bolt's diameter
+            :param string grade: Bolt's grade or class
+            options: ['4.6', '4.8', '5.8', '8.8', '9.8', '10.9', '12.9']
+
+            :returns: Proof-Strength, Ultimate-tensile-strength, Yield-strength
+            :rtype: list
+            """
+        grade_prop = namedtuple('Grade', ['low', 'high', 'Sp', 'Sut', 'Sy'])
+        grade_list = {'4.6': grade_prop(5, 36, 225, 400, 240),
+                      '4.8': grade_prop(1.6, 16, 310, 420, 340),
+                      '5.8': grade_prop(5, 24, 380, 520, 420),
+                      '8.8': grade_prop(16, 36, 600, 830, 660),
+                      '9.8': grade_prop(1.6, 16, 650, 900, 720),
+                      '10.9': grade_prop(5, 36, 830, 1040, 940),
+                      '12.9': grade_prop(1.6, 36, 970, 1220, 1100)}
+        if diameter < grade_list[grade].low or diameter > grade_list[grade].high:
+            raise Exception(f"Diameter({diameter}) not in range([{grade_list[grade].low},"
+                            f"{grade_list[grade].high}]) for this grade({grade})")
+        else:
+            return [grade_list[grade].Sp, grade_list[grade].Sut, grade_list[grade].Sy]

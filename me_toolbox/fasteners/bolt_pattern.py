@@ -3,7 +3,7 @@ from numpy import array, cross, dot, sqrt
 from numpy.linalg import norm
 
 # from me_toolbox.fatigue import EnduranceLimit, FatigueAnalysis
-# from me_toolbox.fasteners import MetricBolt, UNBolt, ThreadedFastener
+# from me_toolbox.fasteners import Bolt, ThreadedFastener
 from me_toolbox.tools import print_atributes
 
 
@@ -19,12 +19,12 @@ class BoltPattern:
         self.bolts_z_locations = [bolt[2] for bolt in self.fasteners_locations]
         self.bolts_stiffness = [fastener.bolt_stiffness for fastener in fasteners]
         # print(f"bolts_stiffness{self.bolts_stiffness}")
-        self.substrates_stiffness = [fastener.substrate_stiffness for fastener in fasteners]
-        # print(f"substrates_stiffness{self.substrates_stiffness}")
+        self.members_stiffness = [fastener.member_stiffness for fastener in fasteners]
+        # print(f"members_stiffness{self.members_stiffness}")
         self.fasteners_stiffness = [fastener.fastener_stiffness for fastener in fasteners]
         # print(f"fasteners_stiffness{self.fasteners_stiffness}")
         self.total_stiffness = [i + j for i, j in
-                                zip(self.substrates_stiffness, self.bolts_stiffness)]
+                                zip(self.members_stiffness, self.bolts_stiffness)]
         self.force = force
         self.force_location = force_location
         self.bolt_shank_area = [bolt.nominal_area for bolt in self.bolts]

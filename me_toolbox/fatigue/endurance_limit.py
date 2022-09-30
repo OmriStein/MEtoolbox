@@ -9,7 +9,6 @@ class EnduranceLimit:
                  stress_type, temp, reliability, material=None, unmodified_endurance=None,
                  A95=None, diameter=None, height=None, width=None):
         """ Instantiating EnduranceLimit Object
-
         :param float Sut: ultimate tensile strength
         :param str surface_finish: 'ground' / 'machined' / 'cold-drawn' / 'hot-rolled' / 'as forged'
         :param bool rotating: rotating mode (True/False)
@@ -20,7 +19,7 @@ class EnduranceLimit:
         :param float reliability: reliability
         :param str material:
         :param float unmodified_endurance:
-        :param float A95: Area containing over 95% of maximum periodic stress in the cross section
+        :param float A95: Area containing over 95% of maximum periodic stress in the cross-section
         :param float diameter:
         :param float height:
         :param float width:
@@ -161,7 +160,6 @@ class EnduranceLimit:
 
     def get_factors(self, verbose=True):
         """Prints Marine factors
-
         :param bool verbose: Enables Marin factors printing
 
         :returns: Marin factors

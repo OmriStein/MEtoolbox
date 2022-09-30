@@ -5,8 +5,8 @@ from math import tan, radians, pi, log
 
 from numpy import array
 
-from me_toolbox.fatigue import FatigueAnalysis
-from me_toolbox.fasteners import MetricBolt, UNBolt
+# from me_toolbox.fatigue import FatigueAnalysis
+from me_toolbox.fasteners import Bolt
 from me_toolbox.tools import print_atributes
 
 
@@ -15,25 +15,16 @@ class ThreadedFastener:
     def __repr__(self):
         return f"Fastener(M{self.bolt.diameter})"
 
-    def __init__(self, bolt, layers, pre_load=None, load=None, nut=True):
+    def __init__(self, bolt, layers, nut):
         """Initialize threaded fastener with a nut
-        :param MetricBolt or UNBolt bolt: A bolt object
-        :param list[list] layers: list containing lists of layers thicknesses and elastic modulus
-        :param float pre_load: the initial loading of the bolt
-        :param float load: the load on the fastener
+        :param Bolt bolt: A bolt object
+        :param list[list] layers: lists of layers thicknesses and elastic modulus
+        e.g. [[10,207e3], [5,70e3], [5,207e3]]
         :param bool nut: True if a nut is used, False if the last layer is threaded
         """
         self.bolt = bolt
         self.layers = layers
-        self.pre_load = pre_load
-        self.load = load
         self.nut = nut
-        self.substrate_stiffness = None
-
-        # FIXME: make this note less annoying
-        # unit = 'mm' if isinstance(bolt, MetricBolt) else 'in'
-        # print(f"Note: the space left for the nut is: {bolt.length - griped_length}{unit}")
-        # lt = self.griped_thread_length
 
     def get_info(self):
         """print all the fastener properties"""
@@ -41,14 +32,15 @@ class ThreadedFastener:
 
     @property
     def grip_length(self):
-        """griped length in the substrate (l)"""
+        """griped length in the member (l)"""
         if self.nut:
             return sum([layer[0] for layer in self.layers])
         else:
+            sum_of_unthreaded_layers = sum([layer[0] for layer in self.layers[:-1]])
             if self.layers[-1][0] < self.bolt.diameter:
-                grip_length = sum([layer[0] for layer in self.layers[:-1]]) + 0.5 * self.layers[-1][0]
+                grip_length = sum_of_unthreaded_layers + 0.5 * self.layers[-1][0]
             else:
-                grip_length = sum([layer[0] for layer in self.layers[:-1]]) + 0.5 * self.bolt.diameter
+                grip_length = sum_of_unthreaded_layers + 0.5 * self.bolt.diameter
             return grip_length
 
     @property
@@ -56,8 +48,8 @@ class ThreadedFastener:
         """threaded section in grip (lt)"""
         lt = self.grip_length - self.bolt.shank_length
         if lt <= 0:
-            raise ValueError("the shank_length (the shank) "
-                             "is larger than the griped_length, Tip: use shorter bolt")
+            raise ValueError(f"The bolt's shank length ({self.bolt.shank_length}) "
+                             f"is larger than the griped length({self.grip_length})")
         return lt
 
     @property
@@ -73,37 +65,30 @@ class ThreadedFastener:
         return (Ad * At * E) / ((Ad * lt) + (At * ld))
 
     @property
-    def substrate_stiffness(self):
-        """Substrate stiffness (Kb) getter"""
-        return self.__substrate_stiffness
+    def member_stiffness(self):
+        """ member stiffness (Kb) """
+        d = self.bolt.diameter
+        D1 = self.bolt.head_diameter
+        lt = self.grip_length
 
-    @substrate_stiffness.setter
-    def substrate_stiffness(self, __):
-        """Substrate stiffness (Kb) setter"""
-        angle = self.bolt.angle
-        layers = deepcopy(self.layers)
-        grip_length = self.grip_length
-        diameter = self.bolt.diameter
-        head_diam = self.bolt.head_diam
-        nut = self.nut
-        self.__substrate_stiffness = self.calc_substrate_stiffness(diameter, head_diam, grip_length, layers, angle, nut)
+        return self.calc_member_stiffness(d, D1, lt, self.layers, self.nut)
 
     @staticmethod
-    def calc_substrate_stiffness(diameter, head_diam, grip_length, layers, angle, nut=True, verbose=False):
-        """Calculates substrate stiffness (Kb)
+    def calc_member_stiffness(diameter, head_diam, grip_length, Layers, nut=True, verbose=False):
+        """Calculates member stiffness (Kb)
         :param float diameter: Bolt's nominal diameter
         :param float head_diam: Bolt's head diameter
         :param float grip_length: Length of gripped material
-        :param tuple[tuple or list] or list[tuple or list] layers: tuple (or list)
+        :param list[list] Layers: tuple (or list)
             containing a tuple (or list) of layer thickness and material
-        :param int angle: Thread angle
         :param bool nut: True if fastener has a nut, False if the last layer is threaded
         :param bool verbose: print details for each layer
 
         :returns: Substrate stiffness
         :rtype: float
         """
-        alpha = radians(angle / 2)  # angle of the approximated stress shape
+        alpha = radians(30)  # angle of the approximated stress cone
+        layers = deepcopy(Layers)
 
         if not nut:
             if layers[-1][0] < diameter:
@@ -165,24 +150,24 @@ class ThreadedFastener:
         """Fastener stiffness of the joint (C),
         the fraction of external load carried by bolt
         """
-        return self.bolt_stiffness / (self.substrate_stiffness + self.bolt_stiffness)
+        return self.bolt_stiffness / (self.member_stiffness + self.bolt_stiffness)
 
-    def bolt_load(self, bolt_load):
+    def bolt_load(self, preload, external_force):
         """The load on the bolt (Fb)"""
-        return self.fastener_stiffness * bolt_load + self.bolt.preload
+        return self.fastener_stiffness * external_force + preload
 
-    def substrate_load(self, bolt_load):
-        """The load on the substrate (Fm)"""
-        return (1 - self.fastener_stiffness) * bolt_load - self.bolt.preload
+    def member_load(self, preload, bolt_load):
+        """The load on the member (Fm)"""
+        return (1 - self.fastener_stiffness) * bolt_load - preload
 
-    def load_safety_factor(self, equivalent_stresses):
+    def load_safety_factor(self, preload, equivalent_stresses):
         """Safety factor for load (nL)"""
-        return (self.bolt.proof_load - self.bolt.preload) / (
-                (equivalent_stresses * self.bolt.stress_area) - self.bolt.preload)
+        return (self.bolt.proof_load - preload) / (
+                (equivalent_stresses * self.bolt.stress_area) - preload)
 
-    def separation_safety_factor(self, bolt_load):
+    def separation_safety_factor(self, preload, bolt_load):
         """Safety factor against joint separation (n0)"""
-        return self.bolt.preload / (bolt_load * (1 - self.fastener_stiffness))
+        return preload / (bolt_load * (1 - self.fastener_stiffness))
 
     def proof_safety_factor(self, equivalent_stress):
         """Safety factor for proof strength (np)"""
