@@ -101,7 +101,7 @@ class Bolt:
                 else:
                     self._preload = 0.90 * self.proof_load  # for permanent connections
             except NotImplementedError:
-                raise NotImplementedError("preload *estimation* is only implemented in child class")
+                raise NotImplementedError("preloads *estimation* is only implemented in child class")
         else:
             self._preload = preload
 
