@@ -68,8 +68,8 @@ class BoltPattern:
         return [(force * area) / sum(self.bolt_shank_area) for area in self.bolt_shank_area]
 
     @property
-    def torque_shear_force(self):
-        """shear forces from the resulting torque (FGi)"""
+    def center_of_rotation(self):
+        """center of rotation for an off center shear force"""
         bolts_x_locations = [bolt[0] for bolt in self.fasteners_locations]
         bolts_y_locations = [bolt[1] for bolt in self.fasteners_locations]
         bolts_z_locations = [bolt[2] for bolt in self.fasteners_locations]
@@ -81,8 +81,13 @@ class BoltPattern:
             Gy += (area * location) / sum(self.bolt_shank_area)
         for area, location in zip(self.bolt_shank_area, bolts_z_locations):
             Gz += (area * location) / sum(self.bolt_shank_area)
+        return Gx, Gy, Gz
 
-        center_of_rotation = array([Gx, Gy, Gz])
+    @property
+    def torque_shear_force(self):
+        """shear forces from the resulting torque (FGi)"""
+
+        center_of_rotation = array(self.center_of_rotation)
         force_relative_to_G = array(self.force_location) - center_of_rotation
         torque_around_G = cross(force_relative_to_G, array(self.force))
 
