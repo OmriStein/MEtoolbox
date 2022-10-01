@@ -19,7 +19,8 @@ force = [0, -8500, 0]  # [N]
 preloads = [32062.5, 32062.5, 7850] # [N]
 force_location = [0, 0, 100]
 tilting_edge = [0, -0.000001, 0]
-pattern = BoltPattern(fasteners, fasteners_locations, force, preloads, force_location, tilting_edge)
+pattern = BoltPattern(fasteners, fasteners_locations, force, preloads, force_location, tilting_edge,
+                      'shank')
 
 M5_kb = (M5.nominal_area*M5.stress_area*M5.elastic_modulus)/(M5.nominal_area*M5_fastener.griped_thread_length+M5.stress_area*M5.shank_length)
 M10_kb = (M10.nominal_area*M10.stress_area*M10.elastic_modulus)/(M10.nominal_area*M10_fastener.griped_thread_length+M10.stress_area*M10.shank_length)

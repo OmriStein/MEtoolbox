@@ -160,14 +160,19 @@ class ThreadedFastener:
         """The load on the member (Fm)"""
         return (1 - self.fastener_stiffness) * bolt_load - preload
 
+    @staticmethod
+    def bolt_stress(bolt_load, stress_area):
+        """Bolt stress from pure tension"""
+        return bolt_load/stress_area
+
     def load_safety_factor(self, preload, equivalent_stress):
         """Safety factor for load (nL)"""
         return (self.bolt.proof_load - preload) / (
                 (equivalent_stress * self.bolt.stress_area) - preload)
 
-    def separation_safety_factor(self, preload, fastener_load):
+    def separation_safety_factor(self, preload, external_force):
         """Safety factor against joint separation (n0)"""
-        return preload / (fastener_load * (1 - self.fastener_stiffness))
+        return preload / (external_force * (1 - self.fastener_stiffness))
 
     def proof_safety_factor(self, equivalent_stress):
         """Safety factor for proof strength (np)"""

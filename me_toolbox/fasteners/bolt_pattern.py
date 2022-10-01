@@ -160,16 +160,24 @@ class BoltPattern:
         moment_around_H[2] = 0
 
         # finding bolts distances from rotation edge
-        edge = array(self.tilting_edge)
-        edge_direction = edge / norm(edge)
-        bolts_distance_from_edge = [edge + dot(r, edge_direction) * edge_direction for r in
-                                    array(self.fasteners_locations)]
-        force_times_stiffness = [cross(moment_around_H, bolts_distance_from_edge[i]) * j for i, j in
+        edge_p1, edge_p2 = self.tilting_edge
+        edge_vector = edge_p2 - edge_p1
+        perpendicular_edge_vector = [-edge_vector[1], edge_vector[0]]
+        edge_direction = perpendicular_edge_vector / norm(perpendicular_edge_vector)
+        distance_from_edge = [cross(edge_vector, p0[:-1] - edge_p1) / norm(edge_vector) *
+                              edge_direction for p0 in array[self.fasteners_locations]]
+
+        # edge = array(self.tilting_edge)
+        # edge_direction = edge / norm(edge)
+        # distance_from_edge = [edge + dot(r, edge_direction) * edge_direction for r in
+        #                             array(self.fasteners_locations)]
+
+        force_times_stiffness = [cross(moment_around_H, distance_from_edge[i]) * j for i, j in
                                  enumerate(self.total_stiffness)]
 
         b = 0
         for i, j in enumerate(self.total_stiffness):
-            b += j * norm(bolts_distance_from_edge[i]) ** 2
+            b += j * norm(distance_from_edge[i]) ** 2
         return [a / b for a in force_times_stiffness]
 
     @property
