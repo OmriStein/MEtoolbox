@@ -160,12 +160,12 @@ class BoltPattern:
         moment_around_H[2] = 0
 
         # finding bolts distances from rotation edge
-        edge_p1, edge_p2 = self.tilting_edge
+        edge_p1, edge_p2 = array(self.tilting_edge)
         edge_vector = edge_p2 - edge_p1
         perpendicular_edge_vector = [-edge_vector[1], edge_vector[0]]
         edge_direction = perpendicular_edge_vector / norm(perpendicular_edge_vector)
         distance_from_edge = [cross(edge_vector, p0[:-1] - edge_p1) / norm(edge_vector) *
-                              edge_direction for p0 in array[self.fasteners_locations]]
+                              edge_direction for p0 in array(self.fasteners_locations)]
 
         # edge = array(self.tilting_edge)
         # edge_direction = edge / norm(edge)
