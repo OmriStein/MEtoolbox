@@ -9,7 +9,7 @@ from me_toolbox.tools import print_atributes
 
 class BoltPattern:
     def __init__(self, fasteners, fasteners_locations, force, preloads, force_location,
-                 tilting_edge):
+                 tilting_edge, shear_location):
         """Initialize threaded fastener with a nut"""
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
@@ -17,6 +17,7 @@ class BoltPattern:
         self.preloads = preloads
         self.force_location = force_location
         self.tilting_edge = tilting_edge
+        self.shear_location = shear_location
 
     def get_info(self):
         """print all the fastener properties"""
@@ -38,19 +39,18 @@ class BoltPattern:
         return [fastener.member_stiffness + fastener.bolt_stiffness for fastener in self.fasteners]
 
     @property
-    def bolt_shank_area(self):
-        return [fastener.bolt.nominal_area for fastener in self.fasteners]
-
-    @property
-    def bolt_stress_area(self):
-        return [fastener.bolt.stress_area for fastener in self.fasteners]
-    # TODO: use stress_area if the shear stress is in the threaded section or nominal_area if
-    #  the shear stress is in the shank section and generalise for multiple layers
+    def bolt_shear_area(self):
+        """if the shear stress is in the threaded section the shear area is the stress areas
+           if the shear stress is in the shank section the shear area is the shank area"""
+        if self.shear_location == 'shank':
+            return [fastener.bolt.nominal_area for fastener in self.fasteners]
+        else:
+            return [fastener.bolt.stress_area for fastener in self.fasteners]
 
     @property
     def shear_stress(self):
         """bolts' shear stress"""
-        return [norm(i) / j for i, j in zip(self.total_shear_force, self.bolt_shank_area)]
+        return [norm(i) / j for i, j in zip(self.total_shear_force, self.bolt_shear_area)]
 
     @property
     def total_shear_force(self):
@@ -65,7 +65,7 @@ class BoltPattern:
         # zeroing forces in the z direction (because they don't cause shear)
         force[2] = 0
 
-        return [(force * area) / sum(self.bolt_shank_area) for area in self.bolt_shank_area]
+        return [(force * area) / sum(self.bolt_shear_area) for area in self.bolt_shear_area]
 
     @property
     def center_of_rotation(self):
@@ -75,12 +75,12 @@ class BoltPattern:
         bolts_z_locations = [bolt[2] for bolt in self.fasteners_locations]
         # calculating center of rotation (G)
         Gx, Gy, Gz = 0, 0, 0
-        for area, location in zip(self.bolt_shank_area, bolts_x_locations):
-            Gx += (area * location) / sum(self.bolt_shank_area)
-        for area, location in zip(self.bolt_shank_area, bolts_y_locations):
-            Gy += (area * location) / sum(self.bolt_shank_area)
-        for area, location in zip(self.bolt_shank_area, bolts_z_locations):
-            Gz += (area * location) / sum(self.bolt_shank_area)
+        for area, location in zip(self.bolt_shear_area, bolts_x_locations):
+            Gx += (area * location) / sum(self.bolt_shear_area)
+        for area, location in zip(self.bolt_shear_area, bolts_y_locations):
+            Gy += (area * location) / sum(self.bolt_shear_area)
+        for area, location in zip(self.bolt_shear_area, bolts_z_locations):
+            Gz += (area * location) / sum(self.bolt_shear_area)
         return Gx, Gy, Gz
 
     @property
@@ -98,9 +98,9 @@ class BoltPattern:
         rGi = [array(i) - center_of_rotation for i in self.fasteners_locations]
 
         force_times_area = [cross(torque_around_G, rGi[i]) * j for i, j in
-                            enumerate(self.bolt_shank_area)]
+                            enumerate(self.bolt_shear_area)]
         b = 0
-        for i, j in enumerate(self.bolt_shank_area):
+        for i, j in enumerate(self.bolt_shear_area):
             b += j * norm(rGi[i]) ** 2
 
         return [a / b for a in force_times_area]
@@ -108,7 +108,8 @@ class BoltPattern:
     @property
     def normal_stress(self):
         """normal stress in the bolt"""
-        return self.bolt_load / self.bolt_stress_area
+        bolt_stress_area = [fastener.bolt.stress_area for fastener in self.fasteners]
+        return self.bolt_load / bolt_stress_area
 
     @property
     def bolt_load(self):
