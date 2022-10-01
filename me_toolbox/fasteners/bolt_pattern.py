@@ -44,8 +44,10 @@ class BoltPattern:
            if the shear stress is in the shank section the shear area is the shank area"""
         if self.shear_location == 'shank':
             return [fastener.bolt.nominal_area for fastener in self.fasteners]
-        else:
+        elif self.shear_location == 'thread':
             return [fastener.bolt.stress_area for fastener in self.fasteners]
+        else:
+            raise ValueError("shear_location can be 'shank' or 'thread'")
 
     @property
     def shear_stress(self):
@@ -133,7 +135,7 @@ class BoltPattern:
         """The location of the neutral point of tension"""
         bolts_x_locations = [bolt[0] for bolt in self.fasteners_locations]
         bolts_y_locations = [bolt[1] for bolt in self.fasteners_locations]
-        # bolts_z_locations = [bolt[2] for bolt in self.fasteners_locations]
+        bolts_z_locations = [bolt[2] for bolt in self.fasteners_locations]
 
         # location of the neutral point of tension
         Hx, Hy, Hz = 0, 0, 0
@@ -141,15 +143,14 @@ class BoltPattern:
             Hx += (stiffness * location) / sum(self.total_stiffness)
         for stiffness, location in zip(self.total_stiffness, bolts_y_locations):
             Hy += (stiffness * location) / sum(self.total_stiffness)
-        # Todo: check what if the bolts are not at the same height, i.e if I can add Hz
-        # for stiffness, location in zip(self.total_stiffness, self.bolts_z_locations):
-        #     Hz += (stiffness * location) / sum(self.total_stiffness)
-        return Hx, Hy
+        for stiffness, location in zip(self.total_stiffness, bolts_z_locations):
+            Hz += (stiffness * location) / sum(self.total_stiffness)
+        return Hx, Hy, Hz
 
     @property
     def bending_normal_load(self):
         """normal force resulting from the bending moment (PMTVj)"""
-        Hx, Hy = self.neutral_point
+        Hx, Hy, Hz = self.neutral_point
 
         # finding resulting moment relative to neutral center
         neutral_center = array([Hx, Hy, 0])

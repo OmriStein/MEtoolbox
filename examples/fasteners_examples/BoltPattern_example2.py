@@ -21,7 +21,8 @@ preloads = [18750, 18750, 11812.5, 11812.5]
 force_location = [40, 0, 0]
 
 tilting_edge = [0.000001, 0, 0]
-pattern = BoltPattern(fasteners, fasteners_locations, force, preloads, force_location, tilting_edge)
+pattern = BoltPattern(fasteners, fasteners_locations, force, preloads, force_location, tilting_edge,
+                      'shank')
 
 M8_kb = (M8.nominal_area * M8.stress_area * M8.elastic_modulus) / (
         M8.nominal_area * M8_fastener.griped_thread_length + M8.stress_area * M8.shank_length)
@@ -55,7 +56,7 @@ fasteners2 = [M8_fastener, M8_fastener]
 fasteners_locations2 = [[-61, 0, 0], [-85, 0, 0]]
 preloads2 = [11812.5, 11812.5]
 pattern2 = BoltPattern(fasteners2, fasteners_locations2, force, preloads2, force_location,
-                       tilting_edge)
+                       tilting_edge, 'shank')
 
 print(f"Fi={pattern2.total_shear_force}\n\u03C4={pattern2.shear_stress}")
 print(f"P={pattern2.fastener_load}\nFb={pattern2.bolt_load}")
