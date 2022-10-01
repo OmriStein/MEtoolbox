@@ -20,7 +20,7 @@ force = [0, 0, -8140]
 preloads = [18750, 18750, 11812.5, 11812.5]
 force_location = [40, 0, 0]
 
-tilting_edge = [0.000001, 0, 0]
+tilting_edge = [[0, 0], [0, 1]]
 pattern = BoltPattern(fasteners, fasteners_locations, force, preloads, force_location, tilting_edge,
                       'shank')
 
