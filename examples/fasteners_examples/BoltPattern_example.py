@@ -16,7 +16,7 @@ M5_fastener = ThreadedFastener(M5, [[5, 207e3], [10, 207e3]], nut=True)
 fasteners = [M10_fastener, M10_fastener, M5_fastener]
 fasteners_locations = [[20, 45, 0], [-20, 45, 0], [0, 15, 0]]
 force = [0, -8500, 0]  # [N]
-preloads = [32062.5, 32062.5, 7850] # [N]
+preloads = [32062.5, 32062.5, 7850]  # [N]
 force_location = [0, 0, 100]
 tilting_edge = [[0, 0], [1, 0]]
 pattern = BoltPattern(fasteners, fasteners_locations, force, preloads, force_location, tilting_edge,

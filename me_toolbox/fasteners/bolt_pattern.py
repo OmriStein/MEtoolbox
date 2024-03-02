@@ -11,6 +11,7 @@ class BoltPattern:
     def __init__(self, fasteners, fasteners_locations, force, preloads, force_location,
                  tilting_edge, shear_location):
         """Initialize threaded fastener with a nut"""
+        # TODO: better documentation
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
         self.force = force

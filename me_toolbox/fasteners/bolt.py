@@ -1,21 +1,21 @@
 """module containing the bolts base class Bolt"""
 from collections import namedtuple
 from math import sqrt, pi
+from mpmath import sec
 
 from me_toolbox.tools import print_atributes
 from me_toolbox.fatigue import EnduranceLimit
 
 
 class Bolt:
-    """Bolt class containing basic geometry attributes
-    that are identical in metric and unified national(NU) standard"""
+    """Bolt class containing basic geometry attributes"""
     angle = 60
 
     def __repr__(self):
         return f"Bolt({self.diameter}x{self.pitch}x{self.length})"
 
     def __init__(self, diameter, pitch, length, thread_length,
-                 yield_strength, tensile_strength, proof_strength, elastic_modulus,):
+                 yield_strength, tensile_strength, proof_strength, elastic_modulus, ):
         """Initialise Bolt object
         :param float diameter: nominal diameter
         :param float pitch: Thread's pitch
@@ -46,14 +46,15 @@ class Bolt:
         return self.pitch * sqrt(3) / 2
 
     @property
-    def mean_diameter(self):
-        """Mean diameter(dm) of the nominal and root diameters(dr)"""
-        return self.diameter - (5 / 8) * self.height
-
-    @property
     def minor_diameter(self):
         """Minor diameter (dr) as calculated in Table 8-1 of Shigley"""
         return self.diameter - 1.226869 * self.pitch
+
+    @property
+    def mean_diameter(self):
+        """Mean diameter(dm) of the nominal and root diameters(dr)"""
+        # return self.diameter - (5 / 8) * self.height
+        return 0.5 * (self.diameter + self.minor_diameter)
 
     @property
     def pitch_diameter(self):
@@ -96,6 +97,19 @@ class Bolt:
                 :param bool reused: True for reused fastener or False for a permanent joint
                 """
         return 0.75 * self.proof_load if reused else 0.90 * self.proof_load
+
+    def preload2torque(self, preload, thread_friction, collar_friction):
+        """calculating tightening torque from preload"""
+        Fi, d, dm = preload, self.diameter, self.mean_diameter
+        length = self.pitch  # for single start
+        tanG = length / (pi * dm)
+        alpha = self.angle
+        return Fi * d * ((dm / (2 * d)) *
+                         ((tanG + thread_friction * sec(alpha)) /
+                          (1 - thread_friction * tanG * sec(alpha))) + 0.625*collar_friction)
+
+    def torque2preload(self, torque):
+        pass
 
     def endurance_limit(self, grade, material, surface_finish, temp, reliability):
         """Calculate the endurance limit
