@@ -18,6 +18,7 @@ class Transmission:
 
     # TODO: add advices to improve strength
     # TODO: add function to find minimum volume for contact and bending
+    # TODO: add gear train calculation, including multiple stages
 
     def __init__(self, driving_machine, driven_machine, oil_temp, reliability,
                  power, SF, gear1, gear2=None, gear_ratio=0, SH=1):
@@ -43,7 +44,7 @@ class Transmission:
         self.gear1 = gear1
         self.gear2 = self._gear2_checkup(gear1, gear2, gear_ratio)
 
-        # check if the pressure angle match between gear1 and gear2
+        # check if the pressure angle and modulus match between gear1 and gear2
         gear1.check_compatibility(self.gear2)
 
         self.driving_machine = driving_machine
