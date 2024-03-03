@@ -4,3 +4,6 @@
 /dist/
 /me_toolbox.egg-info/
 /gen_docs/
+venv/
+. gitignore
+setup.py
