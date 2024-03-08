@@ -12,6 +12,8 @@ class BoltPattern:
                  tilting_edge, shear_location):
         """Initialize threaded fastener with a nut"""
         # TODO: better documentation
+        # TODO: Add function to calculate fastener location for
+        #  standard shapes like a circle or a square
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
         self.force = force
