@@ -175,4 +175,4 @@ class Bolt:
             raise Exception(f"Diameter({diameter}) not in range([{grade_list[grade].low},"
                             f"{grade_list[grade].high}]) for this grade({grade})")
         else:
-            return [grade_list[grade].Sp, grade_list[grade].Sut, grade_list[grade].Sy]
+            return [grade_list[grade].Sy, grade_list[grade].Sut, grade_list[grade].Sp]

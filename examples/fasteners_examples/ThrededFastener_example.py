@@ -2,7 +2,7 @@ from me_toolbox.fasteners import ThreadedFastener
 from me_toolbox.fasteners import Bolt
 
 diameter, pitch, length, threaded_length, grade, E = 12, 1.75, 55, 30, '9.8', 207e3
-Sp, Sut, Sy = Bolt.get_strength_prop(diameter, grade)
+Sy, Sut, Sp = Bolt.get_strength_prop(diameter, grade)
 M12 = Bolt(diameter, pitch, length, threaded_length, Sy, Sut, Sp, E)
 
 thickness = [25, 7, 25]
