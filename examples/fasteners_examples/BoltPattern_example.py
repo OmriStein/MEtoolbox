@@ -4,12 +4,12 @@ from me_toolbox.fasteners import BoltPattern
 
 
 diameter, pitch, length, threaded_length, grade, E = 10, 1.5, 33, 26, '9.8', 207e3
-Sp, Sut, Sy = Bolt.get_strength_prop(diameter, grade)
+Sy, Sut, Sp = Bolt.get_strength_prop(diameter, grade)
 M10 = Bolt(diameter, pitch, length, threaded_length, Sy, Sut, Sp, E)
 M10_fastener = ThreadedFastener(M10, [[5, 207e3], [10, 207e3]], nut=True)
 
 diameter, pitch, length, threaded_length, grade, E = 5, 0.8, 23, 16, '9.8', 207e3
-Sp, Sut, Sy = Bolt.get_strength_prop(diameter, grade)
+Sy, Sut, Sp = Bolt.get_strength_prop(diameter, grade)
 M5 = Bolt(diameter, pitch, length, threaded_length, Sy, Sut, Sp, E)
 M5_fastener = ThreadedFastener(M5, [[5, 207e3], [10, 207e3]], nut=True)
 
