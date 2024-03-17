@@ -1,4 +1,5 @@
 """module containing misc functions"""
+import numpy as np
 
 
 def print_atributes(obj):
@@ -131,3 +132,9 @@ def percent_to_decimal(var):
                 # if var is in decimal form no correction needed
                 dec.append(val)
     return dec
+
+
+def pol2cart(rho, phi):
+    x = rho * np.cos(np.deg2rad(phi))
+    y = rho * np.sin(np.deg2rad(phi))
+    return x, y
