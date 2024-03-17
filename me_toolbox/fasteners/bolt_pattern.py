@@ -23,9 +23,7 @@ class BoltPattern:
                 used to determine what area value to use
                 """
         # TODO: Add function to calculate fastener location for standard shapes
-        # TODO: Replace the shear_location input with a calculation using the shank length
-        # TODO: Contemplate moving the preload to the ThreadedFastener class
-
+        # TODO: Add Fatigue calculation
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
         self.force = force
