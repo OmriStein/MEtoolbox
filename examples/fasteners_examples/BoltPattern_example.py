@@ -6,21 +6,20 @@ from me_toolbox.fasteners import BoltPattern
 diameter, pitch, length, threaded_length, grade, E = 10, 1.5, 33, 26, '9.8', 207e3
 Sy, Sut, Sp = Bolt.get_strength_prop(diameter, grade)
 M10 = Bolt(diameter, pitch, length, threaded_length, Sy, Sut, Sp, E)
-M10_fastener = ThreadedFastener(M10, [[5, 207e3], [10, 207e3]], nut=True)
+M10_fastener = ThreadedFastener(M10, [[5, 207e3], [10, 207e3]], nut=True, preload=32062.5)
 
 diameter, pitch, length, threaded_length, grade, E = 5, 0.8, 23, 16, '9.8', 207e3
 Sy, Sut, Sp = Bolt.get_strength_prop(diameter, grade)
 M5 = Bolt(diameter, pitch, length, threaded_length, Sy, Sut, Sp, E)
-M5_fastener = ThreadedFastener(M5, [[5, 207e3], [10, 207e3]], nut=True)
+M5_fastener = ThreadedFastener(M5, [[5, 207e3], [10, 207e3]], nut=True, preload=7850)
 
 fasteners = [M10_fastener, M10_fastener, M5_fastener]
 fasteners_locations = [[20, 45, 0], [-20, 45, 0], [0, 15, 0]]
 force = [0, -8500, 0]  # [N]
-preloads = [32062.5, 32062.5, 7850]  # [N]
 force_location = [0, 0, 100]
 axis_of_rotation = [[0, 0], [1, 0]]  # Two points on the axis of rotation
-pattern = BoltPattern(fasteners, fasteners_locations, force, preloads, force_location, axis_of_rotation,
-                      'shank')
+pattern = BoltPattern(fasteners, fasteners_locations, force, force_location,
+                      axis_of_rotation, 'shank')
 
 print(f"M5: ld={M5.shank_length}, lt={M5_fastener.griped_thread_length},"
       f"Ad={M5.nominal_area:.2f}, At={M5.stress_area:.2f}, kb={M5_fastener.bolt_stiffness:.2f},"
@@ -36,11 +35,11 @@ print(f"P={pattern.fastener_load}\nFb={pattern.bolt_load}")
 print(f"\u03C3={pattern.normal_stress}")
 print(f"\u03C3eq={pattern.equivalent_stresses}")
 
-M10_nL = M10_fastener.load_safety_factor(preloads[0], pattern.equivalent_stresses[0])
-M5_nL = M5_fastener.load_safety_factor(preloads[2], pattern.equivalent_stresses[2])
+M10_nL = M10_fastener.load_safety_factor(pattern.equivalent_stresses[0])
+M5_nL = M5_fastener.load_safety_factor(pattern.equivalent_stresses[2])
 print(f"M10_nL={M10_nL:.2f},M5_nL={M5_nL:.2f}")
-M10_n0 = M10_fastener.separation_safety_factor(preloads[0], pattern.fastener_load[0])
-M5_n0 = M5_fastener.separation_safety_factor(preloads[2], pattern.fastener_load[2])
+M10_n0 = M10_fastener.separation_safety_factor(pattern.fastener_load[0])
+M5_n0 = M5_fastener.separation_safety_factor(pattern.fastener_load[2])
 print(f"M10_n0={M10_n0:.2f},M5_n0={M5_n0:.2f}")
 M10_np = M10_fastener.proof_safety_factor(pattern.equivalent_stresses[0])
 M5_np = M5_fastener.proof_safety_factor(pattern.equivalent_stresses[2])
