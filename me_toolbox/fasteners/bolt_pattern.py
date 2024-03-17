@@ -8,7 +8,7 @@ from me_toolbox.tools import print_atributes
 
 
 class BoltPattern:
-    def __init__(self, fasteners, fasteners_locations, force, preloads, force_location,
+    def __init__(self, fasteners, fasteners_locations, force, force_location,
                  axis_of_rotation, shear_location):
         """Initialize bolt pattern
                 :param list[ThreadedFastener] fasteners: A List of threaded fasteners object
@@ -16,7 +16,6 @@ class BoltPattern:
                 :param list[list] fasteners_locations: A list of coordinates for each of the
                  fasteners locations
                 :param list force: The external force in vector form [x,y,z]
-                :param list preloads: List of the preload for each of the fasteners
                 :param list force_location: The external force location in vector form [x,y,z]
                 :param list[list] axis_of_rotation: List of two points that describe the axis of
                 rotation
@@ -30,7 +29,7 @@ class BoltPattern:
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
         self.force = force
-        self.preloads = preloads
+        self.preloads = [load.preload for load in self.fasteners]
         self.force_location = force_location
         self.tilting_edge = axis_of_rotation
         self.shear_location = shear_location

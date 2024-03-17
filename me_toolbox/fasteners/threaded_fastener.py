@@ -1,4 +1,4 @@
-"""module containing the ThreadedFastener class used for strength analysis"""
+"""module containing the ThreadedFastener class used for fastener strength analysis"""
 from copy import deepcopy
 
 from math import tan, radians, pi, log
@@ -15,16 +15,25 @@ class ThreadedFastener:
     def __repr__(self):
         return f"Fastener(M{self.bolt.diameter})"
 
-    def __init__(self, bolt, layers, nut):
-        """Initialize threaded fastener with a nut
+    def __init__(self, bolt, layers, nut, preload=None):
+        """Initialize threaded fastener object
         :param Bolt bolt: A bolt object
         :param list[list] layers: lists of layers thicknesses and elastic modulus
         e.g. [[10,207e3], [5,70e3], [5,207e3]]
         :param bool nut: True if a nut is used, False if the last layer is threaded
+        :param float or none preload: The initial load on the bolt
         """
+
         self.bolt = bolt
         self.layers = layers
         self.nut = nut
+        if preload is None:
+            self.preload = bolt.estimate_preload(True)
+            print(f"{self} - No preload was entered so an estimated value was used"
+                  f"({round(self.preload,2)})"
+                  f" under the assumption that the bolt is reusable ")
+        else:
+            self.preload = preload
 
     def get_info(self):
         """print all the fastener properties"""
@@ -152,27 +161,27 @@ class ThreadedFastener:
         """
         return self.bolt_stiffness / (self.member_stiffness + self.bolt_stiffness)
 
-    def bolt_load(self, preload, external_force):
+    def bolt_load(self, external_force):
         """The load on the bolt (Fb)"""
-        return self.fastener_stiffness * external_force + preload
+        return self.fastener_stiffness * external_force + self.preload
 
-    def member_load(self, preload, bolt_load):
+    def member_load(self, bolt_load):
         """The load on the member (Fm)"""
-        return (1 - self.fastener_stiffness) * bolt_load - preload
+        return (1 - self.fastener_stiffness) * bolt_load - self.preload
 
     @staticmethod
     def bolt_stress(bolt_load, stress_area):
         """Bolt stress from pure tension"""
         return bolt_load/stress_area
 
-    def load_safety_factor(self, preload, equivalent_stress):
+    def load_safety_factor(self, equivalent_stress):
         """Safety factor for load (nL)"""
-        return (self.bolt.proof_load - preload) / (
-                (equivalent_stress * self.bolt.stress_area) - preload)
+        return (self.bolt.proof_load - self.preload) / (
+                (equivalent_stress * self.bolt.stress_area) - self.preload)
 
-    def separation_safety_factor(self, preload, external_force):
+    def separation_safety_factor(self, external_force):
         """Safety factor against joint separation (n0)"""
-        return preload / (external_force * (1 - self.fastener_stiffness))
+        return self.preload / (external_force * (1 - self.fastener_stiffness))
 
     def proof_safety_factor(self, equivalent_stress):
         """Safety factor for proof strength (np)"""
