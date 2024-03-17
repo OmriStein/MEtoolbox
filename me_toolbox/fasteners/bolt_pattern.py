@@ -1,4 +1,4 @@
-"""module containing the BoltPattern class used for bolt pattern strength analysis"""
+"""module containing the BoltPattern class used for a bolt pattern strength analysis"""
 from numpy import array, cross, dot, sqrt
 from numpy.linalg import norm
 
@@ -9,29 +9,35 @@ from me_toolbox.tools import print_atributes
 
 class BoltPattern:
     def __init__(self, fasteners, fasteners_locations, force, preloads, force_location,
-                 tilting_edge, shear_location):
-        """Initialize threaded fastener with a nut"""
-        # TODO: better documentation
-        # TODO: Add function to calculate fastener location for
-        #  standard shapes like a circle or a square
-        # TODO: change to shear_location input with a calculation
-        #  based on the substrate thickness and the shank length
+                 axis_of_rotation, shear_location):
+        """Initialize bolt pattern
+                :param list[ThreadedFastener] fasteners: A List of threaded fasteners object
+                e.g. [M10_fastener, M10_fastener, M8_fastener, M8_fastener]
+                :param list[list] fasteners_locations: A list of coordinates for each of the
+                 fasteners locations
+                :param list force: The external force in vector form [x,y,z]
+                :param list preloads: List of the preload for each of the fasteners
+                :param list force_location: The external force location in vector form [x,y,z]
+                :param list[list] axis_of_rotation: List of two points that describe the axis of
+                rotation
+                :param string shear_location: Where along the volt the shear is felt, shank or thread
+                used to determine what area value to use
+                """
+        # TODO: Add function to calculate fastener location for standard shapes
+        # TODO: Replace the shear_location input with a calculation using the shank length
+        # TODO: Contemplate moving the preload to the ThreadedFastener class
+
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
         self.force = force
         self.preloads = preloads
         self.force_location = force_location
-        self.tilting_edge = tilting_edge
+        self.tilting_edge = axis_of_rotation
         self.shear_location = shear_location
 
     def get_info(self):
         """print all the fastener properties"""
         print_atributes(self)
-
-    # @property
-    # def bolts(self):
-    #     """retrieving bolts objects from fasteners"""
-    #     return [fastener.bolt for fastener in self.fasteners]
 
     @property
     def fasteners_stiffness(self):
@@ -192,7 +198,11 @@ class BoltPattern:
                 zip(self.normal_stress, self.shear_stress)]
 
     def load_safety_factor(self, minimal_value=True, verbose=False):
-        """Safety factor for loading (nL)"""
+        """Safety factor for loading (nL)
+                :param bool minimal_value: If true returns the lowest safety factor of all the
+                fasteners, if false returns a list of safety factors for each of the fasteners
+                :param bool verbose: If true prints the safety value for each fastener
+        """
         proof_loads = array([fastener.bolt.proof_load for fastener in self.fasteners])
         nL = (proof_loads - array(self.preloads)) / (self.bolt_load - array(self.preloads))
         if verbose:
@@ -202,7 +212,11 @@ class BoltPattern:
         return min(nL) if minimal_value else nL
 
     def separation_safety_factor(self, minimal_value=True, verbose=False):
-        """Safety factor against fastener separation (n0)"""
+        """Safety factor against fastener separation (n0)
+                :param bool minimal_value: If true returns the lowest safety factor of all the
+                fasteners, if false returns a list of safety factors for each of the fasteners
+                :param bool verbose: If true prints the safety value for each fastener
+        """
         n0 = array(self.preloads) / ((1 - array(self.fasteners_stiffness)) * self.fastener_load)
         if verbose:
             for i, fastener in enumerate(self.fasteners):
@@ -211,7 +225,11 @@ class BoltPattern:
         return min(n0) if minimal_value else n0
 
     def proof_safety_factor(self, minimal_value=True, verbose=False):
-        """Safety factor for proof strength (np)"""
+        """Safety factor for proof strength (np)
+                :param bool minimal_value: If true returns the lowest safety factor of all the
+                fasteners, if false returns a list of safety factors for each of the fasteners
+                :param bool verbose: If true prints the safety value for each fastener
+        """
         np = [fastener.bolt.proof_strength / eq for fastener, eq in
               zip(self.fasteners, self.equivalent_stresses)]
         if verbose:
