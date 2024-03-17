@@ -14,6 +14,8 @@ class BoltPattern:
         # TODO: better documentation
         # TODO: Add function to calculate fastener location for
         #  standard shapes like a circle or a square
+        # TODO: change to shear_location input with a calculation
+        #  based on the substrate thickness and the shank length
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
         self.force = force
@@ -189,19 +191,31 @@ class BoltPattern:
         return [sqrt(normal_stress ** 2 + 3 * shear_stress ** 2) for normal_stress, shear_stress in
                 zip(self.normal_stress, self.shear_stress)]
 
-    def load_safety_factor(self, minimal=True):
+    def load_safety_factor(self, minimal_value=True, verbose=False):
         """Safety factor for loading (nL)"""
         proof_loads = array([fastener.bolt.proof_load for fastener in self.fasteners])
         nL = (proof_loads - array(self.preloads)) / (self.bolt_load - array(self.preloads))
-        return min(nL) if minimal else nL
+        if verbose:
+            for i, fastener in enumerate(self.fasteners):
+                print(f"{fastener} - nL = {nL[i]:.2f}")
+            print("")
+        return min(nL) if minimal_value else nL
 
-    def separation_safety_factor(self, minimal=True):
+    def separation_safety_factor(self, minimal_value=True, verbose=False):
         """Safety factor against fastener separation (n0)"""
         n0 = array(self.preloads) / ((1 - array(self.fasteners_stiffness)) * self.fastener_load)
-        return min(n0) if minimal else n0
+        if verbose:
+            for i, fastener in enumerate(self.fasteners):
+                print(f"{fastener} - n0 = {n0[i]:.2f}")
+            print("")
+        return min(n0) if minimal_value else n0
 
-    def proof_safety_factor(self, minimal=True):
+    def proof_safety_factor(self, minimal_value=True, verbose=False):
         """Safety factor for proof strength (np)"""
         np = [fastener.bolt.proof_strength / eq for fastener, eq in
               zip(self.fasteners, self.equivalent_stresses)]
-        return min(np) if minimal else np
+        if verbose:
+            for i, fastener in enumerate(self.fasteners):
+                print(f"{fastener} - np = {np[i]:.2f}")
+            print("")
+        return min(np) if minimal_value else np
