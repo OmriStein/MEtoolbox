@@ -20,11 +20,21 @@ def calc_kf(q, Kt):
     return 1 + q * (Kt - 1)
 
 
+def calc_thread_kf(grade):
+    if 3.6 <= grade <= 5.8:
+        return {"Rolled Threads": 2.2, "Cut Threads": 2.8, "fillet": 2.1}
+    elif 6.6 <= grade <= 10.9:
+        return {"Rolled Threads": 3, "Cut Threads": 3.8, "fillet": 2.3}
+    else:
+        raise ValueError(f"Grade entered is {grade} but grade can only be in the range of"
+                         f"3.6 to 5.8 or 6.6 to 0.9")
+
+
 class FatigueAnalysis:
     """Perform fatigue analysis"""
 
     # TODO: make endurance_limit optional and add option to input Se, Stress_type and Kc directly
-    # TODO: replace Kc as way to determine what to do in factors calculation
+    # TODO: replace Kc with some other way to determine what to do in factors calculation
 
     def __init__(self, endurance_limit, ductile, Sy=None,
                  Kf_bending=0, Kf_normal=0, Kf_torsion=0,
@@ -36,7 +46,6 @@ class FatigueAnalysis:
         :param fatigue_analysis.EnduranceLimit endurance_limit: EnduranceLimit object containing
         the modified Se
         :param bool ductile: True if material is ductile
-        :param float Sut: Ultimate tensile strength in [Mpa]
         :param float Sy: Yield strength in [Mpa]
         :param float Kf_bending: dynamic stress concentration factor for bending
         :param Kf_normal: dynamic stress concentration factor for normal
