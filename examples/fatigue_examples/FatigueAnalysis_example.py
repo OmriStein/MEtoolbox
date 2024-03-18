@@ -37,8 +37,8 @@ print(f"σaN={alternating_normal_stress}, σmN={mean_normal_stress},"
       f"𝜏aT={alternating_shear_stress}, 𝜏mT={mean_shear_stress}")
 
 max_normal_stress = uniform_stress(normal_Force_max, Area)
-
-endurance_limit = EnduranceLimit(Sut=700, surface_finish='machined', rotating=False, material='steel',
+unmodified_Se = EnduranceLimit.unmodified_Se(700, 'steel')
+endurance_limit = EnduranceLimit(unmodified_Se, Sut=700, surface_finish='machined', rotating=False,
                                  max_normal_stress=max_normal_stress, max_bending_stress=0,
                                  stress_type="multiple", temp=25, reliability=90, diameter=10)
 

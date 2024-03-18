@@ -27,9 +27,10 @@ print(f"Normal Stress = {normal_stress}\n"
       f"Torsion Stress = {torsion_stress}\n"
       f"Shear Stress = {shear_stress}")
 
-endurance_limit = EnduranceLimit(Sut=Sut, surface_finish='machined', rotating=True, max_bending_stress=bending_stress,
-                                 max_normal_stress=normal_stress, material='steel', stress_type="multiple", temp=25,
-                                 reliability=99, diameter=16)
+unmodified_Se = EnduranceLimit.unmodified_Se(Sut, 'steel')
+endurance_limit = EnduranceLimit(unmodified_Se, Sut, surface_finish='machined', rotating=True,
+                                 max_bending_stress=bending_stress, max_normal_stress=normal_stress,
+                                 stress_type="multiple", temp=25, reliability=99, diameter=16)
 
 print(f"Se'={endurance_limit.unmodified}, Se={endurance_limit.modified:.2f}")
 endurance_limit.get_factors()
@@ -55,8 +56,8 @@ print(f"soderberg={soderberg_nF} \ngerber={gerber_nF} \nasme={asme_nF}\n")
 
 # miner for time to failure every group is of the following structure:
 # [freq[Hz], alternating stresses, mean stresses]
-# Note: In this case the stresses in the groups are alternating and mean (instead of the default max and min)
-#       so the alt_mean flag should be True, and because we use frequency instead of number of repetitions
-# the freq flag should be true
+# Note: In this case the stresses in the groups are alternating and mean
+# (instead of the default max and min) so the alt_mean flag should be True,
+# and because we use frequency instead of number of repetitions the freq flag should be true
 stresses = [[2, 700, 500], [5, 400, 540], [3, 900, -200]]
 N_total = fatigue_analysis.miner_rule(stresses, Sut=1500, Se=750, verbose=True, alt_mean=True, freq=True)

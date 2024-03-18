@@ -5,11 +5,12 @@ from math import sqrt
 class EnduranceLimit:
     """calculates Marin modification factors and return modified endurance limit"""
 
-    def __init__(self, Sut, surface_finish, rotating, max_normal_stress, max_bending_stress,
-                 stress_type, temp, reliability, material=None, unmodified_endurance=None,
+    def __init__(self, unmodified_Se, Sut, surface_finish, rotating, max_normal_stress,
+                 max_bending_stress, stress_type, temp, reliability,
                  A95=None, diameter=None, height=None, width=None):
         """ Instantiating EnduranceLimit Object
-        :param float Sut: ultimate tensile strength
+        :param float unmodified_Se: The unmodified endurance strength
+        :param float Sut: Ultimate tensile strength
         :param str surface_finish: 'ground' / 'machined' / 'cold-drawn' / 'hot-rolled' / 'as forged'
         :param bool rotating: rotating mode (True/False)
         :param float max_normal_stress: (for axial loading check)
@@ -17,8 +18,6 @@ class EnduranceLimit:
         :param str stress_type: 'bending' / 'axial' / 'torsion' / 'shear' / 'multiple'
         :param float temp: temperature
         :param float reliability: reliability
-        :param str material:
-        :param float unmodified_endurance:
         :param float A95: Area containing over 95% of maximum periodic stress in the cross-section
         :param float diameter:
         :param float height:
@@ -36,8 +35,7 @@ class EnduranceLimit:
         self.stress_type = stress_type
         self.temp = temp
         self.reliability = reliability
-        self.material = material
-        self.unmodified_endurance = unmodified_endurance
+        self.unmodified = unmodified_Se
         self.A95 = A95
 
     @property
@@ -130,26 +128,24 @@ class EnduranceLimit:
         """Miscellaneous effects factor"""
         return 1
 
-    @property
-    def unmodified(self):
-        """Return the unmodified endurance limit based
-        on the material and ultimate_tensile_strength
+    @staticmethod
+    def unmodified_Se(Sut, material):
+        """Returns the unmodified endurance strength limit based
+        on the material (steel/iron/aluminium/copper alloy) and ultimate_tensile_strength
+
+        :param float Sut: Ultimate Tensile Strength
+        :param string material: (steel/iron/aluminium/copper alloy)
         """
-        if self.material is None and self.unmodified_endurance is None:
-            raise ValueError("material and unmodified endurance can't both be None")
 
-        data = {'steel': {'divider': 1400, 'lesser': 0.5 * self.Sut, 'grater': 700},
-                'iron': {'divider': 400, 'lesser': 0.4 * self.Sut, 'grater': 160},
-                'aluminium': {'divider': 330, 'lesser': 0.4 * self.Sut, 'grater': 130},
-                'copper alloy': {'divider': 280, 'lesser': 0.4 * self.Sut, 'grater': 100}}
+        data = {'steel': {'divider': 1400, 'lesser': 0.5 * Sut, 'grater': 700},
+                'iron': {'divider': 400, 'lesser': 0.4 * Sut, 'grater': 160},
+                'aluminium': {'divider': 330, 'lesser': 0.4 * Sut, 'grater': 130},
+                'copper alloy': {'divider': 280, 'lesser': 0.4 * Sut, 'grater': 100}}
 
-        if self.unmodified_endurance is None:
-            if self.Sut < data[self.material]['divider']:
-                return data[self.material]['lesser']
-            else:
-                return data[self.material]['grater']
+        if Sut < data[material]['divider']:
+            return data[material]['lesser']
         else:
-            return self.unmodified_endurance
+            return data[material]['grater']
 
     @property
     def modified(self):
