@@ -1,6 +1,6 @@
 from me_toolbox.fasteners import ThreadedFastener
 from me_toolbox.fasteners import Bolt
-
+from me_toolbox.fatigue import EnduranceLimit
 diameter, pitch, length, threaded_length, grade, E = 12, 1.75, 55, 30, '9.8', 207e3
 Sy, Sut, Sp = Bolt.get_strength_prop(diameter, grade)
 M12 = Bolt(diameter, pitch, length, threaded_length, Sy, Sut, Sp, E)
@@ -26,3 +26,7 @@ print(f"n0={fastener.separation_safety_factor(external_force):.2f}")
 print(f"nL={fastener.load_safety_factor(eq):.2f}")
 print(f"np={fastener.proof_safety_factor(eq):.2f}")
 
+print("Fatigue:")
+unmodified_Se = EnduranceLimit.unmodified_Se(Sut, 'steel')
+Se = M12.endurance_limit(unmodified_Se, 'cold-drawn', 300, 0.9)
+print(f"unmodified_Se:{unmodified_Se},modified_Se:{Se}")
