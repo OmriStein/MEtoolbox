@@ -8,28 +8,6 @@ from sympy import oo
 from me_toolbox.fatigue import FailureCriteria
 
 
-def calc_kf(q, Kt):
-    """Kf - dynamic stress concentration factor
-
-    :param float Kt: stress concentration theoretical factor
-    :param float q: notch Sensitivity
-
-    :returns: dynamic stress concentration factor
-    :rtype: float
-    """
-    return 1 + q * (Kt - 1)
-
-
-def calc_thread_kf(grade):
-    if 3.6 <= grade <= 5.8:
-        return {"Rolled Threads": 2.2, "Cut Threads": 2.8, "fillet": 2.1}
-    elif 6.6 <= grade <= 10.9:
-        return {"Rolled Threads": 3, "Cut Threads": 3.8, "fillet": 2.3}
-    else:
-        raise ValueError(f"Grade entered is {grade} but grade can only be in the range of"
-                         f"3.6 to 5.8 or 6.6 to 0.9")
-
-
 class FatigueAnalysis:
     """Perform fatigue analysis"""
 
@@ -42,8 +20,7 @@ class FatigueAnalysis:
                  mean_bending_stress=0, mean_normal_stress=0, mean_torsion_stress=0):
         """ Instantiating fatigue object
         Note: all stresses are in [MPa]
-
-        :param fatigue_analysis.EnduranceLimit endurance_limit: EnduranceLimit object containing
+        :param EnduranceLimit endurance_limit: EnduranceLimit object containing
         the modified Se
         :param bool ductile: True if material is ductile
         :param float Sy: Yield strength in [Mpa]
@@ -73,6 +50,41 @@ class FatigueAnalysis:
         self.mean_torsion_stress = mean_torsion_stress
         self.alt_eq_stress = self.calc_alt_eq_stress()
         self.mean_eq_stress = self.calc_mean_eq_stress()
+
+    @staticmethod
+    def calc_kf(q, Kt):
+        """Calculating the dynamic stress concentration factor (Kf)
+        (this calculation is the same for the shear concentration factor)
+
+        :param float Kt: stress concentration theoretical factor
+        :param float q: notch Sensitivity
+
+        :returns: dynamic stress concentration factor
+        :rtype: float
+        """
+        return 1 + q * (Kt - 1)
+
+    @staticmethod
+    def calc_thread_kf(grade, manufacturing):
+        """Calculating the dynamic stress concentration factor (Kf) for threads
+
+        :param float grade: The grade of the bolt
+        :param string manufacturing: Manufacturing methode 'Rolled Threads' or 'Cut Threads'
+
+        :returns: dynamic stress concentration factor for threads
+        :rtype: float
+        """
+        if manufacturing != "Rolled Threads" and manufacturing != "Cut Threads":
+            raise ValueError(f"The only exceptable manufacturing methods are 'Rolled Threads' and "
+                             f"'Cut Threads'")
+        if 3.6 <= grade <= 5.8:
+            options = {"Rolled Threads": 2.2, "Cut Threads": 2.8}
+        elif 6.6 <= grade <= 10.9:
+            options = {"Rolled Threads": 3, "Cut Threads": 3.8}
+        else:
+            raise ValueError(f"Grade entered is {grade} but grade can only be in the range of"
+                             f"3.6 to 5.8 or 6.6 to 0.9")
+        return options[manufacturing]
 
     def calc_alt_eq_stress(self):
         """Returns the alternating equivalent stress according to the load type indicated by Kc
@@ -156,8 +168,8 @@ class FatigueAnalysis:
         :raises ValueError: if ultimate_tensile_strength is not in the fatigue call
         """
 
-        if self.Sut is None:
-            raise ValueError("ultimate_tensile_strength is None")
+        if self.mean_eq_stress < 0:
+            return None
 
         ultimate_strength = self.Sut
         if self.Kc == 0.59:
@@ -179,8 +191,8 @@ class FatigueAnalysis:
         :raises ValueError: if Sy is not in the fatigue call
         """
 
-        if self.Sy is None:
-            raise ValueError("Sy is None")
+        if self.mean_eq_stress < 0:
+            return None
 
         yield_strength = self.Sy
         if self.Kc == 0.59:
@@ -201,8 +213,8 @@ class FatigueAnalysis:
         :raises ValueError: if ultimate_tensile_strength is not in the fatigue call
         """
 
-        if self.Sut is None:
-            raise ValueError("ultimate_tensile_strength is None")
+        if self.mean_eq_stress < 0:
+            return None
 
         ultimate_strength = self.Sut
         if self.Kc == 0.59:
@@ -223,8 +235,8 @@ class FatigueAnalysis:
         :raises ValueError: if ultimate_tensile_strength is not in the fatigue call
         """
 
-        if self.Sut is None:
-            raise ValueError("ultimate_tensile_strength is None")
+        if self.mean_eq_stress < 0:
+            return None
 
         yield_strength = self.Sut
         if self.Kc == 0.59:
@@ -245,9 +257,6 @@ class FatigueAnalysis:
         :raises ValueError: if Sy is not in the fatigue call
         """
 
-        if self.Sy is None:
-            raise ValueError("Sy is None")
-
         yield_strength = self.Sy
         if self.Kc == 0.59:
             # yield_strength correction for shear stress
@@ -258,51 +267,29 @@ class FatigueAnalysis:
                                                    self.alt_eq_stress,
                                                    self.mean_eq_stress)
 
-    def get_safety_factor(self, criterion, verbose=False):
+    def get_safety_factors(self, criterion, verbose=False):
         """Returns dynamic and static safety factors
         according to the quadrant in the alternating-mean
         stress plain where the stresses are in
 
         Note: Should always be used instead of accessing the
-        individual safety factors properties directly
+        individual safety factors properties directly because it takes into account the
+        stress direction
 
-        :param str criterion: The criterion to use
+        :param str criterion: The criterion to use (modified goodman, soderberg, gerber,
+         asme-elliptic)
         :param bool verbose: Print the result
 
         :returns: dynamic and static safety factors
         :rtype: tuple[float, float]
         """
 
-        if self.mean_eq_stress > 0:
-            # stress is in the first quadrant of the alternating-mean stress plan
-            safety_factors = {'modified goodman': self.modified_goodman,
-                              'soderberg': self.soderberg,
-                              'gerber': self.gerber, 'asme-elliptic': self.ASME_elliptic}
-
-            nF = safety_factors.get(criterion.lower(), 'Error')
-
-            if nF == 'Error':
-                raise ValueError(f"Unknown criterion - {criterion}\n"
-                                 f"Available criteria: 'Modified Goodman', 'Soderberg',"
-                                 f"'Gerber', 'ASME-elliptic'")
-
-            msg = f"the {criterion} safety factor is: {nF}\n"
-
-        else:
-            # stress is in the second quadrant of the alternating-mean stress plan
-            nF = self.Se / self.alt_eq_stress
-            msg = f"the dynamic safety factor is: {nF}\n"
-
-        nl = self.langer_static_yield
-
-        if verbose:
-            print(msg + f"the Langer static safety factor is: {nl}")
-
-        return nF, nl
+        return FailureCriteria.get_safety_factors(self.Sy, self.Sut, self.Se, self.alt_eq_stress,
+                                                  self.mean_eq_stress, criterion, verbose)
 
     @property
     def Sm_stress(self):
-        """Getter for the Sm_stress property
+        """Getter for the Sm_stress (at 1e3 cycles) property
 
         :returns: Sm - stress at 1e3 cycles
         :rtype: float
