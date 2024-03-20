@@ -21,7 +21,7 @@ class ThreadedFastener:
         :param list[list] layers: lists of layers thicknesses and elastic modulus
         e.g. [[10,207e3], [5,70e3], [5,207e3]]
         :param bool nut: True if a nut is used, False if the last layer is threaded
-        :param float or none preload: The initial load on the bolt
+        :param float or none preload: The initial load on the bolt (estimated if None)
         """
 
         self.bolt = bolt
