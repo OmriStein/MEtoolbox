@@ -17,37 +17,27 @@ class FailureCriteria:
         :returns: Safety factor
         :rtype: any
 
-        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call
+        :raises Exception: if mean equivalent stress is negative
         """
         if mean_eq_stress < 0:
-            raise Exception("Not valid when the mean equivalent stress is negative,"
-                            "use get_safety_factor method instead ")
+            raise ValueError("Not valid when the mean equivalent stress is negative")
 
-        try:
-            return 1 / ((alt_eq_stress / endurance_limit) + (
-                    mean_eq_stress / ultimate_strength))
-        except TypeError:
-            return None
+        return 1 / ((alt_eq_stress / endurance_limit) + (mean_eq_stress / ultimate_strength))
 
     @staticmethod
     def soderberg(yield_strength, endurance_limit, alt_eq_stress, mean_eq_stress):
         """Safety factor according to Soderberg failure criterion
-        (the safest criterion)
+        Soderberg criterion guards against any yielding, but is biased low (the safest criterion)
 
         :returns: Safety factor
         :rtype: any
 
-        :raises ValueError: if Sy is not in the fatigue call
+        :raises Exception: if mean equivalent stress is negative
         """
         if mean_eq_stress < 0:
-            raise Exception("Not valid when the mean equivalent stress is negative,"
-                            "use get_safety_factor method instead ")
+            raise ValueError("Not valid when the mean equivalent stress is negative")
 
-        try:
-            return 1 / ((alt_eq_stress / endurance_limit) + (
-                    mean_eq_stress / yield_strength))
-        except TypeError:
-            return None
+        return 1 / ((alt_eq_stress / endurance_limit) + (mean_eq_stress / yield_strength))
 
     @staticmethod
     def gerber(ultimate_strength, endurance_limit, alt_eq_stress, mean_eq_stress):
@@ -56,18 +46,14 @@ class FailureCriteria:
 
         :returns: Safety factor
         :rtype: any
-        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call
+        :raises Exception: if mean equivalent stress is negative
         """
         if mean_eq_stress < 0:
-            raise Exception("Not valid when the mean equivalent stress is negative,"
-                            "use get_safety_factor method instead ")
+            raise ValueError("Not valid when the mean equivalent stress is negative")
 
-        try:
-            alpha = ultimate_strength / mean_eq_stress
-            beta = alt_eq_stress / endurance_limit
-            return 0.5 * alpha ** 2 * beta * (-1 + sqrt(1 + 4 * alpha ** (-2) * beta ** (-2)))
-        except TypeError:
-            return None
+        alpha = ultimate_strength / mean_eq_stress
+        beta = alt_eq_stress / endurance_limit
+        return 0.5 * alpha ** 2 * beta * (-1 + sqrt(1 + 4 * alpha ** (-2) * beta ** (-2)))
 
     @staticmethod
     def asme_elliptic(yield_strength, endurance_limit, alt_eq_stress,
@@ -77,16 +63,13 @@ class FailureCriteria:
         :returns: Safety factor
         :rtype: any
 
-        :raises ValueError: if ultimate_tensile_strength is not in the fatigue call
+        :raises Exception: if mean equivalent stress is negative
         """
         if mean_eq_stress < 0:
-            raise Exception("Not valid when the mean equivalent stress is negative,"
-                            "use get_safety_factor method instead ")
-        try:
-            return sqrt(1 / ((alt_eq_stress / endurance_limit) ** 2 + (
-                    mean_eq_stress / yield_strength) ** 2))
-        except TypeError:
-            return None
+            raise ValueError("Not valid when the mean equivalent stress is negative")
+
+        return sqrt(1 / ((alt_eq_stress / endurance_limit) ** 2 + (
+                mean_eq_stress / yield_strength) ** 2))
 
     @staticmethod
     def langer_static_yield(yield_strength, alt_eq_stress, mean_eq_stress):
@@ -95,30 +78,23 @@ class FailureCriteria:
 
         :returns: Safety factor
         :rtype: any
-
-        :raises ValueError: if Sy is not in the fatigue call
         """
-        try:
-            if mean_eq_stress > 0:
-                # stress is in the first quadrant of the alternating-mean stress plan
-                return yield_strength / (alt_eq_stress + mean_eq_stress)
-            else:
-                # stress is in the second quadrant of the alternating-mean stress plan
-                return yield_strength / (alt_eq_stress - mean_eq_stress)
-
-        except TypeError:
-            return None
+        if mean_eq_stress > 0:
+            # stress is in the first quadrant of the alternating-mean stress plan
+            return yield_strength / (alt_eq_stress + mean_eq_stress)
+        else:
+            # stress is in the second quadrant of the alternating-mean stress plan
+            return yield_strength / (alt_eq_stress - mean_eq_stress)
 
     @staticmethod
-    def get_safety_factor(yield_strength, ultimate_strength, endurance_limit,
-                          alt_eq_stress, mean_eq_stress, criterion, verbose=False):
+    def get_safety_factors(yield_strength, ultimate_strength, endurance_limit,
+                           alt_eq_stress, mean_eq_stress, criterion, verbose=False):
         """Returns dynamic and static safety factors
         according to the quadrant in the alternating-mean
         stress plain where the stresses are in
 
-        Note: Should always be used instead of accessing the
-        individual safety factors properties directly
-
+        Note: Takes into account the stress direction and offer alternative calculation
+        in case the mean equivalent stress is negative
         :param str criterion: The criterion to use
         :param float yield_strength: The yield strength (Sy or Ssy)
         :param float ultimate_strength: The yield strength (Sut or Ssu)
@@ -139,43 +115,26 @@ class FailureCriteria:
                 'soderberg': FailureCriteria.soderberg(yield_strength, *args),
                 'gerber': FailureCriteria.gerber(ultimate_strength, *args),
                 'asme-elliptic': FailureCriteria.asme_elliptic(yield_strength, *args)}
+            try:
+                fatigue_safety_factor = safety_factors[criterion.lower()]
 
-            nF = safety_factors.get(criterion.lower(), 'Error')
-
-            if nF == 'Error':
-                raise ValueError(f"Unknown criterion - {criterion}\n"
-                                 "Available criteria: 'Modified Goodman', 'Soderberg',"
-                                 "'Gerber', 'ASME-elliptic'")
+            except KeyError:
+                raise Exception(f"Unknown criterion - {criterion}\n"
+                                f"Available criteria are: 'Modified Goodman', 'Soderberg',"
+                                f"'Gerber', 'ASME-elliptic'")
 
         else:
             # stress is in the second quadrant of the alternating-mean stress plan
             if verbose:
                 print(f"NOTE: The mean stress = {mean_eq_stress} "
                       f"is negative, using alternative calculation")
-            nF = endurance_limit / alt_eq_stress
+            fatigue_safety_factor = endurance_limit / alt_eq_stress
             criterion = 'fatigue'
 
-        nl = FailureCriteria.langer_static_yield(yield_strength, alt_eq_stress, mean_eq_stress)
-
+        static_safety_factor = FailureCriteria.langer_static_yield(yield_strength, alt_eq_stress,
+                                                                   mean_eq_stress)
         if verbose:
-            if nl is None:
-                print("Couldn't calculate Langer static safety factor,"
-                      "the yield_strength is None")
+            print(f"the {criterion} safety factor is: {fatigue_safety_factor}\n"
+                  f"the Langer static safety factor is: {static_safety_factor}")
 
-            if nF is None:
-                if yield_strength is None:
-                    print(f"Couldn't calculate {criterion} static safety factor, "
-                          f"the yield_strength is None")
-                elif ultimate_strength is None:
-                    print(f"Couldn't calculate {criterion} static safety factor, "
-                          f"the ultimate_strength is None")
-
-            if nF is not None and nl is not None:
-                print(f"the {criterion} safety factor is: {nF}\n"
-                      f"the Langer static safety factor is: {nl}")
-            elif nF is None and nl is not None:
-                print(f"the Langer static safety factor is: {nl}")
-            elif nl is None and nF is not None:
-                print(f"the {criterion} safety factor is: {nF}\n")
-
-        return nF, nl
+        return fatigue_safety_factor, static_safety_factor
