@@ -473,13 +473,13 @@ class ExtensionSpring(Spring):
         Sut = self.ultimate_tensile_strength
 
         try:
-            nf_hook_normal, _ = FailureCriteria.get_safety_factor(Sy_end, Sut, Se,
-                                                                  alt_normal_stress,
-                                                                  mean_normal_stress, criterion)
+            nf_hook_normal, _ = FailureCriteria.get_safety_factors(Sy_end, Sut, Se,
+                                                                   alt_normal_stress,
+                                                                   mean_normal_stress, criterion)
 
-            nf_hook_shear, _ = FailureCriteria.get_safety_factor(Ssy_end, Ssu, Sse,
-                                                                 alt_shear_stress,
-                                                                 mean_shear_stress, criterion)
+            nf_hook_shear, _ = FailureCriteria.get_safety_factors(Ssy_end, Ssu, Sse,
+                                                                  alt_shear_stress,
+                                                                  mean_shear_stress, criterion)
         except TypeError as typ_err:
             raise ValueError(f"Fatigue analysis can't handle symbolic vars") from typ_err
 
@@ -488,9 +488,9 @@ class ExtensionSpring(Spring):
         alt_body_shear_stress = self.calc_max_shear_stress(alt_force, self.hook_KB)
         mean_body_shear_stress = (mean_force / alt_force) * alt_shear_stress
 
-        nf_body, ns_body = FailureCriteria.get_safety_factor(Ssy_body, Ssu, Sse,
-                                                             alt_body_shear_stress,
-                                                             mean_body_shear_stress, criterion)
+        nf_body, ns_body = FailureCriteria.get_safety_factors(Ssy_body, Ssu, Sse,
+                                                              alt_body_shear_stress,
+                                                              mean_body_shear_stress, criterion)
 
         if verbose:
             print(f"Alternating force = {alt_force}, Mean force = {mean_force}\n"
