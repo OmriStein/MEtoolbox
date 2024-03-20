@@ -533,8 +533,8 @@ class HelicalPushSpring(Spring):
         Sse = self.shear_endurance_limit(reliability, metric)
         Ssu = self.shear_ultimate_strength
         Ssy = self.shear_yield_strength
-        nf, nl = FailureCriteria.get_safety_factor(Ssy, Ssu, Sse, alt_shear_stress,
-                                                   mean_shear_stress, criterion)
+        nf, nl = FailureCriteria.get_safety_factors(Ssy, Ssu, Sse, alt_shear_stress,
+                                                    mean_shear_stress, criterion)
         if verbose:
             print(f"Alternating force = {alternating_force}, Mean force = {mean_force}\n"
                   f"Alternating shear stress = {alt_shear_stress},"

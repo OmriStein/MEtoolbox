@@ -383,7 +383,7 @@ class HelicalTorsionSpring(Spring):
         Se = Sse / 0.577  # based on the distortion energy method
         Sut = self.ultimate_tensile_strength
         Sy = self.yield_strength
-        nf, nl = FailureCriteria.get_safety_factor(Sy, Sut, Se, alt_stress, mean_stress, criterion)
+        nf, nl = FailureCriteria.get_safety_factors(Sy, Sut, Se, alt_stress, mean_stress, criterion)
         if verbose:
             print(f"Alternating moment = {alt_moment}, Mean moment = {mean_moment}\n"
                   f"Alternating stress = {alt_stress}, Mean stress = {mean_stress}\n"
