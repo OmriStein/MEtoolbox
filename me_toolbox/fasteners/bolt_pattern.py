@@ -2,12 +2,16 @@
 from numpy import array, cross, dot, sqrt
 from numpy.linalg import norm
 
+from me_toolbox.fatigue import FatigueAnalysis
 # from me_toolbox.fatigue import EnduranceLimit, FatigueAnalysis
 # from me_toolbox.fasteners import Bolt, ThreadedFastener
 from me_toolbox.tools import print_atributes
 
 
 class BoltPattern:
+    def __repr__(self):
+        return f"BoltPattern({self.fasteners})"
+
     def __init__(self, fasteners, fasteners_locations, force, force_location,
                  axis_of_rotation, shear_location):
         """Initialize bolt pattern
@@ -22,8 +26,7 @@ class BoltPattern:
                 :param string shear_location: Where along the volt the shear is felt, shank or thread
                 used to determine what area value to use
                 """
-        # TODO: Add function to calculate fastener location for standard shapes
-        # TODO: Add Fatigue calculation
+
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
         self.force = force
@@ -64,7 +67,8 @@ class BoltPattern:
 
     @property
     def total_shear_force(self):
-        """the total shear force on bolt from the direct force and resulting torque (Fi)"""
+        """the total shear force on bolt from the direct shear force and resulting torque
+        (Fi = Fvi+FGi)"""
         return [i + j for i, j in zip(self.direct_shear_force, self.torque_shear_force)]
 
     @property
@@ -234,3 +238,56 @@ class BoltPattern:
                 print(f"{fastener} - np = {np[i]:.2f}")
             print("")
         return min(np) if minimal_value else np
+
+    def variable_loading_stresses(self, Fmin, Fmax):
+        force = self.force
+        self.force = Fmin
+        min_normal_stress = array(self.normal_stress)
+        min_shear_stress = array(self.shear_stress)
+        self.force = Fmax
+        max_normal_stress = array(self.normal_stress)
+        max_shear_stress = array(self.shear_stress)
+
+        alt_normal_stress = (max_normal_stress - min_normal_stress) / 2
+        alt_shear_stress = (max_shear_stress - min_shear_stress) / 2
+        mean_normal_stress = (max_normal_stress + min_normal_stress) / 2
+        mean_shear_stress = (max_shear_stress + min_shear_stress) / 2
+
+        self.force = force
+
+        return alt_normal_stress, alt_shear_stress, mean_normal_stress, mean_shear_stress
+
+    def variable_equivalent_stresses(self, endurance_limit, Fmin, Fmax):
+        alt_normal_stress, alt_shear_stress, mean_normal_stress, mean_shear_stress = \
+            self.variable_loading_stresses(Fmin, Fmax)
+        variable_eq_stresses = []
+        for i, fastener in enumerate(self.fasteners):
+            analysis = FatigueAnalysis(endurance_limit=endurance_limit[i], ductile=True,
+                                       Sy=fastener.bolt.yield_strength,
+                                       Kf_normal=fastener.bolt.Kf,
+                                       Kf_torsion=fastener.bolt.Kf,
+                                       alt_normal_stress=alt_normal_stress[i],
+                                       alt_torsion_stress=alt_shear_stress[i],
+                                       mean_normal_stress=mean_normal_stress[i],
+                                       mean_torsion_stress=mean_shear_stress[i])
+            variable_eq_stresses.append([analysis.mean_eq_stress, analysis.alt_eq_stress])
+        return variable_eq_stresses
+
+    def fatigue_safety_factor(self, endurance_limits, Fmin, Fmax, verbose=False):
+        variable_eq_stress = self.variable_equivalent_stresses(endurance_limits, Fmin, Fmax)
+
+        nf = []
+        ns = []
+        for i, fastener in enumerate(self.fasteners):
+            preload_stress = fastener.preload / fastener.bolt.stress_area
+            mean_stress = variable_eq_stress[i][0]
+            alt_stress = variable_eq_stress[i][1]
+            Sut = fastener.bolt.tensile_strength
+            Se = endurance_limits[i].modified
+            Sp = fastener.bolt.proof_strength
+            if verbose:
+                print(f"σi={preload_stress}, σa={alt_stress}, σm={mean_stress}, Sut={Sut}, Se={Se}")
+            nf.append((Se * (Sut - preload_stress)) /
+                      (Sut * alt_stress + Se * (mean_stress - preload_stress)))
+            ns.append(Sp/(mean_stress+alt_stress))
+        return nf, ns
