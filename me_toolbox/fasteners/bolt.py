@@ -15,7 +15,7 @@ class Bolt:
         return f"Bolt({self.diameter}x{self.pitch}x{self.length})"
 
     def __init__(self, diameter, pitch, length, thread_length,
-                 yield_strength, tensile_strength, proof_strength, elastic_modulus, ):
+                 yield_strength, tensile_strength, proof_strength, elastic_modulus, Kf=None ):
         """Initialise Bolt object
         :param float diameter: nominal diameter
         :param float pitch: Thread's pitch
@@ -35,7 +35,7 @@ class Bolt:
         self.tensile_strength = tensile_strength
         self.proof_strength = proof_strength
         self.elastic_modulus = elastic_modulus
-
+        self.Kf = Kf
     def get_info(self):
         """print all the bolt's properties"""
         print_atributes(self)
@@ -111,46 +111,29 @@ class Bolt:
     def torque2preload(self, torque):
         pass
 
-    def endurance_limit(self, grade, material, surface_finish, temp, reliability):
-        """Calculate the endurance limit
-        :param string grade: the grade or class of the bolt
-        :param string material: the bolt's material
-            options:['steel', 'iron', 'aluminium', 'copper alloy']
+    def endurance_limit(self, unmodified_Se, surface_finish, temp, reliability):
+        """Calls the EnduranceLimit class with the right parameters for a bolt
+        :param float unmodified_Se: Unmodified endurance strength
         :param string surface_finish: the bolt's surface finish
             options:['ground', 'machined', 'cold-drawn', 'hot-rolled', 'as forged']
         :param float temp: The bolt's operating temperature in deg C
         :param float reliability: bolt's reliability
+
+        :returns: An endurance limit object
+        :rtype: EnduranceLimit
         """
-        materials = ['steel', 'iron', 'aluminium', 'copper alloy']
         finishes = ['ground', 'machined', 'cold-drawn', 'hot-rolled', 'as forged']
 
-        if material not in materials:
-            raise Exception(f"The material({material}) is not one of the acceptable"
-                            f"materials[{materials}]")
-
-        if material not in materials:
+        if surface_finish not in finishes:
             raise Exception(f"The surface finish({surface_finish}) is not one of the acceptable"
                             f"surface finishes[{finishes}]")
 
-        Se = EnduranceLimit(Sut=self.tensile_strength, surface_finish=surface_finish,
+        Se = EnduranceLimit(unmodified_Se, Sut=self.tensile_strength, surface_finish=surface_finish,
                             rotating=False, max_normal_stress=1, max_bending_stress=0,
                             stress_type='multiple', temp=temp,
-                            reliability=reliability, material=material,
-                            diameter=self.stress_area)
-
-        se_vals = {'5': (18.6, 16.3), '7': 20.6, '8': 23.2, '8.8': 129, '9.8': 140, '10.9': 162,
-                   '12.9': 190}
-
-        if grade in se_vals:
-            if grade == '5':
-                if 0.25 < self.diameter < 1:
-                    return se_vals['5'][0] * Se.Kd * Se.Ke
-                else:
-                    return se_vals['5'][1] * Se.Kd * Se.Ke
-            else:
-                return se_vals[grade] * Se.Kd * Se.Ke
-        else:
-            return Se.modified
+                            reliability=reliability,
+                            diameter=sqrt((4*self.stress_area)/pi))
+        return Se
 
     @staticmethod
     def get_strength_prop(diameter, grade):
