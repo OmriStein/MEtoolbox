@@ -1,4 +1,4 @@
-from me_toolbox.fatigue import stress, EnduranceLimit, calc_kf, FatigueAnalysis
+from me_toolbox.fatigue import stress, EnduranceLimit, FatigueAnalysis
 from math import pi, sqrt
 
 Sut = 900  # [Mpa]
@@ -36,8 +36,8 @@ print(f"Se'={endurance_limit.unmodified}, Se={endurance_limit.modified:.2f}")
 endurance_limit.get_factors()
 
 # dynamic stress concentration factors
-Kf = calc_kf(0.9, 1.32)
-Kfs = calc_kf(0.95, 1.12)
+Kf = FatigueAnalysis.calc_kf(0.9, 1.32)
+Kfs = FatigueAnalysis.calc_kf(0.95, 1.12)
 
 print(f"Kf={Kf:.3f}, Kfs={Kfs:.3f}")
 
@@ -48,10 +48,10 @@ fatigue_analysis = FatigueAnalysis(endurance_limit=endurance_limit, ductile=True
 print(f"Mean Equivalent Stress={fatigue_analysis.mean_eq_stress}\n"
       f"Alternating Equivalent Stress={fatigue_analysis.alt_eq_stress}\n")
 
-nF, nl = fatigue_analysis.get_safety_factor('Modified Goodman', verbose=True)
-soderberg_nF, _ = fatigue_analysis.get_safety_factor('Soderberg')
-gerber_nF, _ = fatigue_analysis.get_safety_factor('gerber')
-asme_nF, _ = fatigue_analysis.get_safety_factor('asme-elliptic')
+nF, nl = fatigue_analysis.get_safety_factors('Modified Goodman', verbose=True)
+soderberg_nF, _ = fatigue_analysis.get_safety_factors('Soderberg')
+gerber_nF, _ = fatigue_analysis.get_safety_factors('gerber')
+asme_nF, _ = fatigue_analysis.get_safety_factors('asme-elliptic')
 print(f"soderberg={soderberg_nF} \ngerber={gerber_nF} \nasme={asme_nF}\n")
 
 # miner for time to failure every group is of the following structure:

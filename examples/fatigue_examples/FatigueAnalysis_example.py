@@ -1,7 +1,8 @@
 from math import pi
 from sympy import symbols, solveset, Eq
 from sympy.sets import Reals
-from me_toolbox.fatigue import *
+from me_toolbox.fatigue import EnduranceLimit, FatigueAnalysis
+from me_toolbox.fatigue import uniform_stress, torsion_stress
 
 
 # Normal load: N=F*(0.5+sin(wt))
@@ -47,8 +48,8 @@ endurance_limit.get_factors()
 
 
 # dynamic stress concentration factors
-Kf = calc_kf(0.7, 2.35)
-Kfs = calc_kf(0.75, 1.73)
+Kf = FatigueAnalysis.calc_kf(0.7, 2.35)
+Kfs = FatigueAnalysis.calc_kf(0.75, 1.73)
 
 print(f"Kf={Kf:.3f}, Kfs={Kfs:.3f}")
 
@@ -83,7 +84,7 @@ F3 = F2.subs(nF, 2)
 print(f"Langer static safety factor= {fatigue_analysis.langer_static_yield.subs(F, F3):.2f} for F= {F3:.2f}[N]")
 
 # using the get safety factor method
-nF, nl = fatigue_analysis.get_safety_factor('modified Goodman')
+nF, nl = fatigue_analysis.get_safety_factors('modified Goodman')
 print(f"Safety factors for infinite cycles: nF={nF.subs(F, 6e3)}, nl={nl.subs(F, 6e3)}")
 
 # calculating the number of cycles until failure for F=6000
