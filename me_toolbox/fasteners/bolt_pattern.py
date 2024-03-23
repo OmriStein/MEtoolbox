@@ -2,9 +2,7 @@
 from numpy import array, cross, dot, sqrt
 from numpy.linalg import norm
 
-from me_toolbox.fatigue import FatigueAnalysis
-# from me_toolbox.fatigue import EnduranceLimit, FatigueAnalysis
-# from me_toolbox.fasteners import Bolt, ThreadedFastener
+from me_toolbox.fatigue import FatigueAnalysis, EnduranceLimit
 from me_toolbox.tools import print_atributes
 
 
@@ -240,6 +238,14 @@ class BoltPattern:
         return min(np) if minimal_value else np
 
     def variable_loading_stresses(self, Fmin, Fmax):
+        """
+        Returns the alternating and mean normal and shear stresses
+            :param list[float] Fmin: Minimum force
+            :param list[float] Fmax: Maximum force
+            :return:A List of the alternating normal stress, a List of the alternating shear stress,
+            a List of the mean normal stress and a List of the mean shear stress
+            :rtype: list[list[float],list[float],list[float],list[float]]
+        """
         force = self.force
         self.force = Fmin
         min_normal_stress = array(self.normal_stress)
@@ -258,6 +264,16 @@ class BoltPattern:
         return alt_normal_stress, alt_shear_stress, mean_normal_stress, mean_shear_stress
 
     def variable_equivalent_stresses(self, endurance_limit, Fmin, Fmax):
+        """Returns the mean and alternating equivalent stress (σ_eq_a and σ_eq_m)
+            :param list[EnduranceLimit] endurance_limit: List of the pattern's bolts
+            endurance limit objects
+            :param list[float] Fmin: Minimum force
+            :param list[float] Fmax: Maximum force
+
+            :returns: list of mean and alternating equivalent stresses pairs for each of the
+            pattern's bolts
+            :rtype: list[list[float,float]]
+        """
         alt_normal_stress, alt_shear_stress, mean_normal_stress, mean_shear_stress = \
             self.variable_loading_stresses(Fmin, Fmax)
         variable_eq_stresses = []

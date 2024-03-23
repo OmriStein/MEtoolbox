@@ -7,22 +7,21 @@ from me_toolbox.fasteners import BoltPattern
 diameter, pitch, length, threaded_length, grade, E = 10, 1.5, 33, 26, '5.8', 207e3
 Sp, Sut, Sy = Bolt.get_strength_prop(diameter, grade)
 M10 = Bolt(diameter, pitch, length, threaded_length, Sy, Sut, Sp, E)
-M10_fastener = ThreadedFastener(M10, [[10, 207e3], [50, 76e3]], nut=False)
+M10_fastener = ThreadedFastener(M10, [[10, 207e3], [50, 76e3]], nut=False, preload=18750)
 
 diameter, pitch, length, threaded_length, grade, E = 8, 1.25, 30, 22, '5.8', 207e3
 Sp, Sut, Sy = Bolt.get_strength_prop(diameter, grade)
 M8 = Bolt(diameter, pitch, length, threaded_length, Sy, Sut, Sp, E)
-M8_fastener = ThreadedFastener(M8, [[10, 207e3], [50, 76e3]], nut=False)
+M8_fastener = ThreadedFastener(M8, [[10, 207e3], [50, 76e3]], nut=False, preload=11812.5)
 
 fasteners = [M10_fastener, M10_fastener, M8_fastener, M8_fastener]
 fasteners_locations = [[-20, 20, 0], [-20, -20, 0], [-61, 0, 0], [-85, 0, 0]]
 force = [0, 0, -8140]
-preloads = [18750, 18750, 11812.5, 11812.5]
 force_location = [40, 0, 0]
 
 axis_of_rotation = [[0, 0], [0, 1]]
-pattern = BoltPattern(fasteners, fasteners_locations, force, preloads, force_location,
-                      axis_of_rotation, 'shank')
+pattern = BoltPattern(fasteners, fasteners_locations, force, force_location, axis_of_rotation,
+                      'shank')
 
 M8_kb = (M8.nominal_area * M8.stress_area * M8.elastic_modulus) / (
         M8.nominal_area * M8_fastener.griped_thread_length + M8.stress_area * M8.shank_length)
@@ -51,12 +50,14 @@ print(f"M10_n0={M10_n0:.2f},M8_n0={M8_n0:.2f},M8_n0_2={M8_n0_2:.2f}")
 M10_np, _, M8_np, M8_np_2 = [round(i, 2) for i in pattern.proof_safety_factor(False)]
 print(f"M10_np={M10_np:.2f},M8_np={M8_np:.2f},M8_np_2={M8_np_2:.2f}")
 
-print("------------")
+print(f"The safety factor for proof strength is:{min(M10_np, M8_np, M8_np_2)}")
+print(f"The safety factor for Load strength is:{min(M10_nL, M8_nL, M8_nL_2)}")
+
+print("------Without the M10 bolts:------")
 fasteners2 = [M8_fastener, M8_fastener]
 fasteners_locations2 = [[-61, 0, 0], [-85, 0, 0]]
-preloads2 = [11812.5, 11812.5]
-pattern2 = BoltPattern(fasteners2, fasteners_locations2, force, preloads2, force_location,
-                       axis_of_rotation, 'shank')
+pattern2 = BoltPattern(fasteners2, fasteners_locations2, force, force_location, axis_of_rotation,
+                       'shank')
 
 print(f"Fi={pattern2.total_shear_force}\n\u03C4={pattern2.shear_stress}")
 print(f"P={pattern2.fastener_load}\nFb={pattern2.bolt_load}")
@@ -73,4 +74,12 @@ print(f"M8_n0={M8_n0:.2f},M8_n0_2={M8_n0_2:.2f}")
 M8_np, M8_np_2 = [round(i, 2) for i in pattern2.proof_safety_factor(False)]
 print(f"M8_np={M8_np:.2f},M8_np_2={M8_np_2:.2f}")
 
-print(pattern.neutral_point)
+print(f"The safety factor for proof strength is:{min(M8_np, M8_np_2)}")
+print(f"The safety factor for Load strength is:{min(M8_nL, M8_nL_2)}")
+
+print("------Neutral point:------")
+print("If the force is applied at the neutral point there are no eccentric moments")
+print(f"neutral point location: "
+      f"x={pattern.neutral_point[0]:.2f},"
+      f"y={pattern.neutral_point[1]},"
+      f"z={pattern.neutral_point[2]}")
