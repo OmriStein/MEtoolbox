@@ -65,6 +65,6 @@ M10.Kf = Kf
 M5.Kf = Kf
 variable_eq_stress = pattern.variable_equivalent_stresses([M10_Se, M10_Se, M5_Se], Fmin, Fmax)
 print(f"variable equivalent stresses: {variable_eq_stress}")
-
+#
 print(f"fatigue safety factor:{pattern.fatigue_safety_factor([M10_Se, M10_Se, M5_Se], Fmin, Fmax)}")
-
+#

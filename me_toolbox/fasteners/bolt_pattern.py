@@ -272,7 +272,7 @@ class BoltPattern:
 
             :returns: list of mean and alternating equivalent stresses pairs for each of the
             pattern's bolts
-            :rtype: list[list[float,float]]
+            :rtype: list[dict{'mean': float, 'alt': float}]
         """
         alt_normal_stress, alt_shear_stress, mean_normal_stress, mean_shear_stress = \
             self.variable_loading_stresses(Fmin, Fmax)
@@ -286,24 +286,35 @@ class BoltPattern:
                                        alt_torsion_stress=alt_shear_stress[i],
                                        mean_normal_stress=mean_normal_stress[i],
                                        mean_torsion_stress=mean_shear_stress[i])
-            variable_eq_stresses.append([analysis.mean_eq_stress, analysis.alt_eq_stress])
+            variable_eq_stresses.append({'mean': analysis.mean_eq_stress,
+                                         'alt': analysis.alt_eq_stress})
         return variable_eq_stresses
 
     def fatigue_safety_factor(self, endurance_limits, Fmin, Fmax, verbose=False):
+        """
+        Returns the fatigue(Goodman) and static(Langar) safety factors for each bolt
+        :param list[EnduranceLimit] endurance_limits: the EnduranceLimit object of each bolt
+        :param list[float] Fmin: Minimum force
+        :param list[float] Fmax: Maximum force
+        :param bool verbose: Print additional information
+        :return: A list of the fatigue and static safety factors pairs for each of the bolts
+        :rtype: list[dict{'fatigue': float, 'static': float}]
+        """
         variable_eq_stress = self.variable_equivalent_stresses(endurance_limits, Fmin, Fmax)
 
-        nf = []
-        ns = []
+        safety_factors = []
         for i, fastener in enumerate(self.fasteners):
             preload_stress = fastener.preload / fastener.bolt.stress_area
-            mean_stress = variable_eq_stress[i][0]
-            alt_stress = variable_eq_stress[i][1]
+            mean_stress = variable_eq_stress[i]['mean']
+            alt_stress = variable_eq_stress[i]['alt']
             Sut = fastener.bolt.tensile_strength
             Se = endurance_limits[i].modified
             Sp = fastener.bolt.proof_strength
             if verbose:
                 print(f"σi={preload_stress}, σa={alt_stress}, σm={mean_stress}, Sut={Sut}, Se={Se}")
-            nf.append((Se * (Sut - preload_stress)) /
-                      (Sut * alt_stress + Se * (mean_stress - preload_stress)))
-            ns.append(Sp/(mean_stress+alt_stress))
-        return nf, ns
+            nf = ((Se * (Sut - preload_stress)) /
+                  (Sut * alt_stress + Se * (mean_stress - preload_stress)))
+            ns = Sp/(mean_stress+alt_stress)
+            safety_factors.append({'fatigue': nf, 'static': ns})
+        return safety_factors
+
