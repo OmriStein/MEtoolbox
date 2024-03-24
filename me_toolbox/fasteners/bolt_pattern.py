@@ -8,29 +8,35 @@ from me_toolbox.tools import print_atributes
 
 class BoltPattern:
     def __repr__(self):
-        return f"BoltPattern({self.fasteners})"
+        return f"BoltPattern(fasteners={[str(fastener) for fastener in self.fasteners]}, " \
+               f"fasteners_locations={self.fasteners_locations}, " \
+               f"force={self.force}, force_location={self.force_location}, " \
+               f"axis_of_rotation={self.axis_of_rotation}, shear_location={self.shear_location})"
+
+    def __str__(self):
+        return f"Pattern({[str(fastener) for fastener in self.fasteners]})"
 
     def __init__(self, fasteners, fasteners_locations, force, force_location,
                  axis_of_rotation, shear_location):
         """Initialize bolt pattern
-                :param list[ThreadedFastener] fasteners: A List of threaded fasteners object
-                e.g. [M10_fastener, M10_fastener, M8_fastener, M8_fastener]
-                :param list[list] fasteners_locations: A list of coordinates for each of the
-                 fasteners locations
-                :param list force: The external force in vector form [x,y,z]
-                :param list force_location: The external force location in vector form [x,y,z]
-                :param list[list] axis_of_rotation: List of two points that describe the axis of
-                rotation
-                :param string shear_location: Where along the volt the shear is felt, shank or thread
-                used to determine what area value to use
-                """
+        :param list[ThreadedFastener] fasteners: A List of threaded fasteners object
+        e.g. [M10_fastener, M10_fastener, M8_fastener, M8_fastener]
+        :param list[list] fasteners_locations: A list of coordinates for each of the
+         fasteners locations
+        :param list force: The external force in vector form [x,y,z]
+        :param list force_location: The external force location in vector form [x,y,z]
+        :param list[list] axis_of_rotation: List of two points that describe the axis of
+        rotation
+        :param string shear_location: Where along the volt the shear is felt, shank or thread
+        used to determine what area value to use
+        """
 
         self.fasteners = fasteners
         self.fasteners_locations = fasteners_locations
         self.force = force
         self.preloads = [load.preload for load in self.fasteners]
         self.force_location = force_location
-        self.tilting_edge = axis_of_rotation
+        self.axis_of_rotation = axis_of_rotation
         self.shear_location = shear_location
 
     def get_info(self):
@@ -170,14 +176,14 @@ class BoltPattern:
         moment_around_H[2] = 0
 
         # finding bolts distances from rotation edge
-        edge_p1, edge_p2 = array(self.tilting_edge)
+        edge_p1, edge_p2 = array(self.axis_of_rotation)
         edge_vector = edge_p2 - edge_p1
         perpendicular_edge_vector = [-edge_vector[1], edge_vector[0]]
         edge_direction = perpendicular_edge_vector / norm(perpendicular_edge_vector)
         distance_from_edge = [cross(edge_vector, p0[:-1] - edge_p1) / norm(edge_vector) *
                               edge_direction for p0 in array(self.fasteners_locations)]
 
-        # edge = array(self.tilting_edge)
+        # edge = array(self.axis_of_rotation)
         # edge_direction = edge / norm(edge)
         # distance_from_edge = [edge + dot(r, edge_direction) * edge_direction for r in
         #                             array(self.fasteners_locations)]
