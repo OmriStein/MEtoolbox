@@ -58,6 +58,7 @@ M5_unmodified_Se = EnduranceLimit.unmodified_Se(M5_Sut, 'steel')
 M5_Se = M5.endurance_limit(M5_unmodified_Se, 'cold-drawn', temp=300, reliability=0.9)
 
 σa, τa, σm, τm = pattern.variable_loading_stresses(Fmin, Fmax)
+
 print(f"variable stresses:")
 print(f"σa = {σa},\nτa={τa},\nσm={σm},\nτm={τm}")
 Kf = FatigueAnalysis.calc_thread_kf(9.8, 'Rolled Threads')
@@ -65,6 +66,5 @@ M10.Kf = Kf
 M5.Kf = Kf
 variable_eq_stress = pattern.variable_equivalent_stresses([M10_Se, M10_Se, M5_Se], Fmin, Fmax)
 print(f"variable equivalent stresses: {variable_eq_stress}")
-#
 print(f"fatigue safety factor:{pattern.fatigue_safety_factor([M10_Se, M10_Se, M5_Se], Fmin, Fmax)}")
-#
+

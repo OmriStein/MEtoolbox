@@ -244,12 +244,23 @@ class BoltPattern:
             :param list[float] Fmax: Maximum force
             :return:A List of the alternating normal stress, a List of the alternating shear stress,
             a List of the mean normal stress and a List of the mean shear stress
-            :rtype: list[list[float],list[float],list[float],list[float]]
+            :rtype: dict{'alt_normal_stress': float,
+                         'alt_shear_stress': float,
+                         'mean_normal_stress': float,
+                         'mean_shear_stress': float}
         """
-        force = self.force
+        force = self.force  # saving the original force used in the class call
+
+        # setting the pattern force attribute as the minimum force and
+        # retrieving the minimum normal stress and the minimum shear stress
+        # from the updated class properties
         self.force = Fmin
         min_normal_stress = array(self.normal_stress)
         min_shear_stress = array(self.shear_stress)
+
+        # setting the pattern force attribute as the maximum force and
+        # retrieving the maximum normal stress and the maximum shear stress
+        # from the updated class properties
         self.force = Fmax
         max_normal_stress = array(self.normal_stress)
         max_shear_stress = array(self.shear_stress)
@@ -259,9 +270,12 @@ class BoltPattern:
         mean_normal_stress = (max_normal_stress + min_normal_stress) / 2
         mean_shear_stress = (max_shear_stress + min_shear_stress) / 2
 
-        self.force = force
+        self.force = force  # restoring the original force used in the class call
 
-        return alt_normal_stress, alt_shear_stress, mean_normal_stress, mean_shear_stress
+        return {'alt_normal_stress': alt_normal_stress,
+                'alt_shear_stress': alt_shear_stress,
+                'mean_normal_stress': mean_normal_stress,
+                'mean_shear_stress': mean_shear_stress}
 
     def variable_equivalent_stresses(self, endurance_limit, Fmin, Fmax):
         """Returns the mean and alternating equivalent stress (σ_eq_a and σ_eq_m)
@@ -275,7 +289,7 @@ class BoltPattern:
             :rtype: list[dict{'mean': float, 'alt': float}]
         """
         alt_normal_stress, alt_shear_stress, mean_normal_stress, mean_shear_stress = \
-            self.variable_loading_stresses(Fmin, Fmax)
+            self.variable_loading_stresses(Fmin, Fmax).values()
         variable_eq_stresses = []
         for i, fastener in enumerate(self.fasteners):
             analysis = FatigueAnalysis(endurance_limit=endurance_limit[i], ductile=True,
@@ -314,7 +328,6 @@ class BoltPattern:
                 print(f"σi={preload_stress}, σa={alt_stress}, σm={mean_stress}, Sut={Sut}, Se={Se}")
             nf = ((Se * (Sut - preload_stress)) /
                   (Sut * alt_stress + Se * (mean_stress - preload_stress)))
-            ns = Sp/(mean_stress+alt_stress)
+            ns = Sp / (mean_stress + alt_stress)
             safety_factors.append({'fatigue': nf, 'static': ns})
         return safety_factors
-
