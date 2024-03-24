@@ -12,19 +12,26 @@ class Bolt:
     angle = 60
 
     def __repr__(self):
+        return f"Bolt(diameter={self.diameter}, pitch={self.pitch}, length={self.length}, " \
+               f"thread_length={self.thread_length}, yield_strength={self.yield_strength}, " \
+               f"tensile_strength={self.tensile_strength}, proof_strength={self.proof_strength}, " \
+               f"elastic_modulus={self.elastic_modulus}, Kf={self.Kf})"
+
+    def __str__(self):
         return f"Bolt({self.diameter}x{self.pitch}x{self.length})"
 
     def __init__(self, diameter, pitch, length, thread_length,
-                 yield_strength, tensile_strength, proof_strength, elastic_modulus, Kf=None ):
+                 yield_strength, tensile_strength, proof_strength, elastic_modulus, Kf=None):
         """Initialise Bolt object
-        :param float diameter: nominal diameter
+        :param float diameter: Nominal diameter
         :param float pitch: Thread's pitch
-        :param float length: bolt's length
-        :param float thread_length: bolt's length
+        :param float length: Bolt's length
+        :param float thread_length: Bolt's length
         :param float yield_strength: Bolt's yield strength
         :param float tensile_strength: Bolt's tensile strength
-        :param float proof_strength: bolt's proof strength (if unknown use 85% of yield strength)
+        :param float proof_strength: Bolt's proof strength (if unknown use 85% of yield strength)
         :param float elastic_modulus: Bolt's elastic modulus
+        :param float Kf: Dynamic stress concentration factor
         """
         self.diameter = diameter
         self.pitch = pitch
@@ -36,6 +43,7 @@ class Bolt:
         self.proof_strength = proof_strength
         self.elastic_modulus = elastic_modulus
         self.Kf = Kf
+
     def get_info(self):
         """print all the bolt's properties"""
         print_atributes(self)
