@@ -13,6 +13,10 @@ from me_toolbox.tools import print_atributes
 class ThreadedFastener:
     # TODO: add pre-torque calculation
     def __repr__(self):
+        return f"ThreadedFastener(bolt={self.bolt}, layers={self.layers}, nut={self.nut}, " \
+               f"preload={self.preload})"
+
+    def __str__(self):
         return f"Fastener(M{self.bolt.diameter})"
 
     def __init__(self, bolt, layers, nut, preload=None):
