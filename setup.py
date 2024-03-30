@@ -18,7 +18,7 @@ setuptools.setup(
     classifiers=[
         'Development Status :: 1 - Planning',
         'Intended Audience :: Education',
-        'Topic :: Scientific/Engineering :: Mechanical Engineering',
+        'Topic :: Scientific/Engineering',
         'Programming Language :: Python :: 3.9',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
