@@ -186,7 +186,7 @@ class ThreadedFastener:
         """
         bolt_load = self.bolt_load(external_force)
         separation_safety_factor = self.preload / (external_force * (1 - self.fastener_stiffness))
-        load_safety_factor = (self.bolt.proof_load - self.preload) / bolt_load - self.preload
+        load_safety_factor = (self.bolt.proof_load - self.preload) / (bolt_load - self.preload)
         proof_safety_factor = self.bolt.proof_strength / bolt_load
         return {'n0': separation_safety_factor,
                 'nL': load_safety_factor,
