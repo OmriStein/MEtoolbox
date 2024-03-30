@@ -169,24 +169,25 @@ class ThreadedFastener:
         """The load on the bolt (Fb)"""
         return self.fastener_stiffness * external_force + self.preload
 
-    def member_load(self, bolt_load):
+    def member_load(self, external_force):
         """The load on the member (Fm)"""
-        return (1 - self.fastener_stiffness) * bolt_load - self.preload
+        return (1 - self.fastener_stiffness) * external_force - self.preload
 
-    @staticmethod
-    def bolt_stress(bolt_load, stress_area):
-        """Bolt stress from pure tension"""
-        return bolt_load/stress_area
+    def safety_factors(self, external_force):
+        """Safety factor for direct normal stress only
+        (not shear stress and not eccentric loading)
+        :param float external_force: The force acting on the fastener
 
-    def load_safety_factor(self, equivalent_stress):
-        """Safety factor for load (nL)"""
-        return (self.bolt.proof_load - self.preload) / (
-                (equivalent_stress * self.bolt.stress_area) - self.preload)
-
-    def separation_safety_factor(self, external_force):
-        """Safety factor against joint separation (n0)"""
-        return self.preload / (external_force * (1 - self.fastener_stiffness))
-
-    def proof_safety_factor(self, equivalent_stress):
-        """Safety factor for proof strength (np)"""
-        return self.bolt.proof_strength / equivalent_stress
+        :return: A dictionary with the static safety factors<br>
+                 n0 - Separation safety factor<br>
+                 nL - Load safety factor<br>
+                 np - Proof safety factor
+        :rtype: dict
+        """
+        bolt_load = self.bolt_load(external_force)
+        separation_safety_factor = self.preload / (external_force * (1 - self.fastener_stiffness))
+        load_safety_factor = (self.bolt.proof_load - self.preload) / bolt_load - self.preload
+        proof_safety_factor = self.bolt.proof_strength / bolt_load
+        return {'n0': separation_safety_factor,
+                'nL': load_safety_factor,
+                'np': proof_safety_factor}
