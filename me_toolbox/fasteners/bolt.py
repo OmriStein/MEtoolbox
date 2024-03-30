@@ -162,6 +162,8 @@ class Bolt:
                       '9.8': grade_prop(1.6, 16, 650, 900, 720),
                       '10.9': grade_prop(5, 36, 830, 1040, 940),
                       '12.9': grade_prop(1.6, 36, 970, 1220, 1100)}
+        if not isinstance(grade, str):
+            raise KeyError(f"The grade should be a string")
         if diameter < grade_list[grade].low or diameter > grade_list[grade].high:
             raise Exception(f"Diameter({diameter}) not in range([{grade_list[grade].low},"
                             f"{grade_list[grade].high}]) for this grade({grade})")
