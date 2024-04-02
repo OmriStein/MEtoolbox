@@ -10,8 +10,8 @@ from me_toolbox.tools import percent_to_decimal
 class HelicalPushSpring(Spring):
     """A helical push spring object"""
 
-    def __init__(self, max_force, wire_diameter, spring_diameter, end_type,
-                 shear_modulus, elastic_modulus, shear_yield_percent, Ap, m,
+    def __init__(self, max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
+                 end_type, shear_modulus, elastic_modulus, shear_yield_percent,
                  spring_constant=None, active_coils=None, free_length=None, density=None,
                  working_frequency=None, set_removed=False, shot_peened=False, anchors=None,
                  zeta=0.15):
@@ -21,8 +21,9 @@ class HelicalPushSpring(Spring):
         :param float or Symbol wire_diameter: spring wire diameter
         :param float or Symbol spring_diameter: spring diameter measured from
             the center point of the wire diameter
-        :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
-        :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
+        # :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
+        # :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
+        :param float ultimate_tensile_strength: Ultimate tensile strength of the material
         :param float shear_modulus: Shear modulus
         :param str end_type: what kind of ending the spring has
         :param float shear_yield_percent: yield percent used to estimate shear_yield_stress
@@ -45,8 +46,8 @@ class HelicalPushSpring(Spring):
         :returns: HelicalPushSpring
         """
 
-        super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus,
-                         elastic_modulus, shot_peened, density, working_frequency, Ap, m)
+        super().__init__(max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
+                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency)
 
         if set_removed:
             print("Note: set should ONLY be removed for static loading"

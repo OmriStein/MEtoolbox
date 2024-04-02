@@ -11,8 +11,9 @@ class ExtensionSpring(Spring):
     """An extension spring object"""
 
     def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter,
+                 ultimate_tensile_strength,
                  hook_r1, hook_r2, shear_modulus, elastic_modulus, body_shear_yield_percent,
-                 end_normal_yield_percent, end_shear_yield_percent, Ap, m, spring_constant=None,
+                 end_normal_yield_percent, end_shear_yield_percent, spring_constant=None,
                  active_coils=None, body_coils=None, shot_peened=False, free_length=None,
                  density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
@@ -22,8 +23,9 @@ class ExtensionSpring(Spring):
         :param float or Symbol wire_diameter: spring wire diameter
         :param float or Symbol spring_diameter: spring diameter measured from
             the center point of the wire diameter
-        :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
-        :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
+        # :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
+        # :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
+        :param float ultimate_tensile_strength: Ultimate tensile strength of the material
         :param float hook_r1: hook internal radius
         :param float hook_r2: hook bend radius
         :param float shear_modulus: Spring's material shear modulus
@@ -44,8 +46,8 @@ class ExtensionSpring(Spring):
         :returns: HelicalPushSpring
         """
 
-        super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus, elastic_modulus,
-                         shot_peened, density, working_frequency, Ap, m)
+        super().__init__(max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
+                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1

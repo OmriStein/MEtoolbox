@@ -1,6 +1,8 @@
 from me_toolbox.springs import HelicalPushSpring
 from sympy import symbols
 
+from springs import Spring
+
 G = 75e3  # [Mpa]
 d = symbols('diameter', real=True, positive=True, rational=True)
 C = 8  # the spring index C is defined as D/diameter
@@ -16,12 +18,14 @@ Fs = (1 + z) * Fmax
 print(f"Fsolid = {Fs}")
 
 # for music wire
-Ap = 2211
-m = 0.145
+Sut = Spring.material_prop('music wire', 6.5, metric=True, verbose=True)
+print(f"Sut={Sut:.2f}")
+
 
 spring = HelicalPushSpring(max_force=Fmax, wire_diameter=d, spring_diameter=D,
-                           shear_yield_percent=0.45, end_type='squared and ground', shear_modulus=G,
-                           Ap=Ap, m=m, elastic_modulus=205e3, spring_constant=6.189,
+                           ultimate_tensile_strength=Sut, shear_yield_percent=0.45,
+                           end_type='squared and ground', shear_modulus=G,
+                           elastic_modulus=205e3, spring_constant=6.189,
                            set_removed=False, shot_peened=True, anchors='fixed-hinged', zeta=0.25)
 
 # spring diameter for solid state safety factor of 1.5
@@ -39,8 +43,9 @@ nf, ns = spring.fatigue_analysis(575, 185, 99.999)
 print(f"fatigue safety factor={nf}, safety factor for first cycle={ns}\n")
 
 spring2 = HelicalPushSpring(max_force=Fmax, wire_diameter=6, spring_diameter=60,
-                            shear_yield_percent=0.45, end_type='squared and ground', shear_modulus=G,
-                            Ap=2211, m=0.145, elastic_modulus=205e3, spring_constant=6,
+                            ultimate_tensile_strength=Sut, shear_yield_percent=0.45,
+                            end_type='squared and ground', shear_modulus=G,
+                            elastic_modulus=205e3, spring_constant=6,
                             set_removed=False, shot_peened=True, anchors='fixed-hinged')
 print()
 print(f"static safety factor = {spring2.static_safety_factor()}")

@@ -19,12 +19,13 @@ class Spring:
         except AttributeError:
             return f"{self.__class__.__name__}(d={self.wire_diameter}, D={self.spring_diameter})"
 
-    def __init__(self, max_force, wire_diameter, spring_diameter,
-                 shear_modulus, elastic_modulus, shot_peened, density, working_frequency, Ap, m):
+    def __init__(self, max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
+                 shear_modulus, elastic_modulus, shot_peened, density, working_frequency):
         self.max_force = max_force
-        self.Ap, self.m = Ap, m
+        # self.Ap, self.m = Ap, m
         self._wire_diameter = wire_diameter
         self._spring_diameter = spring_diameter
+        self.ultimate_tensile_strength = ultimate_tensile_strength
         self.shear_modulus = shear_modulus
         self.elastic_modulus = elastic_modulus
         self.shot_peened = shot_peened
@@ -42,7 +43,7 @@ class Spring:
         return Spring(F, d, D, G, E, shot_peened, density, working_frequency, Ap, m)
 
     def get_info(self):
-        """print all of the spring properties"""
+        """print all the spring properties"""
         print_atributes(self)
 
     @property
@@ -75,10 +76,10 @@ class Spring:
         """
         return self.spring_diameter / self.wire_diameter
 
-    @property
-    def ultimate_tensile_strength(self):
-        """ Sut - ultimate tensile strength """
-        return self.Ap / (self.wire_diameter ** self.m)
+    # @property
+    # def ultimate_tensile_strength(self):
+    #     """ Sut - ultimate tensile strength """
+    #     return self.Ap / (self.wire_diameter ** self.m)
 
     @property
     def shear_ultimate_strength(self):
@@ -158,15 +159,16 @@ class Spring:
         return ((G * d) / (8 * C ** 3 * Na)) * ((2 * C ** 2) / (1 + 2 * C ** 2))
 
     @staticmethod
-    def material_prop(material, diameter, metric=True):
-        """Reads table A_and_m.csv from file and returns the
-        material properties Ap and m for Sut estimation
+    def material_prop(material, diameter, metric=True, verbose=False):
+        """Reads table A_and_m.csv from file and returns the Sut estimation from the material
+         properties Ap and m
 
         :param str material: The spring's material
         :param float diameter: Wire diameter
-        :param str metric: Metric or imperial
+        :param bool metric: Metric or imperial
+        :param bool verbose: Prints Values of A and m
 
-        :returns: Ap and m for Sut estimation
+        :returns: ultimate tensile strength (Sut)
         :rtype: (float, float)
         """
         # TODO: Find a way to work with symbolic diameter
@@ -187,7 +189,10 @@ class Spring:
             min_d = float(line['min_d_mm'] if metric else line['min_d_in'])
             max_d = float(line['max_d_mm'] if metric else line['max_d_in'])
             if line['type'] == material.lower() and min_d <= diameter <= max_d:
-                return float(line['A_mm'] if metric else line['A_in']), float(line['m'])
+                A, m = float(line['A_mm'] if metric else line['A_in']), float(line['m'])
+                if verbose:
+                    print(f"A={A}, m={m}")
+                return A / (diameter ** m)
 
         if material not in available_types:
             raise KeyError("The material is unknown")

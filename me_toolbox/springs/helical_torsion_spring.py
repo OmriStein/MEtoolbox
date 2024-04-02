@@ -10,8 +10,8 @@ from me_toolbox.tools import percent_to_decimal
 class HelicalTorsionSpring(Spring):
     """A Helical torsion spring object"""
 
-    def __init__(self, max_moment, wire_diameter, spring_diameter, leg1, leg2,
-                 shear_modulus, elastic_modulus, yield_percent, Ap, m,
+    def __init__(self, max_moment, wire_diameter, spring_diameter, ultimate_tensile_strength,
+                 leg1, leg2, shear_modulus, elastic_modulus, yield_percent,
                  spring_constant=None, active_coils=None, body_coils=None, shot_peened=False,
                  density=None, working_frequency=None, radius=None, pin_diameter=None):
         """Instantiate helical torsion spring object with the given parameters
@@ -20,13 +20,14 @@ class HelicalTorsionSpring(Spring):
         :param float or Symbol wire_diameter: spring wire diameter
         :param float or Symbol spring_diameter: spring diameter measured from
             the center point of the wire diameter
+        :param float ultimate_tensile_strength: Ultimate tensile strength of the material
         :param float leg1: spring leg
         :param float leg2: spring leg
         :param float shear_modulus: Spring's material shear modulus
         :param float elastic_modulus: Spring's material elastic modulus
         :param float yield_percent: Used to estimate the spring's yield stress
-        :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
-        :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
+        # :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
+        # :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
         :param float or None spring_constant: K - spring constant
         :param float or None active_coils: active_coils - number of active coils
         :param float or None body_coils: Spring's number of body coils
@@ -42,8 +43,8 @@ class HelicalTorsionSpring(Spring):
         """
         max_force = max_moment / radius if radius is not None else None
 
-        super().__init__(max_force, wire_diameter, spring_diameter, shear_modulus, elastic_modulus,
-                         shot_peened, density, working_frequency, Ap, m)
+        super().__init__(max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
+                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency)
 
         self.max_moment = max_moment
         self.yield_percent = yield_percent
