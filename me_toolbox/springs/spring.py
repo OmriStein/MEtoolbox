@@ -169,7 +169,7 @@ class Spring:
         :param bool verbose: Prints Values of A and m
 
         :returns: ultimate tensile strength (Sut)
-        :rtype: (float, float)
+        :rtype: float
         """
         # TODO: Find a way to work with symbolic diameter
         if isinstance(diameter, Symbol):

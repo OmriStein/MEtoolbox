@@ -21,7 +21,6 @@ print(f"Fsolid = {Fs}")
 Sut = Spring.material_prop('music wire', 6.5, metric=True, verbose=True)
 print(f"Sut={Sut:.2f}")
 
-
 spring = HelicalPushSpring(max_force=Fmax, wire_diameter=d, spring_diameter=D,
                            ultimate_tensile_strength=Sut, shear_yield_percent=0.45,
                            end_type='squared and ground', shear_modulus=G,
