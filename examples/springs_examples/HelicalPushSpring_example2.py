@@ -1,4 +1,4 @@
-from me_toolbox.springs import HelicalPushSpring
+from me_toolbox.springs import Spring, HelicalPushSpring
 from sympy import symbols, Eq, solveset
 
 D = symbols('D')
@@ -7,13 +7,15 @@ L0 = 39.15
 Lw = 25
 d = 1.8
 # music wire
-G, E, Ap, m, yield_percent = 82.7e3, 203.4, 2211, 0.145, 0.6
+G, E, yield_percent = 82.7e3, 203.4, 0.6
+Sut = Spring.material_prop('music wire', 6.5, metric=True, verbose=True)
 K = force / (L0 - Lw)
 print(f"K={K}")
 spring = HelicalPushSpring(max_force=force, wire_diameter=d, spring_diameter=D,
+                           ultimate_tensile_strength=Sut,
                            shear_yield_percent=0.45, end_type='squared and ground',
                            shear_modulus=G, elastic_modulus=E,
-                           Ap=Ap, m=m, spring_constant=K, set_removed=True, shot_peened=False)
+                           spring_constant=K, set_removed=True, shot_peened=False)
 
 # finding D with sympy
 n_static = spring.static_safety_factor()
