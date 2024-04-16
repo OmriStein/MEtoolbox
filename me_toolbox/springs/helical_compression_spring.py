@@ -126,8 +126,8 @@ class HelicalCompressionSpring(Spring):
             natural_freq = self.natural_frequency
             if natural_freq <= 20 * self.working_frequency:
                 print(
-                    f"Note: the natural frequency={natural_freq} is less than 20*working"
-                    f"frequency={20 * self.working_frequency}")
+                    f"Note: the natural frequency={natural_freq:.2f} is less than 20*working"
+                    f"frequency={20 * self.working_frequency:.2f} which is not good")
                 good_design = False
 
         return good_design
@@ -356,7 +356,7 @@ class HelicalCompressionSpring(Spring):
     def Fsolid(self):  # pylint: disable=invalid-name
         """calculate the max_force necessary to bring the spring to solid length
         it is good practice for the max_force that compresses the spring to
-        solid state to be greater than the maximum max_force anticipated so we
+        solid state to be greater than the maximum max_force anticipated, so we
         use this calculation: Fs=(1+zeta)Fmax in case the free length is unknown
 
         Note: zeta is the overrun safety factor, it's customary that zeta=0.15 so Fs=1.15Fmax
