@@ -3,7 +3,7 @@ from math import pi
 from sympy import Symbol  # pylint: disable=unused-import
 
 from me_toolbox.fatigue import FailureCriteria
-from me_toolbox.springs import Spring, HelicalPushSpring
+from me_toolbox.springs import Spring, HelicalCompressionSpring
 from me_toolbox.tools import percent_to_decimal
 
 
@@ -43,7 +43,7 @@ class ExtensionSpring(Spring):
         :param float or None working_frequency: the spring working frequency
             (used for fatigue calculations)
 
-        :returns: HelicalPushSpring
+        :returns: HelicalCompressionSpring
         """
 
         super().__init__(max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
@@ -58,19 +58,19 @@ class ExtensionSpring(Spring):
 
         if sum([active_coils is not None, spring_constant is not None, body_coils is not None]) > 1:
             # if two or more are given raise error to prevent input mistakes
-            raise ValueError("active_coils, body_coils and/or spring_constant were"
+            raise ValueError("active_coils, body_coils and/or spring_rate were"
                              "given but only one is expected")
         elif spring_constant is not None:
-            # spring_constant -> active_coils -> body_coils
+            # spring_rate -> active_coils -> body_coils
             self.spring_constant = spring_constant
         elif active_coils is not None:
-            # active_coils -> spring_constant, active_coils->body_coils
+            # active_coils -> spring_rate, active_coils->body_coils
             self.active_coils = active_coils
         elif body_coils is not None:
-            # body_coils -> active_coils -> spring_constant
+            # body_coils -> active_coils -> spring_rate
             self.body_coils = body_coils
         else:
-            raise ValueError("active_coils, body_coils and the spring_constant"
+            raise ValueError("active_coils, body_coils and the spring_rate"
                              "can't all be None, Tip: Find the spring constant")
 
         self.free_length = free_length
@@ -194,7 +194,7 @@ class ExtensionSpring(Spring):
         """getter for the :attr:`active_coils` attribute
         the method checks if active_coils was given and if not it
         calculates it form the other known parameters
-        and then update the :attr:`spring_constant` attribute to match
+        and then update the :attr:`spring_rate` attribute to match
 
         :param float or None active_coils: Spring active coils
         """
@@ -271,7 +271,7 @@ class ExtensionSpring(Spring):
 
     @property
     def spring_constant(self):
-        """getter for the :attr:`spring_constant` attribute
+        """getter for the :attr:`spring_rate` attribute
 
         :returns: The spring constant
         :rtype: float
@@ -280,7 +280,7 @@ class ExtensionSpring(Spring):
 
     @spring_constant.setter
     def spring_constant(self, spring_constant):
-        """getter for the :attr:`spring_constant` attribute
+        """getter for the :attr:`spring_rate` attribute
         the method checks if the spring constant was given and
         if not it calculates it form the other known parameters
         and then update the :attr:`active_coils` attribute to match
@@ -288,7 +288,7 @@ class ExtensionSpring(Spring):
         :param float or None spring_constant: K - The spring constant
         """
         if spring_constant is not None:
-            # spring_constant was given
+            # spring_rate was given
             self._spring_constant = spring_constant
             # makes sure active_coils is calculated based on the new
             # spring constant and not on the last body_coils value
@@ -297,7 +297,7 @@ class ExtensionSpring(Spring):
             self.body_coils = None
             self.free_length = None
         else:
-            # spring_constant was not given so calculate it
+            # spring_rate was not given so calculate it
             self._spring_constant = self.calc_spring_constant()
 
     @property
@@ -350,7 +350,7 @@ class ExtensionSpring(Spring):
         :rtype: float
         """
         # return self.calc_max_shear_stress(self.max_force)
-        return HelicalPushSpring.calc_max_shear_stress(self, self.max_force, self.hook_KB)
+        return HelicalCompressionSpring.calc_max_shear_stress(self, self.max_force, self.hook_KB)
 
     @property
     def max_body_shear_stress(self):
@@ -511,7 +511,7 @@ class ExtensionSpring(Spring):
         for given safety factor in order to avoid failure,
 
         Because KA and KB contains d no simple solution is available as in the
-        HelicalPushSpring, so we assume an initial K and iterate until convergence,
+        HelicalCompressionSpring, so we assume an initial K and iterate until convergence,
         be aware that for some static_safety_factor convergence my not occur.
 
         NOTE: for static use only

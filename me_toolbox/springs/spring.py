@@ -21,6 +21,21 @@ class Spring:
 
     def __init__(self, max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
                  shear_modulus, elastic_modulus, shot_peened, density, working_frequency):
+        """Instantiate helical push spring object with the given parameters
+        :param float or Symbol max_force: The maximum load on the spring [N]
+        :param float or Symbol wire_diameter: Spring wire diameter [mm]
+        :param float or Symbol spring_diameter: Spring diameter measured from [mm]
+            the center point of the wire diameter
+        :param float ultimate_tensile_strength: Ultimate tensile strength of the material [MPa]
+        :param float shear_modulus: Shear modulus [MPa]
+        :param float or None elastic_modulus: Elastic modulus (used for buckling calculations) [MPa]
+        :param bool shot_peened: If True adds to fatigue strength
+        :param float or None density: Spring's material density [kg/m^3]
+        :param float or None working_frequency: the spring working frequency [Hz]
+
+        :returns: Spring object
+        """
+
         self.max_force = max_force
         # self.Ap, self.m = Ap, m
         self._wire_diameter = wire_diameter
@@ -34,13 +49,13 @@ class Spring:
 
         self._active_coils = None
         self._body_coils = None
-        self._spring_constant = None
+        self._spring_rate = None
 
     @classmethod
     def symbolic_spring(cls, shot_peened=False):
-        F, d, D, G, E, yield_percent, density, working_frequency, Ap, m = symbols(
-            'F, d, D, G, E, yield_percent, rho, omega, Ap, m')
-        return Spring(F, d, D, G, E, shot_peened, density, working_frequency, Ap, m)
+        F, d, D, Sut, G, E, yield_percent, density, working_frequency = symbols(
+            'F, d, D, Sut, G, E, yield_percent, rho, omega')
+        return Spring(F, d, D, Sut, G, E, shot_peened, density, working_frequency)
 
     def get_info(self):
         """print all the spring properties"""
@@ -75,11 +90,6 @@ class Spring:
         :type: float or Symbol
         """
         return self.spring_diameter / self.wire_diameter
-
-    # @property
-    # def ultimate_tensile_strength(self):
-    #     """ Sut - ultimate tensile strength """
-    #     return self.Ap / (self.wire_diameter ** self.m)
 
     @property
     def shear_ultimate_strength(self):
@@ -127,7 +137,7 @@ class Spring:
         Na = self.active_coils
         G = self.shear_modulus
         try:
-            return (d / (2 * D ** 2 * Na * pi)) * sqrt(G / (2 * self.density))
+            return (d*1e-3 / (2 * D*1e-3 ** 2 * Na * pi)) * sqrt(G / (2 * self.density))
         except TypeError:
             return None
 
@@ -138,8 +148,8 @@ class Spring:
         :returns: Spring weight
         :type: float or Symbol
         """
-        area = 0.25 * pi * self.wire_diameter ** 2  # cross section area
-        length = pi * self.spring_diameter  # the circumference of the spring
+        area = 0.25 * pi * (self.wire_diameter*1e-3) ** 2  # cross-section area
+        length = pi * self.spring_diameter*1e-3   # the circumference of the spring
         volume = area * length
         try:
             return volume * self.active_coils * self.density
@@ -171,7 +181,7 @@ class Spring:
         :returns: ultimate tensile strength (Sut)
         :rtype: float
         """
-        # TODO: Find a way to work with symbolic diameter
+
         if isinstance(diameter, Symbol):
             raise ValueError(f"the material keyword can't be used if the diameter is symbolic "
                              f"specify Ap and m manually")

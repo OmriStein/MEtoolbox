@@ -1,4 +1,4 @@
-from me_toolbox.springs import HelicalPushSpring
+from me_toolbox.springs import HelicalCompressionSpring
 from sympy import symbols
 
 from springs import Spring
@@ -21,11 +21,11 @@ print(f"Fsolid = {Fs}")
 Sut = Spring.material_prop('music wire', 6.5, metric=True, verbose=True)
 print(f"Sut={Sut:.2f}")
 
-spring = HelicalPushSpring(max_force=Fmax, wire_diameter=d, spring_diameter=D,
-                           ultimate_tensile_strength=Sut, shear_yield_percent=0.45,
-                           end_type='squared and ground', shear_modulus=G,
-                           elastic_modulus=205e3, spring_constant=6.189,
-                           set_removed=False, shot_peened=True, anchors='fixed-hinged', zeta=0.25)
+spring = HelicalCompressionSpring(max_force=Fmax, wire_diameter=d, spring_diameter=D,
+                                  ultimate_tensile_strength=Sut, end_type='squared and ground',
+                                  shear_modulus=G, elastic_modulus=205e3, shear_yield_percent=0.45,
+                                  spring_rate=6.189, set_removed=False, shot_peened=True,
+                                  anchors='fixed-hinged', zeta=0.25)
 
 # spring diameter for solid state safety factor of 1.5
 print(f"minimum wire diameter for Fsolid = {spring.min_wire_diameter(1.5, solid=True)}")
@@ -41,11 +41,11 @@ print(f"static safety factor = {spring.static_safety_factor()}")
 nf, ns = spring.fatigue_analysis(575, 185, 99.999)
 print(f"fatigue safety factor={nf}, safety factor for first cycle={ns}\n")
 
-spring2 = HelicalPushSpring(max_force=Fmax, wire_diameter=6, spring_diameter=60,
-                            ultimate_tensile_strength=Sut, shear_yield_percent=0.45,
-                            end_type='squared and ground', shear_modulus=G,
-                            elastic_modulus=205e3, spring_constant=6,
-                            set_removed=False, shot_peened=True, anchors='fixed-hinged')
+spring2 = HelicalCompressionSpring(max_force=Fmax, wire_diameter=6, spring_diameter=60,
+                                   ultimate_tensile_strength=Sut, end_type='squared and ground',
+                                   shear_modulus=G, elastic_modulus=205e3, shear_yield_percent=0.45,
+                                   spring_rate=6, set_removed=False, shot_peened=True,
+                                   anchors='fixed-hinged')
 print()
 print(f"static safety factor = {spring2.static_safety_factor()}")
 print(f"minimum wire diameter for n=2: {spring2.min_wire_diameter(2)}")
