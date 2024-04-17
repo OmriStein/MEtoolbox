@@ -1,1 +1,2 @@
 include me_toolbox\gears\tables\*.csv
+include me_toolbox\springs\tables\*.csv
