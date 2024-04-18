@@ -37,15 +37,14 @@ class Spring:
         """
 
         self.max_force = max_force
-        # self.Ap, self.m = Ap, m
+        self.working_frequency = working_frequency
         self._wire_diameter = wire_diameter
         self._spring_diameter = spring_diameter
         self.ultimate_tensile_strength = ultimate_tensile_strength
         self.shear_modulus = shear_modulus
         self.elastic_modulus = elastic_modulus
-        self.shot_peened = shot_peened
         self.density = density
-        self.working_frequency = working_frequency
+        self.shot_peened = shot_peened
 
         self._active_coils = None
         self._body_coils = None
@@ -122,33 +121,6 @@ class Spring:
         :rtype: float or Symbol
         """
         return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
-
-    @property
-    def natural_frequency(self):
-        """Figures out what is the natural frequency of the spring"""
-        d = self.wire_diameter
-        D = self.spring_diameter
-        Na = self.active_coils
-        G = self.shear_modulus
-        try:
-            return (d*1e-3 / (2 * D*1e-3 ** 2 * Na * pi)) * sqrt(G / (2 * self.density))
-        except TypeError:
-            return None
-
-    @property
-    def weight(self):
-        """Return's the spring *active coils* weight according to the specified density
-
-        :returns: Spring weight
-        :type: float or Symbol
-        """
-        area = 0.25 * pi * (self.wire_diameter*1e-3) ** 2  # cross-section area
-        length = pi * self.spring_diameter*1e-3   # the circumference of the spring
-        volume = area * length
-        try:
-            return volume * self.active_coils * self.density
-        except TypeError:
-            return None
 
     def calc_spring_constant(self):
         """Calculate spring constant (using Castigliano's theorem)
