@@ -51,12 +51,6 @@ class Spring:
         self._body_coils = None
         self._spring_rate = None
 
-    @classmethod
-    def symbolic_spring(cls, shot_peened=False):
-        F, d, D, Sut, G, E, yield_percent, density, working_frequency = symbols(
-            'F, d, D, Sut, G, E, yield_percent, rho, omega')
-        return Spring(F, d, D, Sut, G, E, shot_peened, density, working_frequency)
-
     def get_info(self):
         """print all the spring properties"""
         print_atributes(self)
