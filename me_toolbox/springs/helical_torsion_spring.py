@@ -12,7 +12,7 @@ class HelicalTorsionSpring(Spring):
 
     def __init__(self, max_moment, wire_diameter, spring_diameter, ultimate_tensile_strength,
                  leg1, leg2, shear_modulus, elastic_modulus, yield_percent,
-                 spring_constant=None, active_coils=None, body_coils=None, shot_peened=False,
+                 spring_rate=None, active_coils=None, body_coils=None, shot_peened=False,
                  density=None, working_frequency=None, radius=None, pin_diameter=None):
         """Instantiate helical torsion spring object with the given parameters
 
@@ -26,9 +26,7 @@ class HelicalTorsionSpring(Spring):
         :param float shear_modulus: Spring's material shear modulus
         :param float elastic_modulus: Spring's material elastic modulus
         :param float yield_percent: Used to estimate the spring's yield stress
-        # :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
-        # :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
-        :param float or None spring_constant: K - spring constant
+        :param float or None spring_rate: K - spring rate
         :param float or None active_coils: active_coils - number of active coils
         :param float or None body_coils: Spring's number of body coils
         :param bool shot_peened: if True adds to fatigue strength
@@ -43,21 +41,22 @@ class HelicalTorsionSpring(Spring):
         """
         max_force = max_moment / radius if radius is not None else None
 
-        super().__init__(max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
-                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency)
+        super().__init__(max_force, wire_diameter, spring_diameter, spring_rate, active_coils,
+                         ultimate_tensile_strength, shear_modulus, elastic_modulus,
+                         shot_peened, density, working_frequency)
 
         self.max_moment = max_moment
         self.yield_percent = yield_percent
         self.leg1, self.leg2 = leg1, leg2
         self.pin_diameter = pin_diameter
 
-        if sum([active_coils is not None, spring_constant is not None, body_coils is not None]) > 1:
+        if sum([active_coils is not None, spring_rate is not None, body_coils is not None]) > 1:
             # if two or more are given raise error to prevent input mistakes
             raise ValueError("active_coils, body_coils and/or spring_rate were"
                              "given but only one is expected")
-        elif spring_constant is not None:
+        elif spring_rate is not None:
             # spring_rate -> active_coils -> body_coils
-            self.spring_constant = spring_constant
+            self.spring_rate = spring_rate
         elif active_coils is not None:
             # active_coils -> spring_rate, active_coils->body_coils
             self.active_coils = active_coils
@@ -93,7 +92,7 @@ class HelicalTorsionSpring(Spring):
         self._wire_diameter = wire_diameter
         # updating active_coils and free length with the new diameter
         self.active_coils = None
-        self.spring_constant = None
+        self.spring_rate = None
 
     @property
     def spring_diameter(self):
@@ -113,7 +112,7 @@ class HelicalTorsionSpring(Spring):
         self._spring_diameter = wire_diameter
         # updating active_coils and free length with the new diameter
         self.active_coils = None
-        self.spring_constant = None
+        self.spring_rate = None
 
     @property
     def active_coils(self):
@@ -137,7 +136,7 @@ class HelicalTorsionSpring(Spring):
             # active_coils was given
             self._active_coils = active_coils
             # recalculate spring constant and free_length according to the new active_coils
-            self.spring_constant = None
+            self.spring_rate = None
             self.body_coils = None
 
         else:
@@ -155,7 +154,7 @@ class HelicalTorsionSpring(Spring):
 
         if self.body_coils is None:
             d = self.wire_diameter
-            active_coils = (d ** 4 * self.elastic_modulus) / (10.8 * D * self.spring_constant)
+            active_coils = (d ** 4 * self.elastic_modulus) / (10.8 * D * self.spring_rate)
         else:
             active_coils = self.body_coils + (self.leg1 + self.leg2) / (3 * pi * D)
         return active_coils
@@ -186,7 +185,7 @@ class HelicalTorsionSpring(Spring):
             self._body_coils = body_coils
             # recalculate spring constant and free_length according to the new active_coils
             self.active_coils = None
-            self.spring_constant = None
+            self.spring_rate = None
 
         else:
             # active_coils was not given so calculate it
@@ -206,26 +205,26 @@ class HelicalTorsionSpring(Spring):
         del self._body_coils
 
     @property
-    def spring_constant(self):
+    def spring_rate(self):
         """getter for the :attr:`spring_rate` attribute
 
         :returns: The spring constant
         :rtype: float
         """
-        return self._spring_constant
+        return self._spring_rate
 
-    @spring_constant.setter
-    def spring_constant(self, spring_constant):
+    @spring_rate.setter
+    def spring_rate(self, spring_rate):
         """getter for the :attr:`spring_rate` attribute
         the method checks if the spring constant was given and
         if not it calculates it form the other known parameters
         and then update the :attr:`active_coils` attribute to match
 
-        :param float or None spring_constant: K - The spring constant
+        :param float or None spring_rate: K - The spring constant
         """
-        if spring_constant is not None:
+        if spring_rate is not None:
             # spring_rate was given
-            self._spring_constant = spring_constant
+            self._spring_rate = spring_rate
             # makes sure active_coils is calculated based on the new
             # spring constant and not on the last body_coils value
             del self.body_coils
@@ -234,16 +233,16 @@ class HelicalTorsionSpring(Spring):
 
         else:
             # spring_rate was not given so calculate it
-            self._spring_constant = self.calc_spring_constant()
+            self._spring_rate = self.calc_spring_rate()
 
     @property
-    def spring_const_deg(self):
+    def spring_rate_deg(self):
         """convert the spring constant from
         [N*mm/turn] or [pound force*inch/turn]
         to [N*mm/deg] or [pound force*inch/deg]"""
-        return self.spring_constant / 360
+        return self.spring_rate / 360
 
-    def calc_spring_constant(self):
+    def calc_spring_rate(self):
         """Calculate spring constant in [N*mm/turn] or [pound force*inch/turn]
 
         :returns: The spring constant

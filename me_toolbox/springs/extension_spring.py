@@ -11,11 +11,10 @@ class ExtensionSpring(Spring):
     """An extension spring object"""
 
     def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter,
-                 ultimate_tensile_strength,
-                 hook_r1, hook_r2, shear_modulus, elastic_modulus, body_shear_yield_percent,
-                 end_normal_yield_percent, end_shear_yield_percent, spring_constant=None,
-                 active_coils=None, body_coils=None, shot_peened=False, free_length=None,
-                 density=None, working_frequency=None):
+                 ultimate_tensile_strength, hook_r1, hook_r2, shear_modulus, elastic_modulus,
+                 body_shear_yield_percent, hook_normal_yield_percent, hook_shear_yield_percent,
+                 spring_rate=None, active_coils=None, body_coils=None,
+                 shot_peened=False, free_length=None, density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
 
         :param float or Symbol max_force: The maximum load on the spring
@@ -31,9 +30,9 @@ class ExtensionSpring(Spring):
         :param float shear_modulus: Spring's material shear modulus
         :param float elastic_modulus: Spring's material elastic modulus
         :param float body_shear_yield_percent: Used to estimate the spring's body shear yield stress
-        :param float end_normal_yield_percent: Used to estimate the spring's hook yield stress
-        :param float end_shear_yield_percent: Used to estimate the spring's hook shear yield stress
-        :param float or None spring_constant: K - spring constant
+        :param float hook_normal_yield_percent: Used to estimate the spring's hook yield stress
+        :param float hook_shear_yield_percent: Used to estimate the spring's hook shear yield stress
+        :param float or None spring_rate: K - spring constant
         :param float or None active_coils: active_coils - number of active coils
         :param bool shot_peened: if True adds to fatigue strength
         :param float or None body_coils: Spring's number of body coils
@@ -53,16 +52,16 @@ class ExtensionSpring(Spring):
         self.hook_r1 = hook_r1
         self.hook_r2 = hook_r2
         self.body_shear_yield_percent = body_shear_yield_percent
-        self.end_normal_yield_percent = end_normal_yield_percent
-        self.end_shear_yield_percent = end_shear_yield_percent
+        self.hook_normal_yield_percent = hook_normal_yield_percent
+        self.hook_shear_yield_percent = hook_shear_yield_percent
 
-        if sum([active_coils is not None, spring_constant is not None, body_coils is not None]) > 1:
+        if sum([active_coils is not None, spring_rate is not None, body_coils is not None]) > 1:
             # if two or more are given raise error to prevent input mistakes
             raise ValueError("active_coils, body_coils and/or spring_rate were"
                              "given but only one is expected")
-        elif spring_constant is not None:
+        elif spring_rate is not None:
             # spring_rate -> active_coils -> body_coils
-            self.spring_constant = spring_constant
+            self.spring_rate = spring_rate
         elif active_coils is not None:
             # active_coils -> spring_rate, active_coils->body_coils
             self.active_coils = active_coils
@@ -121,33 +120,24 @@ class ExtensionSpring(Spring):
         return percent_to_decimal(self.body_shear_yield_percent) * self.ultimate_tensile_strength
 
     @property
-    def end_normal_yield_strength(self):  # pylint: disable=invalid-name
+    def hook_normal_yield_strength(self):  # pylint: disable=invalid-name
         """getter for the yield strength attribute (Sy = % * Sut)
 
-        :returns: end bending yield strength
+        :returns: hook bending yield strength
         :rtype: float
         """
-        return percent_to_decimal(self.end_normal_yield_percent) * self.ultimate_tensile_strength
+        return percent_to_decimal(self.hook_normal_yield_percent) * self.ultimate_tensile_strength
 
     @property
-    def end_shear_yield_strength(self):  # pylint: disable=invalid-name
+    def hook_shear_yield_strength(self):  # pylint: disable=invalid-name
         """getter for the yield strength attribute (Sy = % * Sut)
 
-        :returns: end bending yield strength
+        :returns: hook bending yield strength
         :rtype: float
         """
-        return percent_to_decimal(self.end_shear_yield_percent) * self.ultimate_tensile_strength
+        return percent_to_decimal(self.hook_shear_yield_percent) * self.ultimate_tensile_strength
 
-    @property
-    def wire_diameter(self):
-        """Getter for the wire diameter attribute
-
-        :returns: The spring's wire diameter
-        :rtype: float or Symbol
-        """
-        return self._wire_diameter
-
-    @wire_diameter.setter
+    @Spring.wire_diameter.setter
     def wire_diameter(self, wire_diameter):
         """Sets the wire diameter and updates relevant attributes
 
@@ -156,19 +146,10 @@ class ExtensionSpring(Spring):
         self._wire_diameter = wire_diameter
         # updating active_coils and free length with the new diameter
         self.active_coils = None
-        self.spring_constant = None
+        self.spring_rate = None
         self.free_length = None
 
-    @property
-    def spring_diameter(self):
-        """Getter for the spring diameter attribute
-
-        :returns: The spring diameter
-        :rtype: float or Symbol
-        """
-        return self._spring_diameter
-
-    @spring_diameter.setter
+    @Spring.spring_diameter.setter
     def spring_diameter(self, wire_diameter):
         """Sets the spring diameter and updates relevant attributes
 
@@ -177,19 +158,10 @@ class ExtensionSpring(Spring):
         self._spring_diameter = wire_diameter
         # updating active_coils and free length with the new diameter
         self.active_coils = None
-        self.spring_constant = None
+        self.spring_rate = None
         self.free_length = None
 
-    @property
-    def active_coils(self):
-        """getter for the :attr:`active_coils` attribute
-
-        :returns: The spring active coils
-        :rtype: float
-        """
-        return self._active_coils
-
-    @active_coils.setter
+    @Spring.active_coils.setter
     def active_coils(self, active_coils):
         """getter for the :attr:`active_coils` attribute
         the method checks if active_coils was given and if not it
@@ -202,7 +174,7 @@ class ExtensionSpring(Spring):
             # active_coils was given
             self._active_coils = active_coils
             # recalculate spring constant and free_length according to the new active_coils
-            self.spring_constant = None
+            self.spring_rate = None
             self.body_coils = None
             self.free_length = None
         else:
@@ -218,7 +190,7 @@ class ExtensionSpring(Spring):
         """
         if self.body_coils is None:
             active_coils = ((self.shear_modulus * self.wire_diameter) /
-                            (8 * self.spring_index ** 3 * self.spring_constant)) * (
+                            (8 * self.spring_index ** 3 * self.spring_rate)) * (
                                    (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
         else:
             active_coils = self.body_coils + (self.shear_modulus / self.elastic_modulus)
@@ -250,7 +222,7 @@ class ExtensionSpring(Spring):
             self._body_coils = body_coils
             # recalculate spring constant and free_length according to the new active_coils
             self.active_coils = None
-            self.spring_constant = None
+            self.spring_rate = None
             self.free_length = None
         else:
             # active_coils was not given so calculate it
@@ -270,26 +242,26 @@ class ExtensionSpring(Spring):
         del self._body_coils
 
     @property
-    def spring_constant(self):
+    def spring_rate(self):
         """getter for the :attr:`spring_rate` attribute
 
         :returns: The spring constant
         :rtype: float
         """
-        return self._spring_constant
+        return self._spring_rate
 
-    @spring_constant.setter
-    def spring_constant(self, spring_constant):
+    @spring_rate.setter
+    def spring_rate(self, spring_rate):
         """getter for the :attr:`spring_rate` attribute
         the method checks if the spring constant was given and
         if not it calculates it form the other known parameters
         and then update the :attr:`active_coils` attribute to match
 
-        :param float or None spring_constant: K - The spring constant
+        :param float or None spring_rate: K - The spring constant
         """
-        if spring_constant is not None:
+        if spring_rate is not None:
             # spring_rate was given
-            self._spring_constant = spring_constant
+            self._spring_rate = spring_rate
             # makes sure active_coils is calculated based on the new
             # spring constant and not on the last body_coils value
             del self.body_coils
@@ -298,7 +270,7 @@ class ExtensionSpring(Spring):
             self.free_length = None
         else:
             # spring_rate was not given so calculate it
-            self._spring_constant = self.calc_spring_constant()
+            self._spring_rate = self.calc_spring_rate()
 
     @property
     def hook_KA(self):  # pylint: disable=invalid-name
@@ -403,8 +375,8 @@ class ExtensionSpring(Spring):
         """
 
         n_body = self.body_shear_yield_strength / self.max_body_shear_stress
-        n_hook_normal = self.end_normal_yield_strength / self.max_hook_normal_stress
-        n_hook_shear = self.end_shear_yield_strength / self.max_hook_shear_stress
+        n_hook_normal = self.hook_normal_yield_strength / self.max_hook_normal_stress
+        n_hook_shear = self.hook_shear_yield_strength / self.max_hook_shear_stress
 
         return n_body, n_hook_normal, n_hook_shear
 
@@ -425,7 +397,7 @@ class ExtensionSpring(Spring):
         :returns: Spring max_deflection
         :rtype: float or Symbol
         """
-        return (force - self.initial_tension) / self.spring_constant
+        return (force - self.initial_tension) / self.spring_rate
 
     @property
     def factor_Kw(self):  # pylint: disable=invalid-name
@@ -469,17 +441,17 @@ class ExtensionSpring(Spring):
         Sse = self.shear_endurance_limit(reliability, metric)  # pylint: disable=invalid-name
         Ssu = self.shear_ultimate_strength
         Ssy_body = self.body_shear_yield_strength
-        Ssy_end = self.end_shear_yield_strength
-        Sy_end = self.end_normal_yield_strength
+        Ssy_hook = self.hook_shear_yield_strength
+        Sy_hook = self.hook_normal_yield_strength
         Se = Sse / 0.577  # estimation using distortion-energy theory
         Sut = self.ultimate_tensile_strength
 
         try:
-            nf_hook_normal, _ = FailureCriteria.get_safety_factors(Sy_end, Sut, Se,
+            nf_hook_normal, _ = FailureCriteria.get_safety_factors(Sy_hook, Sut, Se,
                                                                    alt_normal_stress,
                                                                    mean_normal_stress, criterion)
 
-            nf_hook_shear, _ = FailureCriteria.get_safety_factors(Ssy_end, Ssu, Sse,
+            nf_hook_shear, _ = FailureCriteria.get_safety_factors(Ssy_hook, Ssu, Sse,
                                                                   alt_shear_stress,
                                                                   mean_shear_stress, criterion)
         except TypeError as typ_err:
@@ -506,7 +478,7 @@ class ExtensionSpring(Spring):
 
         return nf_body, ns_body, nf_hook_normal, nf_hook_shear
 
-    def min_wire_diameter(self, safety_factor, spring_index=None):
+    def min_wire_diameter(self, Ap, m, safety_factor, spring_index=None):
         """The minimal wire diameters (for shear and normal stresses)
         for given safety factor in order to avoid failure,
 
@@ -523,15 +495,13 @@ class ExtensionSpring(Spring):
         :rtype: float or tuple[Symbol, Symbol]
         """
         F = self.max_force
-        Ap = self.Ap
-        m = self.m
         C = spring_index
 
         factor_k, temp_k = 1.1, 0
         normal_diam = 0
         while abs(factor_k - temp_k) > 1e-4:
             # waiting for k to converge
-            percent = self.end_normal_yield_percent
+            percent = self.hook_normal_yield_percent
             normal_diam = (safety_factor * F * (16 * factor_k * C - 4) / (percent * Ap * pi)) ** (
                     1 / (2 - m))
             temp_k = factor_k
@@ -542,7 +512,7 @@ class ExtensionSpring(Spring):
         shear_diam = 0
         while abs(factor_k - temp_k) > 1e-4:
             # waiting for k to converge
-            percent = self.end_shear_yield_percent
+            percent = self.hook_shear_yield_percent
             shear_diam = ((8 * factor_k * F * C * safety_factor) / (percent * Ap * pi)) ** (
                     1 / (2 - m))
             temp_k = factor_k
@@ -563,11 +533,11 @@ class ExtensionSpring(Spring):
         :rtype: float or Symbol
         """
         # extracted from shear stress
-        diameter_shear = (self.end_shear_yield_strength * pi * self.wire_diameter ** 3) / (
+        diameter_shear = (self.hook_shear_yield_strength * pi * self.wire_diameter ** 3) / (
                 self.hook_KB * 8 * self.max_force * static_safety_factor)
         # extracted from normal stress
         diameter_normal = (1 / (4 * self.hook_KA)) * \
-                          (((self.end_normal_yield_strength * pi * self.wire_diameter ** 3) /
+                          (((self.hook_normal_yield_strength * pi * self.wire_diameter ** 3) /
                             (4 * self.max_force * static_safety_factor)) - self.wire_diameter)
         try:
             return max(diameter_shear, diameter_normal)

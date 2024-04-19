@@ -17,10 +17,11 @@ Ap, m = 1783, 0.190
 G, E = 77.2e3, 203.4e3  # in [Mpa]
 
 spring = ExtensionSpring(max_force=Fmax, initial_tension=Fi, wire_diameter=d, spring_diameter=D,
-                         Ap=Ap, m=m, hook_r1=r1, hook_r2=r2, shear_modulus=G, elastic_modulus=E,
-                         body_shear_yield_percent=0.45, end_normal_yield_percent=0.75,
-                         end_shear_yield_percent=0.4, spring_constant=None, active_coils=None,
-                         body_coils=12.17, free_length=None, density=None, working_frequency=None)
+                         ultimate_tensile_strength=, hook_r1=r1, hook_r2=r2, shear_modulus=G,
+                         elastic_modulus=E, body_shear_yield_percent=0.45,
+                         hook_normal_yield_percent=0.75, end_shear_yield_percent=0.4,
+                         spring_rate=None, active_coils=None, body_coils=12.17, free_length=None,
+                         density=None, working_frequency=None)
 
 n_body, n_hook_normal, n_hook_shear = spring.static_safety_factor
 print(f"ns_body={n_body}, ns_hook_normal={n_hook_normal}, ns_hook_shear={n_hook_shear}")

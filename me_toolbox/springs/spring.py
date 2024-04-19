@@ -1,31 +1,37 @@
-# third party
+"""A module containing the spring class"""
 import csv
 import os
-from math import pi
 import numpy as np
-from sympy import Symbol, symbols, sqrt
+from sympy import Symbol
 
-# internal package
 from me_toolbox.tools import print_atributes
 
 
-# TODO: add optimization based on cost and other needs
 class Spring:
 
     def __repr__(self):
-        try:
-            return f"{self.__class__.__name__}(K={self.spring_constant}, d={self.wire_diameter}, " \
-                   f"D={self.spring_diameter})"
-        except AttributeError:
-            return f"{self.__class__.__name__}(d={self.wire_diameter}, D={self.spring_diameter})"
+        return f"Spring(max_force={self.max_force}, wire_diameter={self.wire_diameter}, " \
+               f"spring_diameter={self.spring_diameter}, spring_rate={self.spring_rate}, " \
+               f"active_coils={self.active_coils}, " \
+               f"ultimate_tensile_strength={self.ultimate_tensile_strength}, " \
+               f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}," \
+               f"shot_peened={self.shot_peened}, density={self.density}, " \
+               f"working_frequency={self.working_frequency})"
 
-    def __init__(self, max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
-                 shear_modulus, elastic_modulus, shot_peened, density, working_frequency):
+    def __str__(self):
+        return f"{self.__class__.__name__}(K={self.spring_constant}, d={self.wire_diameter}, " \
+               f"D={self.spring_diameter})"
+
+    def __init__(self, max_force, wire_diameter, spring_diameter, spring_rate, active_coils,
+                 ultimate_tensile_strength, shear_modulus, elastic_modulus, shot_peened,
+                 density, working_frequency):
         """Instantiate helical push spring object with the given parameters
         :param float or Symbol max_force: The maximum load on the spring [N]
         :param float or Symbol wire_diameter: Spring wire diameter [mm]
         :param float or Symbol spring_diameter: Spring diameter measured from [mm]
             the center point of the wire diameter
+        :param float or None spring_rate: Spring rate (k) [N/mm]
+        :param float or None active_coils: Number of active coils (Na)
         :param float ultimate_tensile_strength: Ultimate tensile strength of the material [MPa]
         :param float shear_modulus: Shear modulus [MPa]
         :param float or None elastic_modulus: Elastic modulus (used for buckling calculations) [MPa]
@@ -40,15 +46,13 @@ class Spring:
         self.working_frequency = working_frequency
         self._wire_diameter = wire_diameter
         self._spring_diameter = spring_diameter
+        self._spring_rate = spring_rate
+        self._active_coils = active_coils
         self.ultimate_tensile_strength = ultimate_tensile_strength
         self.shear_modulus = shear_modulus
         self.elastic_modulus = elastic_modulus
         self.density = density
         self.shot_peened = shot_peened
-
-        self._active_coils = None
-        self._body_coils = None
-        self._spring_rate = None
 
     def get_info(self):
         """print all the spring properties"""
@@ -63,6 +67,13 @@ class Spring:
         """
         return self._wire_diameter
 
+    @wire_diameter.setter
+    def wire_diameter(self, diameter):
+        """Sets the wire diameter and updates relevant attributes
+        :param float diameter: Spring's wire diameter
+        """
+        self._wire_diameter = diameter
+
     @property
     def spring_diameter(self):
         """Getter for the spring diameter attribute
@@ -71,6 +82,22 @@ class Spring:
         :rtype: float or Symbol
         """
         return self._spring_diameter
+
+    @spring_diameter.setter
+    def spring_diameter(self, diameter):
+        """Sets the spring diameter and updates relevant attributes
+        :param float diameter: Spring's diameter
+        """
+
+        self._spring_diameter = diameter
+
+    @property
+    def inside_diameter(self):
+        return self.spring_diameter - self.wire_diameter
+
+    @property
+    def outside_diameter(self):
+        return self.spring_diameter + self.wire_diameter
 
     @property
     def spring_index(self):
@@ -85,13 +112,44 @@ class Spring:
         return self.spring_diameter / self.wire_diameter
 
     @property
+    def active_coils(self):
+        """getter for the :attr:`active_coils` attribute
+
+        :returns: The spring active coils
+        :rtype: float
+        """
+        return self._active_coils
+
+    @active_coils.setter
+    def active_coils(self, active_coils):
+        """setter for the :attr:`active_coils` attribute
+        :param float or None active_coils: Spring active coils
+        """
+        self._active_coils = active_coils
+
+    @property
+    def spring_rate(self):
+        """getter for the :attr:`spring_rate` attribute
+
+        :returns: The spring rate
+        :rtype: float
+        """
+        return self._spring_rate
+
+    @spring_rate.setter
+    def spring_rate(self, spring_rate):
+        """setter for the :attr:`spring_rate` attribute
+        :param float or None spring_rate: K - The spring rate
+        """
+        self._spring_rate = spring_rate
+
+    @property
     def shear_ultimate_strength(self):
         """ Ssu - ultimate tensile strength for shear """
         return 0.67 * self.ultimate_tensile_strength
 
     def shear_endurance_limit(self, reliability, metric=True):
         """Sse - Shear endurance limit according to Zimmerli
-
         :param float reliability: reliability in percentage
         :param bool metric: metric or imperial
 
@@ -111,34 +169,10 @@ class Spring:
 
         return Ke * (Ssa / (1 - (Ssm / self.shear_ultimate_strength) ** 2))
 
-    def calc_max_shear_stress(self, force, k_factor):
-        """Calculates the max shear stress based on the max_force applied
-
-        :param float of Symbol force: Working max_force of the spring
-        :param float k_factor: the appropriate k factor for the calculation
-
-        :returns: Shear stress
-        :rtype: float or Symbol
-        """
-        return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
-
-    def calc_spring_constant(self):
-        """Calculate spring constant (using Castigliano's theorem)
-
-        :returns: The spring constant
-        :rtype: float
-        """
-        G = self.shear_modulus
-        d = self.wire_diameter
-        C = self.spring_index
-        Na = self.active_coils
-        return ((G * d) / (8 * C ** 3 * Na)) * ((2 * C ** 2) / (1 + 2 * C ** 2))
-
     @staticmethod
     def material_prop(material, diameter, metric=True, verbose=False):
         """Reads table A_and_m.csv from file and returns the Sut estimation from the material
          properties Ap and m
-
         :param str material: The spring's material
         :param float diameter: Wire diameter
         :param bool metric: Metric or imperial

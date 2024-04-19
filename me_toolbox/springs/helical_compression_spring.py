@@ -1,6 +1,6 @@
 """A module containing the helical push spring class"""
 from math import pi, sqrt
-from sympy import Symbol, symbols
+from sympy import Symbol, sqrt
 
 from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import Spring
@@ -45,19 +45,22 @@ class HelicalCompressionSpring(Spring):
         :returns: HelicalCompressionSpring object
         """
 
-        super().__init__(max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
-                         shear_modulus, elastic_modulus, shot_peened, density, working_frequency)
+        super().__init__(max_force, wire_diameter, spring_diameter, spring_rate, active_coils,
+                         ultimate_tensile_strength, shear_modulus, elastic_modulus,
+                         shot_peened, density, working_frequency)
 
+        self._spring_diameter = spring_diameter
+        self._wire_diameter = wire_diameter
+        self._free_length_input_flag = False if free_length is None else True
         if set_removed:
             print("Note: set should ONLY be removed for static loading"
                   "and NOT for periodical loading")
 
         self.set_removed = set_removed
-        self.shot_peened = shot_peened
         self.shear_yield_percent = shear_yield_percent
         self.zeta = zeta  # overrun safety factor
-
         self.end_type = end_type.lower()
+
         end_types = ('plain', 'plain and ground', 'squared or closed', 'squared and ground')
         if self.end_type not in end_types:
             raise ValueError(f"{end_type} not one of this: {end_types}")
@@ -73,7 +76,8 @@ class HelicalCompressionSpring(Spring):
             raise ValueError("Both active coils and spring rate were"
                              "given but only one is expected")
 
-        self.free_length = free_length
+        self.free_length = self.calc_free_length() if free_length is None else free_length
+        # self.free_length = free_length
         self.anchors = anchors
 
         self.check_design()
@@ -132,75 +136,32 @@ class HelicalCompressionSpring(Spring):
 
         return good_design
 
-    @property
-    def shear_yield_strength(self):
-        """ Ssy - yield strength for shear
-        (shear_yield_stress = % * ultimate_tensile_strength))
-
-        :returns: yield strength for shear stress
-        :rtype: float
-        """
-        try:
-            return percent_to_decimal(self.shear_yield_percent) * self.ultimate_tensile_strength
-        except TypeError:
-            return self.shear_yield_percent * self.ultimate_tensile_strength
-
-    @property
-    def wire_diameter(self):
-        """Getter for the wire diameter attribute
-
-        :returns: The spring's wire diameter
-        :rtype: float or Symbol
-        """
-        return self._wire_diameter
-
-    @wire_diameter.setter
+    @Spring.wire_diameter.setter
     def wire_diameter(self, diameter):
         """Sets the wire diameter and updates relevant attributes
-
         :param float diameter: Spring's wire diameter
         """
         self._wire_diameter = diameter
         # updating active_coils and free length with the new diameter
         self.active_coils = None
-        self.free_length = None
+        self.free_length = self.calc_free_length()
 
-    @property
-    def spring_diameter(self):
-        """Getter for the spring diameter attribute
-
-        :returns: The spring diameter
-        :rtype: float or Symbol
-        """
-        return self._spring_diameter
-
-    @spring_diameter.setter
+    @Spring.spring_diameter.setter
     def spring_diameter(self, diameter):
         """Sets the spring diameter and updates relevant attributes
-
         :param float diameter: Spring's diameter
         """
         self._spring_diameter = diameter
         # updating active_coils and free length with the new diameter
         self.active_coils = None
-        self.free_length = None
+        self.free_length = self.calc_free_length()
 
-    @property
-    def active_coils(self):
-        """getter for the :attr:`active_coils` attribute
-
-        :returns: The spring active coils
-        :rtype: float
-        """
-        return self._active_coils
-
-    @active_coils.setter
+    @Spring.active_coils.setter
     def active_coils(self, active_coils):
-        """getter for the :attr:`active_coils` attribute
+        """setter for the :attr:`active_coils` attribute
         the method checks if active_coils was given and if not
         it calculates it form the other known parameters and then
         update the :attr:`spring_rate` attribute to match
-
         :param float or None active_coils: Spring active coils
         """
         if active_coils is not None:
@@ -208,7 +169,7 @@ class HelicalCompressionSpring(Spring):
             self._active_coils = active_coils
             # recalculate spring rate and free_length according to the new active_coils
             self.spring_rate = None
-            self.free_length = None
+            self.free_length = self.calc_free_length()
         else:
             # active_coils was not given so calculate it
             self._active_coils = self.calc_active_coils()
@@ -223,22 +184,12 @@ class HelicalCompressionSpring(Spring):
                 (8 * self.spring_index ** 3 * self.spring_rate)) * (
                        (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
-    @property
-    def spring_rate(self):
-        """getter for the :attr:`spring_rate` attribute
-
-        :returns: The spring rate
-        :rtype: float
-        """
-        return self._spring_rate
-
-    @spring_rate.setter
+    @Spring.spring_rate.setter
     def spring_rate(self, spring_rate):
-        """getter for the :attr:`spring_rate` attribute
+        """setter for the :attr:`spring_rate` attribute
         the method checks if the spring rate was given and if not
         it calculates it form the other known parameters and then
         update the :attr:`active_coils` attribute to match
-
         :param float or None spring_rate: K - The spring rate
         """
         if spring_rate is not None:
@@ -246,10 +197,35 @@ class HelicalCompressionSpring(Spring):
             self._spring_rate = spring_rate
             # recalculate active_coils and the free length according to the new spring_rate
             self.active_coils = None
-            self.free_length = None
+            self.free_length = self.calc_free_length()
         else:
             # spring_rate was not given so calculate it
             self._spring_rate = self.calc_spring_rate()
+
+    def calc_spring_rate(self):
+        """Calculate spring constant (using Castigliano's theorem)
+
+        :returns: The spring constant
+        :rtype: float
+        """
+        G = self.shear_modulus
+        d = self.wire_diameter
+        C = self.spring_index
+        Na = self.active_coils
+        return ((G * d) / (8 * C ** 3 * Na)) * ((2 * C ** 2) / (1 + 2 * C ** 2))
+
+    @property
+    def shear_yield_strength(self):
+        """ Ssy - yield strength for shear
+        (shear_yield_stress = % * ultimate_tensile_strength))
+
+        :returns: yield strength for shear stress
+        :rtype: float
+        """
+        try:
+            return percent_to_decimal(self.shear_yield_percent) * self.ultimate_tensile_strength
+        except TypeError:
+            return self.shear_yield_percent * self.ultimate_tensile_strength
 
     @property
     def factor_Ks(self):  # pylint: disable=invalid-name
@@ -291,6 +267,16 @@ class HelicalCompressionSpring(Spring):
         k_factor = self.factor_Ks if self.set_removed else self.factor_Kw
         return self.calc_max_shear_stress(self.max_force, k_factor)
 
+    def calc_max_shear_stress(self, force, k_factor):
+        """Calculates the max shear stress based on the max_force applied
+        :param float of Symbol force: Working max_force of the spring
+        :param float k_factor: the appropriate k factor for the calculation
+
+        :returns: Shear stress
+        :rtype: float or Symbol
+        """
+        return (k_factor * 8 * force * self.spring_diameter) / (pi * self.wire_diameter ** 3)
+
     @property
     def max_deflection(self):
         """Returns the spring max_deflection, It's change in length
@@ -302,7 +288,6 @@ class HelicalCompressionSpring(Spring):
 
     def calc_deflection(self, force):
         """Calculate the spring deflection (change in length) due to specific max_force
-
         :param float or Symbol force: Spring working max_force
 
         :returns: Spring deflection
@@ -371,26 +356,6 @@ class HelicalCompressionSpring(Spring):
             # if free_length is unknown make an estimation
             return (1 + self.zeta) * self.max_force
 
-    @property
-    def free_length(self):
-        """ getter for the :attr:`free_length` attribute
-
-        :returns: free length of the springs
-        :rtype: float
-        """
-        return self._free_length
-
-    @free_length.setter
-    def free_length(self, free_length):
-        """free_length setter methods
-        if free length is specified assign it and set the
-        _free_length_input_flag for the :attr:`Fsolid` method
-        if free length is not specified calculate it using :meth:`calc_free_length()`
-        :param float or None free_length: The free length of the spring
-        """
-        self._free_length_input_flag = False if free_length is None else True
-        self._free_length = self.calc_free_length() if free_length is None else free_length
-
     def calc_free_length(self):
         """Calculates the free length of the spring"""
         return (self.Fsolid / self.spring_rate) + self.solid_length
@@ -405,72 +370,6 @@ class HelicalCompressionSpring(Spring):
         shear_stress = self.calc_max_shear_stress(self.Fsolid,
                                                   k_factor) if solid else self.max_shear_stress
         return self.shear_yield_strength / shear_stress
-
-    def min_wire_diameter(self, safety_factor, spring_diameter=None, spring_index=None,
-                          solid=False):
-        """The minimal wire diameter for given
-        safety factor in order to avoid failure,
-        according to the spring parameters.
-        if solid is True the calculation uses :attr:`Fsolid`
-        instead of :attr:`max_force`
-
-        Note: In order for the calculation to succeed the spring
-            diameter or the spring index should be known
-
-        :param float safety_factor: Static safety factor
-        :param float spring_diameter: The spring diameter
-        :param float spring_index: The spring index
-        :param bool solid: If true calculate to according to the solid max_force
-
-        :returns: The minimal wire diameter
-        :rtype: float or Symbol
-        """
-        if spring_index is not None:
-            factor_ks = (2 * spring_index + 1) / (2 * spring_index)
-            factor_kw = (4 * spring_index - 1) / (4 * spring_index - 4) + (0.615 / spring_index)
-            factor_k = factor_ks if self.set_removed else factor_kw
-            force = self.Fsolid if solid else self.max_force
-            return ((8 * factor_k * force * spring_index * safety_factor) / (
-                    self.shear_yield_percent * self.Ap * pi)) ** (1 / (2 - self.m))
-
-        elif spring_index is None and spring_diameter is not None:
-
-            factor_k, temp_k = 1.1, 0
-            diam = 0
-            while abs(factor_k - temp_k) > 1e-4:
-                # waiting for k to converge
-                diam = ((8 * self.max_force * spring_diameter * safety_factor * factor_k) / (
-                        pi * self.shear_yield_percent * self.Ap)) ** (1 / (3 - self.m))
-                temp_k = factor_k
-                factor_ks = (2 * spring_diameter + diam) / (2 * spring_diameter)
-                factor_kb = (4 * spring_diameter + 2 * diam) / (4 * spring_diameter - 3 * diam)
-                factor_k = factor_ks if self.set_removed else factor_kb
-            return diam
-        else:
-            print("Need to know spring index or spring diameter to calculate wire diameter")
-
-    def min_spring_diameter(self, safety_factor, wire_diameter, solid=False):
-        """return the minimum spring diameter to avoid static failure
-        according to the specified safety factor, if the solid flag is True :attr:'Fsolid'
-        is used instead of :attr:`max_force`
-
-        :param float safety_factor: static safety factor
-        :param float wire_diameter: Spring's wire diameter
-        :param bool solid: If true calculate to according to the solid max_force
-
-        :returns: The minimal spring diameter
-        :rtype: float or Symbol
-        """
-        force = self.Fsolid if solid else self.max_force
-        d = wire_diameter
-        if self.set_removed:
-            Ssy = self.shear_yield_strength
-            return 0.5 * ((Ssy / safety_factor) * ((pi * d ** 3) / (4 * force)) - d)
-        else:
-            # derived using the KB factor (because it was easier)
-            Sut = self.ultimate_tensile_strength
-            alpha = (Sut * pi * d ** 3) / (8 * self.max_force * safety_factor)
-            return 0.25 * ((2 * alpha - d) + sqrt((d - 2 * alpha) ** 2 - 24 * alpha * d))
 
     def buckling(self, anchors, verbose=True):
         """ Checks if the spring will buckle and find the
@@ -504,8 +403,9 @@ class HelicalCompressionSpring(Spring):
                           f"but the free_length = {self.free_length:.2f}")
 
                 else:
-                    print(f"Buckling is NOT accruing, the max safe length = {max_safe_length:.2f}, ",
-                          f"and the free_length = {self.free_length:.2f}")
+                    print(
+                        f"Buckling is NOT accruing, the max safe length = {max_safe_length:.2f}, ",
+                        f"and the free_length = {self.free_length:.2f}")
 
             return self.free_length >= max_safe_length, max_safe_length
 
@@ -513,7 +413,6 @@ class HelicalCompressionSpring(Spring):
                          criterion='modified goodman', verbose=False, metric=True):
         """ Returns safety factors for fatigue and
         for first cycle according to Langer
-
         :param float max_force: Maximal max_force acting on the spring
         :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
@@ -548,7 +447,6 @@ class HelicalCompressionSpring(Spring):
     def calc_spring_index(self, solid_safety_factor):
         """Calculate Spring index for certain safety factor if only wire diameter was given
         but the spring diameter was not (from Shigley's)
-
         :param float solid_safety_factor: Spring's safety factor for solid length
 
         :returns: Spring's index number
@@ -568,3 +466,96 @@ class HelicalCompressionSpring(Spring):
             # for Kb NOT IMPLEMENTED!!!
             # return ((2 * alpha - beta) / (4 * beta)) + sympy.sqrt(
             #     ((2 * alpha - beta) / (4 * beta)) ** 2 - ((3 * alpha) / (4 * beta)))
+
+    @property
+    def natural_frequency(self):
+        """Figures out what is the natural frequency of the spring"""
+        d = self.wire_diameter
+        D = self.spring_diameter
+        Na = self.active_coils
+        G = self.shear_modulus
+        try:
+            return (d * 1e-3 / (2 * D * 1e-3 ** 2 * Na * pi)) * sqrt(G / (2 * self.density))
+        except TypeError:
+            return None
+
+    @property
+    def weight(self):
+        """Return's the spring *active coils* weight according to the specified density
+
+        :returns: Spring weight
+        :type: float or Symbol
+        """
+        area = 0.25 * pi * (self.wire_diameter * 1e-3) ** 2  # cross-section area
+        length = pi * self.spring_diameter * 1e-3  # the circumference of the spring
+        volume = area * length
+        try:
+            return volume * self.active_coils * self.density
+        except TypeError:
+            return None
+
+    def min_wire_diameter(self, Ap, m, safety_factor, spring_diameter=None, spring_index=None,
+                          solid=False):
+        """The minimal wire diameter for given
+        safety factor in order to avoid failure,
+        according to the spring parameters.
+        if solid is True the calculation uses :attr:`Fsolid`
+        instead of :attr:`max_force`
+
+        Note: In order for the calculation to succeed the spring
+            diameter or the spring index should be known
+        :param float Ap: for Sut calc
+        :param float m: for Sut calc
+        :param float safety_factor: Static safety factor
+        :param float spring_diameter: The spring diameter
+        :param float spring_index: The spring index
+        :param bool solid: If true calculate to according to the solid max_force
+
+        :returns: The minimal wire diameter
+        :rtype: float or Symbol
+        """
+        if spring_index is not None:
+            factor_ks = (2 * spring_index + 1) / (2 * spring_index)
+            factor_kw = (4 * spring_index - 1) / (4 * spring_index - 4) + (0.615 / spring_index)
+            factor_k = factor_ks if self.set_removed else factor_kw
+            force = self.Fsolid if solid else self.max_force
+            return ((8 * factor_k * force * spring_index * safety_factor) / (
+                    self.shear_yield_percent * Ap * pi)) ** (1 / (2 - m))
+
+        elif spring_index is None and spring_diameter is not None:
+
+            factor_k, temp_k = 1.1, 0
+            diam = 0
+            while abs(factor_k - temp_k) > 1e-4:
+                # waiting for k to converge
+                diam = ((8 * self.max_force * spring_diameter * safety_factor * factor_k) / (
+                        pi * self.shear_yield_percent * Ap)) ** (1 / (3 - m))
+                temp_k = factor_k
+                factor_ks = (2 * spring_diameter + diam) / (2 * spring_diameter)
+                factor_kb = (4 * spring_diameter + 2 * diam) / (4 * spring_diameter - 3 * diam)
+                factor_k = factor_ks if self.set_removed else factor_kb
+            return diam
+        else:
+            print("Need to know spring index or spring diameter to calculate wire diameter")
+
+    def min_spring_diameter(self, safety_factor, wire_diameter, solid=False):
+        """return the minimum spring diameter to avoid static failure
+        according to the specified safety factor, if the solid flag is True :attr:'Fsolid'
+        is used instead of :attr:`max_force`
+        :param float safety_factor: static safety factor
+        :param float wire_diameter: Spring's wire diameter
+        :param bool solid: If true calculate to according to the solid max_force
+
+        :returns: The minimal spring diameter
+        :rtype: float or Symbol
+        """
+        force = self.Fsolid if solid else self.max_force
+        d = wire_diameter
+        if self.set_removed:
+            Ssy = self.shear_yield_strength
+            return 0.5 * ((Ssy / safety_factor) * ((pi * d ** 3) / (4 * force)) - d)
+        else:
+            # derived using the KB factor (because it was easier)
+            Sut = self.ultimate_tensile_strength
+            alpha = (Sut * pi * d ** 3) / (8 * self.max_force * safety_factor)
+            return 0.25 * ((2 * alpha - d) + sqrt((d - 2 * alpha) ** 2 - 24 * alpha * d))
