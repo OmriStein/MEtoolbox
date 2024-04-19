@@ -51,7 +51,12 @@ class HelicalCompressionSpring(Spring):
 
         self._spring_diameter = spring_diameter
         self._wire_diameter = wire_diameter
-        self._free_length_input_flag = False if free_length is None else True
+        if free_length is None:
+            self._free_length_input_flag = False
+        else:
+            self._free_length_input_flag = True
+            self.free_length = free_length
+
         if set_removed:
             print("Note: set should ONLY be removed for static loading"
                   "and NOT for periodical loading")
