@@ -14,19 +14,18 @@ Fmax = pn(5)
 Fmin = pn(1.5)
 # Hard drawn wire
 Ap, m = 1783, 0.190
+Sut = Ap / ( d ** m )
 G, E = 77.2e3, 203.4e3  # in [Mpa]
 
 spring = ExtensionSpring(max_force=Fmax, initial_tension=Fi, wire_diameter=d, spring_diameter=D,
-                         ultimate_tensile_strength=, hook_r1=r1, hook_r2=r2, shear_modulus=G,
+                         ultimate_tensile_strength=Sut, hook_r1=r1, hook_r2=r2, shear_modulus=G,
                          elastic_modulus=E, body_shear_yield_percent=0.45,
-                         hook_normal_yield_percent=0.75, end_shear_yield_percent=0.4,
-                         spring_rate=None, active_coils=None, body_coils=12.17, free_length=None,
-                         density=None, working_frequency=None)
+                         hook_normal_yield_percent=0.75, hook_shear_yield_percent=0.4,
+                         spring_rate=30, shot_peened=False, density=None, working_frequency=None)
 
-n_body, n_hook_normal, n_hook_shear = spring.static_safety_factor
-print(f"ns_body={n_body}, ns_hook_normal={n_hook_normal}, ns_hook_shear={n_hook_shear}")
-nf_body, ns_body, nf_hook_bending, nf_hook_shear = spring.fatigue_analysis(Fmax, Fmin, 50, )
-print(f"nf_body={nf_body}, ns_body={ns_body}, nf_hook_bending={nf_hook_bending},"
-      f"nf_hook_shear={nf_hook_shear}")
-print(f"minimum spring diameter = {mi(spring.min_spring_diameter(1.5))}")
-print(f"minimum wire diameter = {mi(spring.min_wire_diameter(1.5, spring.spring_index))}")
+static_safety_factor = spring.static_safety_factor()
+print(static_safety_factor)
+fatigue_safety_factor = spring.fatigue_analysis(Fmax, Fmin, 50, )
+print(fatigue_safety_factor)
+# print(f"minimum spring diameter = {mi(spring.min_spring_diameter(1.5))}")
+# print(f"minimum wire diameter = {mi(spring.min_wire_diameter(1.5, spring.spring_index))}")

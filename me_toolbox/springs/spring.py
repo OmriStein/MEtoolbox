@@ -11,7 +11,7 @@ class Spring:
 
     def __repr__(self):
         return f"Spring(max_force={self.max_force}, wire_diameter={self.wire_diameter}, " \
-               f"spring_diameter={self.spring_diameter}, spring_rate={self.spring_rate}, " \
+               f"diameter={self.diameter}, spring_rate={self.spring_rate}, " \
                f"active_coils={self.active_coils}, " \
                f"ultimate_tensile_strength={self.ultimate_tensile_strength}, " \
                f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}," \
@@ -20,18 +20,17 @@ class Spring:
 
     def __str__(self):
         return f"{self.__class__.__name__}(K={self.spring_constant}, d={self.wire_diameter}, " \
-               f"D={self.spring_diameter})"
+               f"D={self.diameter})"
 
-    def __init__(self, max_force, wire_diameter, spring_diameter, spring_rate, active_coils,
+    def __init__(self, max_force, wire_diameter, diameter, spring_rate,
                  ultimate_tensile_strength, shear_modulus, elastic_modulus, shot_peened,
                  density, working_frequency):
         """Instantiate helical push spring object with the given parameters
         :param float or Symbol max_force: The maximum load on the spring [N]
         :param float or Symbol wire_diameter: Spring wire diameter [mm]
-        :param float or Symbol spring_diameter: Spring diameter measured from [mm]
+        :param float or Symbol diameter: Spring diameter measured from [mm]
             the center point of the wire diameter
         :param float or None spring_rate: Spring rate (k) [N/mm]
-        :param float or None active_coils: Number of active coils (Na)
         :param float ultimate_tensile_strength: Ultimate tensile strength of the material [MPa]
         :param float shear_modulus: Shear modulus [MPa]
         :param float or None elastic_modulus: Elastic modulus (used for buckling calculations) [MPa]
@@ -44,10 +43,9 @@ class Spring:
 
         self.max_force = max_force
         self.working_frequency = working_frequency
-        self._wire_diameter = wire_diameter
-        self._spring_diameter = spring_diameter
-        self._spring_rate = spring_rate
-        self._active_coils = active_coils
+        self.wire_diameter = wire_diameter
+        self.diameter = diameter
+        self.spring_rate = spring_rate
         self.ultimate_tensile_strength = ultimate_tensile_strength
         self.shear_modulus = shear_modulus
         self.elastic_modulus = elastic_modulus
@@ -75,29 +73,28 @@ class Spring:
         self._wire_diameter = diameter
 
     @property
-    def spring_diameter(self):
+    def diameter(self):
         """Getter for the spring diameter attribute
 
         :returns: The spring diameter
         :rtype: float or Symbol
         """
-        return self._spring_diameter
+        return self._diameter
 
-    @spring_diameter.setter
-    def spring_diameter(self, diameter):
+    @diameter.setter
+    def diameter(self, diameter):
         """Sets the spring diameter and updates relevant attributes
         :param float diameter: Spring's diameter
         """
-
-        self._spring_diameter = diameter
+        self._diameter = diameter
 
     @property
     def inside_diameter(self):
-        return self.spring_diameter - self.wire_diameter
+        return self.diameter - self.wire_diameter
 
     @property
     def outside_diameter(self):
-        return self.spring_diameter + self.wire_diameter
+        return self.diameter + self.wire_diameter
 
     @property
     def spring_index(self):
@@ -109,23 +106,7 @@ class Spring:
         :returns: The spring index
         :type: float or Symbol
         """
-        return self.spring_diameter / self.wire_diameter
-
-    @property
-    def active_coils(self):
-        """getter for the :attr:`active_coils` attribute
-
-        :returns: The spring active coils
-        :rtype: float
-        """
-        return self._active_coils
-
-    @active_coils.setter
-    def active_coils(self, active_coils):
-        """setter for the :attr:`active_coils` attribute
-        :param float or None active_coils: Spring active coils
-        """
-        self._active_coils = active_coils
+        return self.diameter / self.wire_diameter
 
     @property
     def spring_rate(self):
