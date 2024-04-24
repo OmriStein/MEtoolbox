@@ -1,6 +1,6 @@
 """A module containing the helical push spring class"""
 from math import pi, sqrt
-from sympy import Symbol, sqrt
+from sympy import sqrt
 
 from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import Spring
@@ -16,9 +16,9 @@ class HelicalCompressionSpring(Spring):
                  density=None, working_frequency=None, anchors=None, zeta=0.15):
         """Instantiate helical push spring object with the given parameters
 
-        :param float or Symbol max_force: The maximum load on the spring [N]
-        :param float or Symbol wire_diameter: Spring wire diameter [mm]
-        :param float or Symbol spring_diameter: Spring diameter measured from [mm]
+        :param float max_force: The maximum load on the spring [N]
+        :param float wire_diameter: Spring wire diameter [mm]
+        :param float spring_diameter: Spring diameter measured from [mm]
             the center point of the wire diameter
         :param float ultimate_tensile_strength: Ultimate tensile strength of the material [MPa]
         :param float shear_yield_percent: Yield percent used to estimate shear_yield_stress
@@ -123,7 +123,7 @@ class HelicalCompressionSpring(Spring):
         (if the spring is fully compressed so the coils are touching each other)
 
         :returns: Spring solid length (when all the coils are touching)
-        :rtype: float or Symbol
+        :rtype: float
         """
         diameter = self.wire_diameter
         total_coils = self.total_coils
@@ -163,7 +163,7 @@ class HelicalCompressionSpring(Spring):
         """Ne - the end coils of the spring
 
         :returns: Number of the spring end coils
-        :rtype: float or Symbol
+        :rtype: float
         """
         options = {'plain': 0,
                    'plain and ground': 1,
@@ -176,7 +176,7 @@ class HelicalCompressionSpring(Spring):
         """Nt - the total coils of the spring
 
         :returns: Number of the spring total coils
-        :rtype: float or Symbol
+        :rtype: float
         """
         return self.end_coils + self.active_coils
 
@@ -185,7 +185,7 @@ class HelicalCompressionSpring(Spring):
         """ p - pitch of the spring (the distance between the coils)
 
         :returns: Pitch
-        :rtype: float or Symbol
+        :rtype: float
         """
         options = {'plain': (self.free_length - self.wire_diameter) / self.active_coils,
                    'plain and ground': self.free_length / (self.active_coils + 1),
@@ -250,11 +250,11 @@ class HelicalCompressionSpring(Spring):
 
     def calc_shear_stress(self, force, k_factor):
         """Calculates the max shear stress based on the max_force applied
-        :param float of Symbol force: Working max_force of the spring
+        :param float force: Working max_force of the spring
         :param float k_factor: the appropriate k factor for the calculation
 
         :returns: Shear stress
-        :rtype: float or Symbol
+        :rtype: float
         """
         return (k_factor * 8 * force * self.diameter) / (pi * self.wire_diameter ** 3)
 
@@ -275,16 +275,16 @@ class HelicalCompressionSpring(Spring):
         """Returns the spring max_deflection, It's change in length
 
         :returns: Spring max_deflection
-        :rtype: float or Symbol
+        :rtype: float
         """
         return self.calc_deflection(self.max_force)
 
     def calc_deflection(self, force):
         """Calculate the spring deflection (change in length) due to specific max_force
-        :param float or Symbol force: Spring working max_force
+        :param float force: Spring working max_force
 
         :returns: Spring deflection
-        :rtype: float or Symbol
+        :rtype: float
         """
         C = self.spring_index
         d = self.wire_diameter
@@ -297,7 +297,7 @@ class HelicalCompressionSpring(Spring):
         """Return's the spring *active coils* weight according to the specified density
 
         :returns: Spring weight
-        :type: float or Symbol
+        :type: float
         """
         area = 0.25 * pi * (self.wire_diameter * 1e-3) ** 2  # cross-section area
         length = pi * self.diameter * 1e-3  # the circumference of the spring
@@ -308,7 +308,7 @@ class HelicalCompressionSpring(Spring):
         """ Returns the static safety factor according to the object attributes
 
         :returns: static factor of safety
-        :type: float or Symbol
+        :type: float
         """
         k_factor = self.factor_Ks if self.set_removed else self.factor_Kw
         if solid:
@@ -370,7 +370,7 @@ class HelicalCompressionSpring(Spring):
         :param bool solid: If true calculate to according to the solid max_force
 
         :returns: The minimal wire diameter
-        :rtype: float or Symbol
+        :rtype: float
         """
         if spring_index is not None:
             factor_ks = (2 * spring_index + 1) / (2 * spring_index)
@@ -405,7 +405,7 @@ class HelicalCompressionSpring(Spring):
         :param bool solid: If true calculate to according to the solid max_force
 
         :returns: The minimal spring diameter
-        :rtype: float or Symbol
+        :rtype: float
         """
         force = self.Fsolid if solid else self.max_force
         d = wire_diameter

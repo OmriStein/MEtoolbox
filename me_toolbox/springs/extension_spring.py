@@ -1,6 +1,5 @@
 """A module containing the extension spring class"""
 from math import pi
-from sympy import Symbol  # pylint: disable=unused-import
 
 from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import HelicalCompressionSpring
