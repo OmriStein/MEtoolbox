@@ -21,8 +21,6 @@ class ExtensionSpring(HelicalCompressionSpring):
         :param float wire_diameter: spring wire diameter
         :param float spring_diameter: spring diameter measured from
             the center point of the wire diameter
-        # :param float Ap: A constant for Estimating Minimum Tensile Strength of Common Spring Wires
-        # :param float m: A Constants Estimating Minimum Tensile Strength of Common Spring Wires
         :param float ultimate_tensile_strength: Ultimate tensile strength of the material
         :param float hook_r1: hook internal radius
         :param float hook_r2: hook bend radius
@@ -176,7 +174,6 @@ class ExtensionSpring(HelicalCompressionSpring):
 
     def calc_normal_stress(self, force):
         """Calculates the normal stress based on the max_force given
-
         :param float force: Working max_force of the spring
 
         :returns: normal stress
@@ -235,9 +232,8 @@ class ExtensionSpring(HelicalCompressionSpring):
 
     def fatigue_analysis(self, max_force, min_force, reliability,
                          criterion='gerber', verbose=False, metric=True):
-        """Fatigue analysis of the hook section
-        for normal and shear stress,and for the
-        body section for shear and static yield.
+        """Fatigue analysis of the hook section, for normal and shear stress,and for the
+        body section for shear and static yield
         :param float max_force: Maximal max_force acting on the spring
         :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
@@ -299,8 +295,8 @@ class ExtensionSpring(HelicalCompressionSpring):
                   f"Mean body shear stress = {mean_body_shear_stress}\n"
                   f"Sse = {Sse}, Se = {Se}")
 
-        return {'nf_body':nf_body, 'ns_body':ns_body, 'nf_hook_normal':nf_hook_normal,
-                'nf_hook_shear':nf_hook_shear}
+        return {'nf_body': nf_body, 'ns_body': ns_body, 'nf_hook_normal': nf_hook_normal,
+                'nf_hook_shear': nf_hook_shear}
 
     def min_wire_diameter(self, Ap, m, safety_factor, spring_index=None):
         """The minimal wire diameters (for shear and normal stresses)
@@ -348,7 +344,7 @@ class ExtensionSpring(HelicalCompressionSpring):
 
     def min_spring_diameter(self, static_safety_factor):
         """return the minimum spring diameter to avoid static failure
-        according to the given safety factor.
+        according to the given safety factor
         :param float static_safety_factor: factor of safety
 
         :returns: The minimal spring diameter

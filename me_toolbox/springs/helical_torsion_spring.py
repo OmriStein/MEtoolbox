@@ -10,15 +10,15 @@ from me_toolbox.tools import percent_to_decimal
 class HelicalTorsionSpring(Spring):
     """A Helical torsion spring object"""
 
-    def __init__(self, max_moment, wire_diameter, spring_diameter, ultimate_tensile_strength,
-                 leg1, leg2, shear_modulus, elastic_modulus, yield_percent,
-                 spring_rate=None, active_coils=None, body_coils=None, shot_peened=False,
-                 density=None, working_frequency=None, radius=None, pin_diameter=None):
+    def __init__(self, max_moment, wire_diameter, spring_diameter, leg1, leg2,
+                 ultimate_tensile_strength, yield_percent, shear_modulus, elastic_modulus,
+                 spring_rate, radius=None, arbor_diameter=None, shot_peened=False, density=None,
+                 working_frequency=None):
         """Instantiate helical torsion spring object with the given parameters
 
-        :param float or Symbol max_moment: The maximum load on the spring
-        :param float or Symbol wire_diameter: spring wire diameter
-        :param float or Symbol spring_diameter: spring diameter measured from
+        :param float  max_moment: The maximum load on the spring
+        :param float  wire_diameter: spring wire diameter
+        :param float  spring_diameter: spring diameter measured from
             the center point of the wire diameter
         :param float ultimate_tensile_strength: Ultimate tensile strength of the material
         :param float leg1: spring leg
@@ -26,237 +26,118 @@ class HelicalTorsionSpring(Spring):
         :param float shear_modulus: Spring's material shear modulus
         :param float elastic_modulus: Spring's material elastic modulus
         :param float yield_percent: Used to estimate the spring's yield stress
-        :param float or None spring_rate: K - spring rate
-        :param float or None active_coils: active_coils - number of active coils
-        :param float or None body_coils: Spring's number of body coils
+        :param float spring_rate: K - spring rate
+        :param float arbor_diameter: the diameter of the pin going through the spring
+        :param float radius: The distance of applied force from the center
         :param bool shot_peened: if True adds to fatigue strength
         :param float or None density: Spring's material density
             (used for buckling and weight calculations)
         :param float or None working_frequency: the spring working frequency
             (used for fatigue calculations)
-        :param float radius: The distance of applied force from the center
-        :param float pin_diameter: the diameter of the pin going through the spring
 
         :returns: HelicalTorsionSpring
         """
         max_force = max_moment / radius if radius is not None else None
 
-        super().__init__(max_force, wire_diameter, spring_diameter, spring_rate, active_coils,
+        super().__init__(max_force, wire_diameter, spring_diameter, spring_rate,
                          ultimate_tensile_strength, shear_modulus, elastic_modulus,
                          shot_peened, density, working_frequency)
 
         self.max_moment = max_moment
         self.yield_percent = yield_percent
-        self.leg1, self.leg2 = leg1, leg2
-        self.pin_diameter = pin_diameter
+        self.leg1 = leg1
+        self.leg2 = leg2
+        self.arbor_diameter = arbor_diameter
 
-        if sum([active_coils is not None, spring_rate is not None, body_coils is not None]) > 1:
-            # if two or more are given raise error to prevent input mistakes
-            raise ValueError("active_coils, body_coils and/or spring_rate were"
-                             "given but only one is expected")
-        elif spring_rate is not None:
-            # spring_rate -> active_coils -> body_coils
-            self.spring_rate = spring_rate
-        elif active_coils is not None:
-            # active_coils -> spring_rate, active_coils->body_coils
-            self.active_coils = active_coils
-        elif body_coils is not None:
-            # body_coils -> active_coils -> spring_rate
-            self.body_coils = body_coils
+    def check_design(self):
+        raise NotImplementedError("check_design is not implemented yet for HelicalTorsionSpring")
+
+    @property
+    def diameter_after_deflection(self):
+        """ After deflection The spring diameter is shrinking it is important to know the new
+        diameter to check if it conflicts with the arbor size
+
+        :return: The spring diameter after deflection
+        :rtype: float
+        """
+        Nb = self.body_coils
+        return (Nb * self.diameter) / (Nb + self.calc_angular_deflection(self.max_moment, False))
+
+    @property
+    def clearance(self):
+        """Diametrical Clearance between the spring after deflection and the arbor"""
+        if self.arbor_diameter is not None:
+            ID = self.diameter_after_deflection - self.wire_diameter
+            return ID - self.arbor_diameter
         else:
-            raise ValueError("active_coils, body_coils and the spring_rate"
-                             "can't all be None, Tip: Find the spring constant")
+            return "The pin diameter was not given"
+
+    @property
+    def length(self):
+        """ The length of the spring - L """
+        return self.wire_diameter * self.body_coils
+
+    @property
+    def active_coils(self):
+        """Number of active coils - Na
+
+        Note: according to the analytical calculation the 67.8584 should be 64 (from the second
+        moment of inertia of a round wire) but 67.8584 fits better to the experimental results,
+        probably due to friction between the coils and arbor.
+
+        :returns: number of active coils
+        :rtype: float
+        """
+        D = self.diameter
+        d = self.wire_diameter
+        active_coils = (d ** 4 * self.elastic_modulus) / (67.8584 * D * self.spring_rate)
+        return active_coils
+
+    @property
+    def body_coils(self):
+        """Total number of coils
+
+        :returns: number of body coils
+        :rtype: float
+        """
+        return self.active_coils - ((self.leg1 + self.leg2) / (3 * pi * self.diameter))
+
+    @property
+    def partial_turn(self):
+        """Partial number of coils (β/360)
+
+        :returns: Partial number of coils
+        :rtype: float
+        """
+        return self.body_coils - int(self.body_coils)
 
     @property
     def yield_strength(self):
         """ Sy - yield strength
         (shear_yield_stress = % * ultimate_tensile_strength))
         """
-        return percent_to_decimal(self.yield_percent) * self.ultimate_tensile_strength
-
-    @property
-    def wire_diameter(self):
-        """Getter for the wire diameter attribute
-
-        :returns: The spring's wire diameter
-        :rtype: float or Symbol
-        """
-        return self._wire_diameter
-
-    @wire_diameter.setter
-    def wire_diameter(self, wire_diameter):
-        """Sets the wire diameter and updates relevant attributes
-
-        :param float wire_diameter: Spring's wire diameter
-        """
-        self._wire_diameter = wire_diameter
-        # updating active_coils and free length with the new diameter
-        self.active_coils = None
-        self.spring_rate = None
-
-    @property
-    def spring_diameter(self):
-        """Getter for the spring diameter attribute
-
-        :returns: The spring diameter
-        :rtype: float or Symbol
-        """
-        return self._spring_diameter
-
-    @spring_diameter.setter
-    def spring_diameter(self, wire_diameter):
-        """Sets the spring diameter and updates relevant attributes
-
-        :param float wire_diameter: Spring's diameter
-        """
-        self._spring_diameter = wire_diameter
-        # updating active_coils and free length with the new diameter
-        self.active_coils = None
-        self.spring_rate = None
-
-    @property
-    def active_coils(self):
-        """getter for the :attr:`active_coils` attribute
-
-        :returns: The spring active coils
-        :rtype: float
-        """
-        return self._active_coils
-
-    @active_coils.setter
-    def active_coils(self, active_coils):
-        """getter for the :attr:`active_coils` attribute
-        the method checks if active_coils was given and if not it
-        calculates it form the other known parameters
-        and then update the :attr:`spring_rate` attribute to match
-
-        :param float or None active_coils: Spring active coils
-        """
-        if active_coils is not None:
-            # active_coils was given
-            self._active_coils = active_coils
-            # recalculate spring constant and free_length according to the new active_coils
-            self.spring_rate = None
-            self.body_coils = None
-
-        else:
-            # active_coils was not given so calculate it
-            self._active_coils = self.calc_active_coils()
-
-    def calc_active_coils(self):
-        """Calculate Na which is the number of active coils
-        (using Castigliano's theorem)
-
-        :returns: number of active coils
-        :rtype: float
-        """
-        D = self.spring_diameter
-
-        if self.body_coils is None:
-            d = self.wire_diameter
-            active_coils = (d ** 4 * self.elastic_modulus) / (10.8 * D * self.spring_rate)
-        else:
-            active_coils = self.body_coils + (self.leg1 + self.leg2) / (3 * pi * D)
-        return active_coils
-
-    @property
-    def body_coils(self):
-        """getter for the :attr:`body_coils` attribute
-
-        :returns: The spring body coils
-        :rtype: float
-        """
         try:
-            return self._body_coils
-        except AttributeError:
-            # if called before attribute was creates
-            return None
-
-    @body_coils.setter
-    def body_coils(self, body_coils):
-        """getter for the :attr:`body_coils` attribute
-        the method checks if body_coils was given and if
-        not it calculates it form the other known parameters
-
-        :param float or None body_coils: Spring body coils
-        """
-        if body_coils is not None:
-            # active_coils was given
-            self._body_coils = body_coils
-            # recalculate spring constant and free_length according to the new active_coils
-            self.active_coils = None
-            self.spring_rate = None
-
-        else:
-            # active_coils was not given so calculate it
-            self._body_coils = self.calc_body_coils()
-
-    def calc_body_coils(self):
-        """Calculate active_coils which is the number of active coils (using Castigliano's theorem)
-
-        :returns: number of active coils
-        :rtype: float
-        """
-        return self.active_coils - (self.leg1 + self.leg2) / (3 * pi * self.spring_diameter)
-
-    @body_coils.deleter
-    def body_coils(self):
-        print("deleter of body_coils called")
-        del self._body_coils
+            return percent_to_decimal(self.yield_percent) * self.ultimate_tensile_strength
+        except TypeError:
+            return self.yield_percent * self.ultimate_tensile_strength
 
     @property
-    def spring_rate(self):
-        """getter for the :attr:`spring_rate` attribute
+    def factor_Ki(self):
+        """Inner fibers stress correction factor
 
-        :returns: The spring constant
+        :returns:stress concentration factor ki
         :rtype: float
         """
-        return self._spring_rate
-
-    @spring_rate.setter
-    def spring_rate(self, spring_rate):
-        """getter for the :attr:`spring_rate` attribute
-        the method checks if the spring constant was given and
-        if not it calculates it form the other known parameters
-        and then update the :attr:`active_coils` attribute to match
-
-        :param float or None spring_rate: K - The spring constant
-        """
-        if spring_rate is not None:
-            # spring_rate was given
-            self._spring_rate = spring_rate
-            # makes sure active_coils is calculated based on the new
-            # spring constant and not on the last body_coils value
-            del self.body_coils
-            self.active_coils = None
-            self.body_coils = None
-
-        else:
-            # spring_rate was not given so calculate it
-            self._spring_rate = self.calc_spring_rate()
+        index = self.spring_index
+        return (4 * index ** 2 - index - 1) / (4 * index * (index - 1))
 
     @property
-    def spring_rate_deg(self):
-        """convert the spring constant from
-        [N*mm/turn] or [pound force*inch/turn]
-        to [N*mm/deg] or [pound force*inch/deg]"""
-        return self.spring_rate / 360
+    def factor_Ko(self):
+        """Outer fiber stress correction factor. in light that factor_Ko is always less than
+        factor_ki we don't use it in the stress estimation, but it is brought here
+        for the sake of completion
 
-    def calc_spring_rate(self):
-        """Calculate spring constant in [N*mm/turn] or [pound force*inch/turn]
-
-        :returns: The spring constant
-        :rtype: float
-        """
-        d = self.wire_diameter
-        D = self.spring_diameter
-        return (d ** 4 * self.elastic_modulus) / (10.8 * D * self.active_coils)
-
-    @property
-    def factor_ki(self):
-        """Internal stress correction factor
-
-        :returns:stress concentration factor
+        :returns:stress concentration factor Ko
         :rtype: float
         """
         index = self.spring_index
@@ -267,92 +148,82 @@ class HelicalTorsionSpring(Spring):
         """The normal stress due to bending and axial loads
 
         :returns: Normal stress
-        :rtype: float or Symbol
+        :rtype: float 
         """
         return self.calc_max_stress(self.max_moment)
 
     def calc_max_stress(self, moment):
         """Calculates the normal stress based on the moment given
         NOTE: The calculation is for round wire torsion spring
-
-        :param float of Symbol moment: Working force of the spring
+        :param float moment: Working force of the spring
 
         :returns: normal stress
-        :rtype: float or Symbol
+        :rtype: float 
         """
-        return (self.factor_ki * 32 * moment) / (pi * self.wire_diameter ** 3)
+        return self.factor_Ki * ((32 * moment) / (pi * self.wire_diameter ** 3))
 
     @property
-    def max_total_angular_deflection(self):
+    def natural_frequency(self):
+        raise NotImplementedError("natural_frequency has not been implemented yet "
+                                  "for HelicalTorsionSpring")
+
+    @property
+    def max_angular_deflection(self):
         """The total angular deflection due to the max moment
-        this deflection is comprise out of the angular deflection
+        this deflection consists of the angular deflection
         of the coil body and from the end deflection of cantilever
         for *each* leg.
 
         :returns: Max angular deflection
-        :rtype: float or Symbol
+        :rtype: float 
         """
         return self.calc_angular_deflection(self.max_moment)
 
-    @property
-    def max_total_angular_deflection_deg(self):
-        """convert max angular deflection from [turns] to [degrees]"""
-        return self.max_total_angular_deflection * 360
+    def calc_angular_deflection(self, moment, total_deflection=True):
+        """Calculates the total angular deflection based on the moment given,
+        If the total flag is True than the total angular deflection is calculated,
+        if False only the deflection of the coil body is calculated (without the legs)
 
-    @property
-    def max_angular_deflection(self):
-        """The angular deflection due to the max moment
-        of *only* the coil body in [turns]
+        Note: according to the analytical calculation the 67.8584 should be 64 (from the second
+        moment of inertia of a round wire) but 67.8584 fits better to the experimental results,
+        probably due to friction between the coils and arbor.
 
-        :returns: Max angular deflection
-        :rtype: float or Symbol
-        """
-        return self.calc_angular_deflection(self.max_moment, total=False)
+        :param float  moment: Working moment of the spring
+        :param bool total_deflection: total or partial deflection
 
-    @property
-    def max_angular_deflection_deg(self):
-        """convert max angular deflection from [turns] to [degrees]"""
-        return self.max_angular_deflection * 360
-
-    def calc_angular_deflection(self, moment, total=True):
-        """Calculates the total angular deflection based on the moment given
-        if the total flag is True than the total angular deflection is calculated,
-        if False only the deflection of the coil body is calculated
-
-        NOTE: the units of the deflection is in [turns]
-
-        :param float of Symbol moment: Working moment of the spring
-        :param bool total: total or partial deflection
-
-        :returns: Total angular deflection
-        :rtype: float or Symbol
+        :returns: Total angular deflection in radians
+        :rtype: float 
         """
         d = self.wire_diameter
-        D = self.spring_diameter
+        D = self.diameter
         E = self.elastic_modulus
-
-        N = self.active_coils if total else self.body_coils
-        return ((10.8 * moment * D) / (d ** 4 * E)) * N
-
-    @property
-    def helix_diameter(self):
-        """The helix diameter"""
+        l1 = self.leg1
+        l2 = self.leg2
         Nb = self.body_coils
-        return (Nb * self.spring_diameter) / (Nb + self.max_angular_deflection)
+        legs_deflection_part = (l1 + l2)/(3*pi*D) if total_deflection else 0
+        return ((67.8584 * moment * D) / (d ** 4 * E)) * (Nb + legs_deflection_part)
 
     @property
-    def clearance(self):
-        if self.pin_diameter is not None:
-            return self.helix_diameter - self.wire_diameter - self.pin_diameter
+    def weight(self):
+        """Return's the spring *active coils* weight according to the specified density
+
+        :returns: Spring weight
+        :type: float
+        """
+        area = 0.25 * pi * (self.wire_diameter * 1e-3) ** 2  # cross-section area
+        length = pi * self.diameter * 1e-3  # the circumference of the spring
+        coil_volume = area * length
+        if self.density is not None:
+            return (coil_volume * self.body_coils + (self.leg1 + self.leg2) * area) * self.density
         else:
-            return "The pin diameter was not given"
+            raise ValueError(f"Can't calculate weight, no density is specified")
 
     @property
     def static_safety_factor(self):  # pylint: disable=unused-argument
         """ Returns the static safety factor
 
         :returns: Spring's safety factor
-        :type: float or Symbol
+        :type: float
         """
         return self.yield_strength / self.max_stress
 
@@ -360,7 +231,6 @@ class HelicalTorsionSpring(Spring):
                          criterion='gerber', verbose=False, metric=True):
         """ Returns safety factors for fatigue and
         for first cycle according to Langer
-
         :param float max_moment: Maximal max_force acting on the spring
         :param float min_moment: Minimal max_force acting on the spring
         :param float reliability: in percentage
@@ -396,7 +266,6 @@ class HelicalTorsionSpring(Spring):
 
         Note: In order for the calculation to succeed the
             spring diameter or the spring index should be known
-
         :param float safety_factor: static safety factor
         :param float spring_diameter: The spring diameter
         :param float spring_index: The spring index
@@ -425,7 +294,6 @@ class HelicalTorsionSpring(Spring):
     def min_spring_diameter(self, safety_factor, wire_diameter):
         """return the minimum spring diameter to avoid static failure
         according to the specified safety factor
-
         :param float safety_factor: static safety factor
         :param float wire_diameter: Spring's wire diameter
 
@@ -439,3 +307,14 @@ class HelicalTorsionSpring(Spring):
         beta = -d * (4 * Sy * pi * d ** 3 + 32 * M * safety_factor)
         gamma = 32 * M * safety_factor * d ** 2
         return (-beta + sqrt(beta ** 2 - 4 * alpha * gamma)) / (2 * alpha)
+
+    @staticmethod
+    def calc_spring_rate(wire_diameter, spring_diameter, active_coils, elastic_modulus):
+        """Estimate spring constant from geometric and material properties
+
+        :returns: The spring constant [Nm/rad]
+        :rtype: float
+        """
+        d = wire_diameter
+        D = spring_diameter
+        return (d ** 4 * elastic_modulus) / (67.8584 * D * active_coils)
