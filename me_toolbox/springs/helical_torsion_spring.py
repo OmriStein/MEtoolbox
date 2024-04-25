@@ -154,7 +154,8 @@ class HelicalTorsionSpring(Spring):
 
     def calc_max_stress(self, moment):
         """Calculates the normal stress based on the moment given
-        NOTE: The calculation is for round wire torsion spring
+        NOTE: The calculation is for round wire torsion spring.
+
         :param float moment: Working force of the spring
 
         :returns: normal stress
@@ -230,7 +231,8 @@ class HelicalTorsionSpring(Spring):
     def fatigue_analysis(self, max_moment, min_moment, reliability,
                          criterion='gerber', verbose=False, metric=True):
         """ Returns safety factors for fatigue and
-        for first cycle according to Langer
+        for first cycle according to Langer failure criteria.
+
         :param float max_moment: Maximal max_force acting on the spring
         :param float min_moment: Minimal max_force acting on the spring
         :param float reliability: in percentage
@@ -265,7 +267,8 @@ class HelicalTorsionSpring(Spring):
         in order to avoid failure, according to the spring parameters
 
         Note: In order for the calculation to succeed the
-            spring diameter or the spring index should be known
+            spring diameter or the spring index should be known.
+
         :param float safety_factor: static safety factor
         :param float spring_diameter: The spring diameter
         :param float spring_index: The spring index
@@ -293,7 +296,8 @@ class HelicalTorsionSpring(Spring):
 
     def min_spring_diameter(self, safety_factor, wire_diameter):
         """return the minimum spring diameter to avoid static failure
-        according to the specified safety factor
+        according to the specified safety factor.
+
         :param float safety_factor: static safety factor
         :param float wire_diameter: Spring's wire diameter
 

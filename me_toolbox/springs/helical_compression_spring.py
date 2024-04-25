@@ -14,7 +14,7 @@ class HelicalCompressionSpring(Spring):
                  shear_yield_percent, shear_modulus, elastic_modulus, end_type,
                  spring_rate, set_removed=False, shot_peened=False,
                  density=None, working_frequency=None, anchors=None, zeta=0.15):
-        """Instantiate helical push spring object with the given parameters
+        """Instantiate helical push spring object with the given parameters.
 
         :param float max_force: The maximum load on the spring [N]
         :param float wire_diameter: Spring wire diameter [mm]
@@ -231,7 +231,7 @@ class HelicalCompressionSpring(Spring):
     def factor_KB(self):  # pylint: disable=invalid-name
         """K_B - Bergstrasser shear stress concentration factor (very close to factor_Kw)
 
-        NOT IMPLEMENTED!!!
+        NOTE:for the sake of completion NOT IMPLEMENTED!!!
 
         :returns: Bergstrasser shear stress concentration factor
         :rtype: float
@@ -249,7 +249,8 @@ class HelicalCompressionSpring(Spring):
         return self.calc_shear_stress(self.max_force, k_factor)
 
     def calc_shear_stress(self, force, k_factor):
-        """Calculates the max shear stress based on the max_force applied
+        """Calculates the max shear stress based on the max_force applied.
+
         :param float force: Working max_force of the spring
         :param float k_factor: the appropriate k factor for the calculation
 
@@ -280,7 +281,8 @@ class HelicalCompressionSpring(Spring):
         return self.calc_deflection(self.max_force)
 
     def calc_deflection(self, force):
-        """Calculate the spring deflection (change in length) due to specific max_force
+        """Calculate the spring deflection (change in length) due to specific max_force.
+
         :param float force: Spring working max_force
 
         :returns: Spring deflection
@@ -322,8 +324,9 @@ class HelicalCompressionSpring(Spring):
 
     def fatigue_analysis(self, max_force, min_force, reliability,
                          criterion='modified goodman', verbose=False, metric=True):
-        """ Returns safety factors for fatigue and
-        for first cycle according to Langer
+        """ Returns safety factors for fatigue and for first cycle according to Lange failure
+        criteria.
+
         :param float max_force: Maximal max_force acting on the spring
         :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
@@ -365,6 +368,7 @@ class HelicalCompressionSpring(Spring):
 
         Note: In order for the calculation to succeed the spring
             diameter or the spring index should be known
+
         :param float Ap: for Sut calc
         :param float m: for Sut calc
         :param float safety_factor: Static safety factor
@@ -402,7 +406,8 @@ class HelicalCompressionSpring(Spring):
     def min_spring_diameter(self, safety_factor, wire_diameter, solid=False):
         """return the minimum spring diameter to avoid static failure
         according to the specified safety factor, if the solid flag is True :attr:'Fsolid'
-        is used instead of :attr:`max_force`
+        is used instead of :attr:`max_force`.
+
         :param float safety_factor: static safety factor
         :param float wire_diameter: Spring's wire diameter
         :param bool solid: If true calculate to according to the solid max_force

@@ -173,7 +173,8 @@ class ExtensionSpring(HelicalCompressionSpring):
         return self.calc_normal_stress(self.max_force)
 
     def calc_normal_stress(self, force):
-        """Calculates the normal stress based on the max_force given
+        """Calculates the normal stress based on the max_force given.
+
         :param float force: Working max_force of the spring
 
         :returns: normal stress
@@ -207,7 +208,8 @@ class ExtensionSpring(HelicalCompressionSpring):
         raise NotImplementedError("Need to adapt the formula to extension spring")
 
     def calc_deflection(self, force):
-        """Calculate the spring max_deflection (change in length) due to specific max_force
+        """Calculate the spring max_deflection (change in length) due to specific max_force.
+
         :param float force: Spring working max_force
 
         :returns: Spring max_deflection
@@ -233,7 +235,8 @@ class ExtensionSpring(HelicalCompressionSpring):
     def fatigue_analysis(self, max_force, min_force, reliability,
                          criterion='gerber', verbose=False, metric=True):
         """Fatigue analysis of the hook section, for normal and shear stress,and for the
-        body section for shear and static yield
+        body section for shear and static yield.
+
         :param float max_force: Maximal max_force acting on the spring
         :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
@@ -306,7 +309,8 @@ class ExtensionSpring(HelicalCompressionSpring):
         HelicalCompressionSpring, so we assume an initial K and iterate until convergence,
         be aware that for some static_safety_factor convergence my not occur.
 
-        NOTE: for static use only
+        NOTE: for static use only.
+
         :param float safety_factor: Static safety factor
         :param float spring_index: Spring index
 
@@ -344,7 +348,8 @@ class ExtensionSpring(HelicalCompressionSpring):
 
     def min_spring_diameter(self, static_safety_factor):
         """return the minimum spring diameter to avoid static failure
-        according to the given safety factor
+        according to the given safety factor.
+
         :param float static_safety_factor: factor of safety
 
         :returns: The minimal spring diameter
