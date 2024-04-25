@@ -54,7 +54,7 @@ class ExtensionSpring(HelicalCompressionSpring):
         self.hook_normal_yield_percent = hook_normal_yield_percent
         self.hook_shear_yield_percent = hook_shear_yield_percent
 
-        self.check_design()
+        # self.check_design()
 
     def check_design(self, verbose=False):
         """Check if the spring index,active_coils,zeta and free_length
@@ -101,11 +101,13 @@ class ExtensionSpring(HelicalCompressionSpring):
 
     @property
     def solid_length(self):
-        raise NotImplementedError("Inherited from HelicalCompressionSpring but useless here")
+        raise NotImplementedError("solid_length is inherited from HelicalCompressionSpring "
+                                  "but has no use in ExtensionSpring")
 
     @property
     def Fsolid(self):
-        raise NotImplementedError("Inherited from HelicalCompressionSpring but useless here")
+        raise NotImplementedError("Fsolid is inherited from HelicalCompressionSpring "
+                                  "but has no use in ExtensionSpring")
 
     @property
     def body_coils(self):

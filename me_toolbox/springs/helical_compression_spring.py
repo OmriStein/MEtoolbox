@@ -302,7 +302,10 @@ class HelicalCompressionSpring(Spring):
         area = 0.25 * pi * (self.wire_diameter * 1e-3) ** 2  # cross-section area
         length = pi * self.diameter * 1e-3  # the circumference of the spring
         coil_volume = area * length
-        return coil_volume * self.total_coils * self.density
+        if self.density is not None:
+            return coil_volume * self.total_coils * self.density
+        else:
+            raise ValueError(f"Can't calculate weight, no density is specified")
 
     def static_safety_factor(self, solid=False):
         """ Returns the static safety factor according to the object attributes

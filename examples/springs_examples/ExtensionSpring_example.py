@@ -22,10 +22,10 @@ spring = ExtensionSpring(max_force=Fmax, initial_tension=Fi, wire_diameter=d, sp
                          elastic_modulus=E, body_shear_yield_percent=0.45,
                          hook_normal_yield_percent=0.75, hook_shear_yield_percent=0.4,
                          spring_rate=30, shot_peened=False, density=None, working_frequency=None)
-
-static_safety_factor = spring.static_safety_factor()
-print(static_safety_factor)
-fatigue_safety_factor = spring.fatigue_analysis(Fmax, Fmin, 50, )
-print(fatigue_safety_factor)
+spring.get_info()
+# static_safety_factor = spring.static_safety_factor()
+# print(static_safety_factor)
+# fatigue_safety_factor = spring.fatigue_analysis(Fmax, Fmin, 50, )
+# print(fatigue_safety_factor)
 # print(f"minimum spring diameter = {mi(spring.min_spring_diameter(1.5))}")
 # print(f"minimum wire diameter = {mi(spring.min_wire_diameter(1.5, spring.spring_index))}")

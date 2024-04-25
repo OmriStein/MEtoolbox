@@ -9,9 +9,20 @@ def print_atributes(obj):
 
     :param obj: any object
     """
-    attribute_list = [attribute for attribute in dir(obj) if
-                      not callable(getattr(obj, attribute)) and attribute.startswith(
-                          '__') is False and attribute.startswith('_') is False]
+    # attribute_list = [attribute for attribute in dir(obj) if
+    #                   not callable(getattr(obj, attribute)) and attribute.startswith(
+    #                       '__') is False and attribute.startswith('_') is False]
+
+    attribute_list = []
+
+    for attribute in dir(obj):
+        try:
+            if (not callable(getattr(obj, attribute)) and attribute.startswith('__') is False and
+                    attribute.startswith('_') is False):
+                attribute_list.append(attribute)
+        except Exception:
+            continue
+
     for item in attribute_list:
         print(f"{item} : {getattr(obj, item)}")
 
