@@ -9,6 +9,24 @@ from me_toolbox.tools import percent_to_decimal
 class ExtensionSpring(HelicalCompressionSpring):
     """An extension spring object"""
 
+    def __repr__(self):
+        return f"ExtensionSpring(max_force={self.max_force}, " \
+               f"initial_tension={self.initial_tension}, wire_diameter={self.wire_diameter}, " \
+               f"spring_diameter={self.diameter}, hook_r1={self.hook_r1}, " \
+               f"hook_r2={self.hook_r2}, " \
+               f"ultimate_tensile_strength={self.ultimate_tensile_strength}, " \
+               f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}, " \
+               f"body_shear_yield_percent={self.body_shear_yield_percent}, " \
+               f"hook_normal_yield_percent={self.hook_normal_yield_percent}, " \
+               f"hook_shear_yield_percent={self.hook_normal_yield_percent}, " \
+               f"spring_rate={self.spring_rate}, shot_peened={self.shot_peened}, " \
+               f"density={self.density}, working_frequency={self.working_frequency}, " \
+               f"anchors={self.anchors})"
+
+    def __str__(self):
+        return f"ExtensionSpring(d={self.wire_diameter}, D={self.diameter}, " \
+               f"k={self.spring_rate}, L={self.free_length})"
+
     def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, hook_r1, hook_r2,
                  ultimate_tensile_strength, shear_modulus, elastic_modulus,
                  body_shear_yield_percent, hook_normal_yield_percent, hook_shear_yield_percent,

@@ -1,6 +1,5 @@
 """A module containing the helical torsion spring class"""
 from math import pi, sqrt
-from sympy import Symbol  # pylint: disable=unused-import
 
 from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import Spring
@@ -9,6 +8,21 @@ from me_toolbox.tools import percent_to_decimal
 
 class HelicalTorsionSpring(Spring):
     """A Helical torsion spring object"""
+
+    def __repr__(self):
+        return f"HelicalTorsionSpring(max_moment={self.max_moment}, " \
+               f"wire_diameter{self.wire_diameter}, spring_diameter={self.diameter}, " \
+               f"leg1={self.leg1}, leg2={self.leg2}, " \
+               f"ultimate_tensile_strength={self.ultimate_tensile_strength}, " \
+               f"yield_percent={self.yield_percent}, shear_modulus={self.shear_modulus}, " \
+               f"elastic_modulus={self.elastic_modulus}, spring_rate={self.spring_rate}, " \
+               f"radius={self.radius}, arbor_diameter={self.arbor_diameter}, " \
+               f"shot_peened={self.shot_peened}, density={self.density}, " \
+               f"working_frequency={self.working_frequency})"
+
+    def __str__(self):
+        return f"HelicalTorsionSpring(d={self.wire_diameter}, D={self.diameter}, " \
+               f"k={self.spring_rate})"
 
     def __init__(self, max_moment, wire_diameter, spring_diameter, leg1, leg2,
                  ultimate_tensile_strength, yield_percent, shear_modulus, elastic_modulus,
@@ -43,6 +57,7 @@ class HelicalTorsionSpring(Spring):
                          ultimate_tensile_strength, shear_modulus, elastic_modulus,
                          shot_peened, density, working_frequency)
 
+        self.radius = radius  # Needs a better name
         self.max_moment = max_moment
         self.yield_percent = yield_percent
         self.leg1 = leg1
@@ -262,7 +277,7 @@ class HelicalTorsionSpring(Spring):
                   f"Sse = {Sse}, Se= {Se}")
         return nf, nl
 
-    def min_wire_diameter(self, safety_factor, spring_diameter=None, spring_index=None):
+    def min_wire_diameter(self, safety_factor, Ap, m, spring_diameter=None, spring_index=None):
         """The minimal wire diameter for given safety factor
         in order to avoid failure, according to the spring parameters
 
@@ -281,8 +296,8 @@ class HelicalTorsionSpring(Spring):
         while abs(factor_k - temp_k) > 1e-4:
             # waiting for k to converge
             diam = ((32 * self.max_moment * factor_k * safety_factor) / (
-                    self.yield_percent * self.Ap * pi)) ** (
-                           1 / (3 - self.m))
+                    self.yield_percent * Ap * pi)) ** (
+                           1 / (3 - m))
             temp_k = factor_k
             if spring_diameter is not None:
                 D = spring_diameter

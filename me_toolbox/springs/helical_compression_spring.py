@@ -9,6 +9,20 @@ from me_toolbox.tools import percent_to_decimal
 
 class HelicalCompressionSpring(Spring):
     """A helical push spring object"""
+    def __repr__(self):
+        return f"HelicalCompressionSpring(max_force={self.max_force}, " \
+               f"wire_diameter={self.wire_diameter}, spring_diameter={self.diameter}, " \
+               f"ultimate_tensile_strength={self.ultimate_tensile_strength}, " \
+               f"shear_yield_percent={self.shear_yield_percent}, " \
+               f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}, " \
+               f"end_type={self.end_type}, spring_rate={self.spring_rate}, " \
+               f"set_removed={self.set_removed}, shot_peened={self.shot_peened}, " \
+               f"density={self.density}, working_frequency={self.working_frequency}, " \
+               f"anchors={self.anchors}, zeta={self.zeta})"
+
+    def __str__(self):
+        return f"HelicalCompressionSpring(d={self.wire_diameter}, D={self.diameter}, " \
+               f"k={self.spring_rate}, L0={self.free_length})"
 
     def __init__(self, max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
                  shear_yield_percent, shear_modulus, elastic_modulus, end_type,
