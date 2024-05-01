@@ -106,12 +106,8 @@ class ExtensionSpring(HelicalCompressionSpring):
         return good_design
 
     @property
-    def free_length(self):
-        """Calculates the free length of the spring
-
-        :returns: free_length - The free length
-        :rtype: float
-        """
+    def free_length(self) -> float:
+        """The free length of the spring"""
         return 2 * (self.diameter - self.wire_diameter) + (self.body_coils + 1) * self.wire_diameter
 
     @property
@@ -125,12 +121,8 @@ class ExtensionSpring(HelicalCompressionSpring):
                                   "but has no use in ExtensionSpring")
 
     @property
-    def body_coils(self):
-        """Calculate active_coils which is the number of active coils (using Castigliano's theorem)
-
-        :returns: number of active coils
-        :rtype: float
-        """
+    def body_coils(self) -> float:
+        """Number of spring's coils"""
         return self.active_coils - (self.shear_modulus / self.elastic_modulus)
 
     @property
@@ -139,12 +131,8 @@ class ExtensionSpring(HelicalCompressionSpring):
                                   "but has no use in ExtensionSpring")
 
     @property
-    def hook_normal_yield_strength(self):  # pylint: disable=invalid-name
-        """getter for the yield strength attribute (Sy = % * Sut)
-
-        :returns: hook bending yield strength
-        :rtype: float
-        """
+    def hook_normal_yield_strength(self) -> float:  # pylint: disable=invalid-name
+        """Hook's yield strength (Sy = % * Sut)"""
         try:
             return (percent_to_decimal(self.hook_normal_yield_percent) *
                     self.ultimate_tensile_strength)
@@ -152,12 +140,8 @@ class ExtensionSpring(HelicalCompressionSpring):
             return self.hook_normal_yield_percent * self.ultimate_tensile_strength
 
     @property
-    def hook_shear_yield_strength(self):
-        """getter for the yield strength attribute (Ssy = % * Sut)
-
-        :returns: hook bending yield strength
-        :rtype: float
-        """
+    def hook_shear_yield_strength(self) -> float:
+        """Hook's yield strength (Ssy = % * Sut)"""
         try:
             return (percent_to_decimal(self.hook_shear_yield_percent) *
                     self.ultimate_tensile_strength)
@@ -165,37 +149,24 @@ class ExtensionSpring(HelicalCompressionSpring):
             return self.hook_shear_yield_percent * self.ultimate_tensile_strength
 
     @property
-    def hook_KA(self):  # pylint: disable=invalid-name
-        """Returns The spring's bending stress correction factor
-
-        :returns: Bending stress correction factor
-        :rtype: float
-        """
+    def hook_KA(self) -> float:  # pylint: disable=invalid-name
+        """Hook's bending stress correction factor"""
         C1 = 2 * self.hook_r1 / self.wire_diameter  # pylint: disable=invalid-name
         return ((4 * C1 ** 2) - C1 - 1) / (4 * C1 * (C1 - 1))
 
     @property
-    def hook_KB(self):
-        """Returns The spring's torsional stress correction factor
-
-        :returns: Torsional stress correction factor
-        :rtype: float
-        """
-
+    def hook_KB(self) -> float:
+        """Hook's torsional stress correction factor"""
         C2 = 2 * self.hook_r2 / self.wire_diameter  # pylint: disable=invalid-name
         return (4 * C2 - 1) / (4 * C2 - 4)
 
     @property
-    def max_hook_normal_stress(self):
-        """The normal stress due to bending and axial loads
-
-        :returns: Normal stress
-        :rtype: float
-        """
+    def max_hook_normal_stress(self) -> float:
+        """Maximum normal stress due to bending and axial loads"""
         return self.calc_normal_stress(self.max_force)
 
     def calc_normal_stress(self, force):
-        """Calculates the normal stress based on the max_force given.
+        """Calculates the normal stress based on the force given.
 
         :param float force: Working max_force of the spring
 
@@ -207,21 +178,13 @@ class ExtensionSpring(HelicalCompressionSpring):
                                 4 / (pi * self.wire_diameter ** 2)))
 
     @property
-    def max_hook_shear_stress(self):
-        """The spring's hook torsion stress
-
-        :returns: Hook torsion stress
-        :rtype: float
-        """
+    def max_hook_shear_stress(self) -> float:
+        """The spring's hook torsion stress"""
         return self.calc_shear_stress(self.max_force, self.hook_KB)
 
     @property
-    def max_body_shear_stress(self):
-        """The spring's body torsion stress
-
-        :returns: Body torsion stress
-        :rtype: float
-        """
+    def max_body_shear_stress(self) -> float:
+        """The spring's body torsion stress"""
         # return self.calc_max_shear_stress(self.max_force, hook=False)
         return self.calc_shear_stress(self.max_force, self.factor_Kw)
 
@@ -230,11 +193,11 @@ class ExtensionSpring(HelicalCompressionSpring):
         raise NotImplementedError("Need to adapt the formula to extension spring")
 
     def calc_deflection(self, force):
-        """Calculate the spring max_deflection (change in length) due to specific max_force.
+        """Calculate the spring's deflection (change in length) due to the specified force.
 
-        :param float force: Spring working max_force
+        :param float force: Spring working force in [N]
 
-        :returns: Spring max_deflection
+        :returns: Spring deflection
         :rtype: float
         """
         return (force - self.initial_tension) / self.spring_rate
