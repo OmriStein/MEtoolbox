@@ -81,7 +81,7 @@ def conversion(val, factor):
 
     :rtype: float or list
     """
-    if not isinstance(val, float) and not isinstance(val, list):
+    if not isinstance(val, int) and not isinstance(val, float) and not isinstance(val, list):
         raise ValueError(f"{type(val)} is not valid input type for this function")
     if not isinstance(val, list):
         return val * factor
