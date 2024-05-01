@@ -3,7 +3,7 @@ import numpy as np
 
 
 def print_atributes(obj):
-    """prints all of the attributes of an object
+    """prints all the attributes of an object
     excluding the dunder attributes and attributes
     with single leading underscore
 
@@ -28,9 +28,9 @@ def print_atributes(obj):
 
 
 def parse_input(obj, fields, kwargs):
-    """adds attributes specified in kwargs to obj only if they are specified in fields
+    """adds attributes specified in kwargs to obj only if they are specified in
     fields contain dictionary of the anticipated attributes and their default value
-    if one exists, if not use the '' as place holder
+    if one exists, if not use the '' as placeholder.
 
     :param obj: An object to which add the attributes
     :param dict fields: A dictionary containing the desired attributes with default values
@@ -73,21 +73,23 @@ def parse_input(obj, fields, kwargs):
 
 
 # unit conversions
-def pound_force_to_newtons(val):
-    """convert pound max_force to newtons
+def lbs_per_in_to_newtons_per_mm(val):
+    """converts lbs/in to N/mm
 
     :param float or list val: value to convert
 
     :returns: converted value
-    :rtype: float or tuple
+    :rtype: float or list
     """
-    try:
-        return val * 4.448
-    except TypeError:
-        return [x * 4.448 for x in val]
+    if not isinstance(val, float) and not isinstance(val, list):
+        raise ValueError(f"{type(val)} is not valid input type for this function")
+    if not isinstance(val, list):
+        return val * 0.175
+    else:
+        return [x * 0.175 for x in val]
 
 
-def newtons_to_pound_force(val):
+def newtons_per_mm_to_lbs_per_in(val):
     """convert newtons to pound max_force
 
     :param float or list val: value to convert
@@ -95,38 +97,44 @@ def newtons_to_pound_force(val):
     :returns: converted value
     :rtype: float or tuple
     """
-    try:
-        return val / 4.448
-    except TypeError:
-        return [x / 4.448 for x in val]
+    if not isinstance(val, float) and not isinstance(val, list):
+        raise ValueError(f"{type(val)} is not valid input type for this function")
+    if not isinstance(val, list):
+        return val * 5.71
+    else:
+        return [x * 5.71 for x in val]
 
 
 def inch_to_millimetre(val):
-    """convert inches in to millimeters
+    """converts inches to millimeters
 
     :param float or list val: value to convert
 
     :returns: converted value
-    :rtype: float or tuple
+    :rtype: float or list
     """
-    try:
+    if not isinstance(val, float) and not isinstance(val, list):
+        raise ValueError(f"{type(val)} is not valid input type for this function")
+    if not isinstance(val, list):
         return val * 25.4
-    except TypeError:
+    else:
         return [x * 25.4 for x in val]
 
 
 def millimetre_to_inch(val):
-    """convert millimetres to inches
+    """converts millimetres to inches
 
     :param float or list val: value to convert
 
     :returns: converted value
     :rtype: float or tuple
     """
-    try:
+    if not isinstance(val, float) and not isinstance(val, list):
+        raise ValueError(f"{type(val)} is not valid input type for this function")
+    if not isinstance(val, list):
         return val / 25.4
-    except TypeError:
-        return [x / 25.4 for x in val]
+    else:
+        return [x /25.4 for x in val]
 
 
 def percent_to_decimal(var):
