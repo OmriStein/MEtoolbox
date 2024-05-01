@@ -73,71 +73,53 @@ def parse_input(obj, fields, kwargs):
 
 
 # unit conversions
-def lbs_per_in_to_newtons_per_mm(val):
-    """converts lbs/in to N/mm
+def conversion(val, factor):
+    """Multiply the value by the conversion factor
 
-    :param float or list val: value to convert
+    :param float or list val: Value to convert
+    :param factor: The conversion factor
 
-    :returns: converted value
     :rtype: float or list
     """
     if not isinstance(val, float) and not isinstance(val, list):
         raise ValueError(f"{type(val)} is not valid input type for this function")
     if not isinstance(val, list):
-        return val * 0.175
+        return val * factor
     else:
-        return [x * 0.175 for x in val]
+        return [x * factor for x in val]
 
 
-def newtons_per_mm_to_lbs_per_in(val):
-    """convert newtons to pound max_force
-
-    :param float or list val: value to convert
-
-    :returns: converted value
-    :rtype: float or tuple
-    """
-    if not isinstance(val, float) and not isinstance(val, list):
-        raise ValueError(f"{type(val)} is not valid input type for this function")
-    if not isinstance(val, list):
-        return val * 5.71
-    else:
-        return [x * 5.71 for x in val]
+def lbs_per_in_to_newtons_per_mm(val: float or list) -> float or list:
+    """converts lbs/in to N/mm"""
+    return conversion(val, 0.175)
 
 
-def inch_to_millimetre(val):
-    """converts inches to millimeters
-
-    :param float or list val: value to convert
-
-    :returns: converted value
-    :rtype: float or list
-    """
-    if not isinstance(val, float) and not isinstance(val, list):
-        raise ValueError(f"{type(val)} is not valid input type for this function")
-    if not isinstance(val, list):
-        return val * 25.4
-    else:
-        return [x * 25.4 for x in val]
+def newtons_per_mm_to_lbs_per_in(val: float or list) -> float or list:
+    """convert newtons to pound max_force"""
+    return conversion(val, 5.71)
 
 
-def millimetre_to_inch(val):
-    """converts millimetres to inches
-
-    :param float or list val: value to convert
-
-    :returns: converted value
-    :rtype: float or tuple
-    """
-    if not isinstance(val, float) and not isinstance(val, list):
-        raise ValueError(f"{type(val)} is not valid input type for this function")
-    if not isinstance(val, list):
-        return val / 25.4
-    else:
-        return [x /25.4 for x in val]
+def lbs_to_newtons(val: float or list) -> float or list:
+    """converts lbs/in to N/mm"""
+    return conversion(val, 4.448)
 
 
-def percent_to_decimal(var):
+def newtons_to_lbs(val: float or list) -> float or list:
+    """convert newtons to pound max_force"""
+    return conversion(val, 0.2248)
+
+
+def inch_to_millimetre(val: float or list) -> float or list:
+    """converts inches to millimeters"""
+    return conversion(val, 25.4)
+
+
+def millimetre_to_inch(val: float or list) -> float or list:
+    """converts millimetres to inches"""
+    return conversion(val, 1/25.4)
+
+
+def percent_to_decimal(var: float or list or tuple) -> float or list:
     """if input in percent (>=1) convert to decimal"""
     if not isinstance(var, list) and not isinstance(var, tuple):
         dec = var / 100 if var >= 1 else var
