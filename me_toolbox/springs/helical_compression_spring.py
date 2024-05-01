@@ -9,6 +9,7 @@ from me_toolbox.tools import percent_to_decimal
 
 class HelicalCompressionSpring(Spring):
     """A helical push spring object"""
+
     def __repr__(self):
         return f"HelicalCompressionSpring(max_force={self.max_force}, " \
                f"wire_diameter={self.wire_diameter}, spring_diameter={self.diameter}, " \
@@ -127,12 +128,12 @@ class HelicalCompressionSpring(Spring):
         return good_design
 
     @property
-    def free_length(self):
+    def free_length(self) -> float:
         """Calculates the free length of the spring"""
         return (self.Fsolid / self.spring_rate) + self.solid_length
 
     @property
-    def solid_length(self):
+    def solid_length(self) -> float:
         """Ls - the solid length of the spring
         (if the spring is fully compressed so the coils are touching each other)
 
@@ -162,23 +163,23 @@ class HelicalCompressionSpring(Spring):
         return (1 + self.zeta) * self.max_force
 
     @property
-    def active_coils(self):
-        """Calculate active_coils which is the number of active coils (using Castigliano's theorem)
+    def active_coils(self) -> float:
+        """Number of active coils (derived using Castigliano's theorem)"""
 
-        :returns: number of active coils
-        :rtype: float
-        """
-        return ((self.shear_modulus * self.wire_diameter) /
+        # The full calculation
+        full = ((self.shear_modulus * self.wire_diameter) /
                 (8 * self.spring_index ** 3 * self.spring_rate)) * (
                        (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
-    @property
-    def end_coils(self):
-        """Ne - the end coils of the spring
+        # The accepted approximation
+        approx = ((self.shear_modulus * self.wire_diameter) /
+                  (8 * self.spring_index ** 3 * self.spring_rate))
+        return approx
 
-        :returns: Number of the spring end coils
-        :rtype: float
-        """
+    @property
+    def end_coils(self) -> float:
+        """Number of the spring's end coils (Ne)"""
+
         options = {'plain': 0,
                    'plain and ground': 1,
                    'squared or closed': 2,
@@ -186,21 +187,14 @@ class HelicalCompressionSpring(Spring):
         return options.get(self.end_type)
 
     @property
-    def total_coils(self):
-        """Nt - the total coils of the spring
+    def total_coils(self) -> float:
+        """Number of the spring's total coils (Nt)"""
 
-        :returns: Number of the spring total coils
-        :rtype: float
-        """
         return self.end_coils + self.active_coils
 
     @property
-    def pitch(self):
-        """ p - pitch of the spring (the distance between the coils)
-
-        :returns: Pitch
-        :rtype: float
-        """
+    def pitch(self) -> float:
+        """The spring's pitch (the distance between the coils)"""
         options = {'plain': (self.free_length - self.wire_diameter) / self.active_coils,
                    'plain and ground': self.free_length / (self.active_coils + 1),
                    'squared or closed': ((self.free_length - 3 * self.wire_diameter) /
@@ -210,71 +204,49 @@ class HelicalCompressionSpring(Spring):
         return options.get(self.end_type)
 
     @property
-    def shear_yield_strength(self):
-        """ Ssy - yield strength for shear
-        (shear_yield_stress = % * ultimate_tensile_strength))
-
-        :returns: yield strength for shear stress
-        :rtype: float
-        """
+    def shear_yield_strength(self) -> float:
+        """ The material shear yield strength (Ssy)
+        (shear_yield_stress = % * ultimate_tensile_strength))"""
         try:
             return percent_to_decimal(self.shear_yield_percent) * self.ultimate_tensile_strength
         except TypeError:
             return self.shear_yield_percent * self.ultimate_tensile_strength
 
     @property
-    def factor_Ks(self):  # pylint: disable=invalid-name
-        """factor_Ks - Static shear stress concentration factor
-
-        :returns: Static shear stress concentration factor
-        :rtype: float
-        """
+    def factor_Ks(self) -> float:  # pylint: disable=invalid-name
+        """Static shear stress concentration factor"""
         return (2 * self.spring_index + 1) / (2 * self.spring_index)
 
     @property
-    def factor_Kw(self):  # pylint: disable=invalid-name
-        """K_W - Wahl shear stress concentration factor
-
-        :returns: Wahl shear stress concentration factor
-        :rtype: float
-        """
+    def factor_Kw(self) -> float:  # pylint: disable=invalid-name
+        """Wahl shear stress concentration factor (K_W)"""
         return (4 * self.spring_index - 1) / (4 * self.spring_index - 4) + \
                (0.615 / self.spring_index)
 
     @property
-    def factor_KB(self):  # pylint: disable=invalid-name
-        """K_B - Bergstrasser shear stress concentration factor (very close to factor_Kw)
+    def factor_KB(self) -> float:  # pylint: disable=invalid-name
+        """Bergstrasser shear stress concentration factor(K_B) (very close to factor_Kw)
 
-        NOTE:for the sake of completion NOT IMPLEMENTED!!!
-
-        :returns: Bergstrasser shear stress concentration factor
-        :rtype: float
+        NOTE: included for the sake of completion NOT USED!!!
         """
         return (4 * self.spring_index + 2) / (4 * self.spring_index - 3)
 
     @property
-    def max_shear_stress(self):
-        """ Return's the shear stress
-
-        :returns: Shear stress
-        :rtype: float
-        """
+    def max_shear_stress(self) -> float:
+        """ Return's the maximum shear stress"""
         k_factor = self.factor_Ks if self.set_removed else self.factor_Kw
         return self.calc_shear_stress(self.max_force, k_factor)
 
-    def calc_shear_stress(self, force, k_factor):
-        """Calculates the max shear stress based on the max_force applied.
+    def calc_shear_stress(self, force, k_factor) -> float:
+        """Calculates the shear stress based on the force applied.
 
-        :param float force: Working max_force of the spring
-        :param float k_factor: the appropriate k factor for the calculation
-
-        :returns: Shear stress
-        :rtype: float
+        :param float force: Force in [N]
+        :param float k_factor: The appropriate k factor for the calculation
         """
         return (k_factor * 8 * force * self.diameter) / (pi * self.wire_diameter ** 3)
 
     @property
-    def natural_frequency(self):
+    def natural_frequency(self) -> float:
         """Figures out what is the natural frequency of the spring"""
         d = self.wire_diameter
         D = self.diameter
@@ -286,21 +258,14 @@ class HelicalCompressionSpring(Spring):
             return None
 
     @property
-    def max_deflection(self):
-        """Returns the spring max_deflection, It's change in length
-
-        :returns: Spring max_deflection
-        :rtype: float
-        """
+    def max_deflection(self) -> float:
+        """Returns the spring maximum deflection (It's change in length)"""
         return self.calc_deflection(self.max_force)
 
-    def calc_deflection(self, force):
-        """Calculate the spring deflection (change in length) due to specific max_force.
+    def calc_deflection(self, force) -> float:
+        """Calculate the spring's deflection (change in length) due to specific force.
 
-        :param float force: Spring working max_force
-
-        :returns: Spring deflection
-        :rtype: float
+        :param float force: Force in [N]
         """
         C = self.spring_index
         d = self.wire_diameter
@@ -309,12 +274,8 @@ class HelicalCompressionSpring(Spring):
         return ((8 * force * C ** 3 * Na) / (G * d)) * ((1 + 2 * C ** 2) / (2 * C ** 2))
 
     @property
-    def weight(self):
-        """Return's the spring *active coils* weight according to the specified density
-
-        :returns: Spring weight
-        :type: float
-        """
+    def weight(self) -> float:
+        """Return's the spring's weight according to it's specified density"""
         area = 0.25 * pi * (self.wire_diameter * 1e-3) ** 2  # cross-section area
         length = pi * self.diameter * 1e-3  # the circumference of the spring
         coil_volume = area * length
