@@ -239,14 +239,23 @@ class ExtensionSpring(HelicalCompressionSpring):
         """
         return (force - self.initial_tension) / self.spring_rate
 
-    def static_safety_factor(self):
+    def static_safety_factor(self, verbose=False):
         """ Returns the static safety factors for the hook (torsion and
         bending), and for the spring's body (torsion)
+
+        :param bool verbose: More information
 
         :returns: Spring's body (torsion) safety factor, Spring's hook bending safety factor,
             Spring's hook torsion safety factor
         :type: dict{str: float}
         """
+        if verbose:
+            print(f"max body shear stress = {self.max_body_shear_stress:.2f}\n"
+                  f"body Ssy = {self.shear_yield_strength:.2f}\n\n"
+                  f"max hook normal stress = {self.max_hook_normal_stress:.2f}\n"
+                  f"hook Sy = {self.hook_normal_yield_strength:.2f}\n\n"
+                  f"max hook shear stress = {self.max_hook_shear_stress:.2f}\n"
+                  f"hook Ssy = {self.hook_shear_yield_strength:.2f}\n")
 
         n_body = self.shear_yield_strength / self.max_body_shear_stress
         n_hook_normal = self.hook_normal_yield_strength / self.max_hook_normal_stress
@@ -276,11 +285,11 @@ class ExtensionSpring(HelicalCompressionSpring):
 
         # calculating mean and alternating stresses for the hook section
         # shear stresses:
-        alt_shear_stress = self.calc_shear_stress(alt_force, self.hook_KB)
-        mean_shear_stress = (mean_force / alt_force) * alt_shear_stress
+        hook_alt_shear_stress = self.calc_shear_stress(alt_force, self.hook_KB)
+        hook_mean_shear_stress = (mean_force / alt_force) * hook_alt_shear_stress
         # normal stresses due to bending:
-        alt_normal_stress = self.calc_normal_stress(alt_force)
-        mean_normal_stress = (mean_force / alt_force) * alt_normal_stress
+        hook_alt_normal_stress = self.calc_normal_stress(alt_force)
+        hook_mean_normal_stress = (mean_force / alt_force) * hook_alt_normal_stress
 
         Sse = self.shear_endurance_limit(reliability, metric)  # pylint: disable=invalid-name
         Ssu = self.shear_ultimate_strength
@@ -291,37 +300,41 @@ class ExtensionSpring(HelicalCompressionSpring):
         Sut = self.ultimate_tensile_strength
 
         try:
-            nf_hook_normal, _ = FailureCriteria.get_safety_factors(Sy_hook, Sut, Se,
-                                                                   alt_normal_stress,
-                                                                   mean_normal_stress, criterion)
+            nf_hook_normal, ns_hook_normal = \
+                FailureCriteria.get_safety_factors(Sy_hook, Sut, Se, hook_alt_normal_stress,
+                                                   hook_mean_normal_stress, criterion)
 
-            nf_hook_shear, _ = FailureCriteria.get_safety_factors(Ssy_hook, Ssu, Sse,
-                                                                  alt_shear_stress,
-                                                                  mean_shear_stress, criterion)
+            nf_hook_shear, ns_hook_shear = \
+                FailureCriteria.get_safety_factors(Ssy_hook, Ssu, Sse, hook_alt_shear_stress,
+                                                   hook_mean_shear_stress, criterion)
         except TypeError as typ_err:
             raise ValueError(f"Fatigue analysis can't handle symbolic vars") from typ_err
 
         # calculating mean and alternating stresses for the body section
         # shear stresses:
         alt_body_shear_stress = self.calc_shear_stress(alt_force, self.hook_KB)
-        mean_body_shear_stress = (mean_force / alt_force) * alt_shear_stress
+        mean_body_shear_stress = (mean_force / alt_force) * hook_alt_shear_stress
 
         nf_body, ns_body = FailureCriteria.get_safety_factors(Ssy_body, Ssu, Sse,
                                                               alt_body_shear_stress,
                                                               mean_body_shear_stress, criterion)
 
         if verbose:
-            print(f"Alternating force = {alt_force}, Mean force = {mean_force}\n"
-                  f"Alternating shear stress = {alt_shear_stress},"
-                  f"Mean shear stress = {mean_shear_stress}\n"
-                  f"Alternating normal stress = {alt_normal_stress},"
-                  f"Mean normal stress = {mean_normal_stress}\n"
-                  f"Alternating body shear stress = {alt_body_shear_stress},"
-                  f"Mean body shear stress = {mean_body_shear_stress}\n"
-                  f"Sse = {Sse}, Se = {Se}")
+            print(f"Alternating force = {alt_force:.2f}, "
+                  f"Mean force = {mean_force:.2f}\n\n"
+                  f"Body's alternating body shear stress = {alt_body_shear_stress:.2f}, "
+                  f"Body's mean body shear stress = {mean_body_shear_stress:.2f}\n\n"
+                  f"Hook's alternating shear stress = {hook_alt_shear_stress:.2f}, "
+                  f"Hook's mean shear stress = {hook_mean_shear_stress:.2f}\n\n"
+                  f"Hook's alternating normal stress = {hook_alt_normal_stress:.2f}, "
+                  f"Hook's mean normal stress = {hook_mean_normal_stress:.2f}\n\n"
+                  f"Sut = {Sut:.2f}, Sse = {Sse:.2f}, Se = {Se:.2f}, Ssu = {Ssu:.2f},\n"
+                  f"Ssy_body = {Ssy_body:.2f}, Ssy_hook = {Ssy_hook:.2f}, "
+                  f"Sy_hook = {Sy_hook:.2f}\n")
 
         return {'nf_body': nf_body, 'ns_body': ns_body, 'nf_hook_normal': nf_hook_normal,
-                'nf_hook_shear': nf_hook_shear}
+                'ns_hook_normal': ns_hook_normal, 'nf_hook_shear': nf_hook_shear,
+                'ns_hook_shear': ns_hook_shear}
 
     def min_wire_diameter(self, Ap, m, safety_factor, spring_index=None):
         """The minimal wire diameters (for shear and normal stresses)
