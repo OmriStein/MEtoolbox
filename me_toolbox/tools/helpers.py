@@ -119,6 +119,26 @@ def millimetre_to_inch(val: float or list) -> float or list:
     return conversion(val, 1/25.4)
 
 
+def Nmm_per_rad_to_Nmm_per_deg(val: float or list) -> float or list:
+    """converts millimetres to inches"""
+    return conversion(val, (2 * np.pi) / 360)
+
+
+def Nmm_per_deg_to_Nmm_per_rad(val: float or list) -> float or list:
+    """converts millimetres to inches"""
+    return conversion(val, 360 / (2 * np.pi))
+
+
+def Nm_per_rad_to_Nmm_per_deg(val: float or list) -> float or list:
+    """converts millimetres to inches"""
+    return conversion(val, 1e3 * ((2 * np.pi) / 360))
+
+
+def Nmm_per_deg_to_Nm_per_rad(val: float or list) -> float or list:
+    """converts millimetres to inches"""
+    return conversion(val, 1e-3 * (360 / (2 * np.pi)))
+
+
 def percent_to_decimal(var: float or list or tuple) -> float or list:
     """if input in percent (>=1) convert to decimal"""
     if not isinstance(var, list) and not isinstance(var, tuple):
