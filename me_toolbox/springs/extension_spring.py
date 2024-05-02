@@ -20,8 +20,7 @@ class ExtensionSpring(HelicalCompressionSpring):
                f"hook_normal_yield_percent={self.hook_normal_yield_percent}, " \
                f"hook_shear_yield_percent={self.hook_normal_yield_percent}, " \
                f"spring_rate={self.spring_rate}, shot_peened={self.shot_peened}, " \
-               f"density={self.density}, working_frequency={self.working_frequency}, " \
-               f"anchors={self.anchors})"
+               f"density={self.density}, working_frequency={self.working_frequency})"
 
     def __str__(self):
         return f"ExtensionSpring(d={self.wire_diameter}, D={self.diameter}, " \
@@ -30,8 +29,7 @@ class ExtensionSpring(HelicalCompressionSpring):
     def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, hook_r1, hook_r2,
                  ultimate_tensile_strength, shear_modulus, elastic_modulus,
                  body_shear_yield_percent, hook_normal_yield_percent, hook_shear_yield_percent,
-                 spring_rate, shot_peened=False, density=None, working_frequency=None,
-                 anchors=None):
+                 spring_rate, shot_peened=False, density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
 
         :param float max_force: The maximum load on the spring [N]
@@ -61,7 +59,7 @@ class ExtensionSpring(HelicalCompressionSpring):
                          body_shear_yield_percent, shear_modulus, elastic_modulus, end_type='plain',
                          spring_rate=spring_rate, set_removed=False, shot_peened=shot_peened,
                          density=density, working_frequency=working_frequency,
-                         anchors=anchors, zeta=0.15)
+                         anchors=None, zeta=0.15)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1
