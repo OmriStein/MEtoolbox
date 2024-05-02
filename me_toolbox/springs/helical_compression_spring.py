@@ -246,14 +246,18 @@ class HelicalCompressionSpring(Spring):
         return (k_factor * 8 * force * self.diameter) / (pi * self.wire_diameter ** 3)
 
     @property
-    def natural_frequency(self) -> float:
+    def natural_frequency(self) -> dict[str:float]:
         """Figures out what is the natural frequency of the spring"""
         d = self.wire_diameter
         D = self.diameter
         Na = self.active_coils
         G = self.shear_modulus
         try:
-            return (d * 1e-3 / (2 * D * 1e-3 ** 2 * Na * pi)) * sqrt(G / (2 * self.density))
+            alpha = 2
+            fix = ((d * 1e-3) / (alpha * pi * (D * 1e-3) ** 2 * Na)) * sqrt(G / (2 * self.density))
+            alpha = 4
+            free = ((d * 1e-3) / (alpha * pi * (D * 1e-3) ** 2 * Na)) * sqrt(G / (2 * self.density))
+            return {'fixed-fixed': fix, 'fixed-free': free}
         except TypeError:
             return None
 
@@ -332,74 +336,6 @@ class HelicalCompressionSpring(Spring):
                   f"Mean shear stress = {mean_shear_stress:.2f}\n"
                   f"Sse = {Sse:.2f}")
         return nf, nl
-
-    def min_wire_diameter(self, Ap, m, safety_factor, diameter=None, spring_index=None,
-                          solid=False):
-        """The minimal wire diameter for given
-        safety factor in order to avoid failure,
-        according to the spring parameters.
-        if solid is True the calculation uses :attr:`Fsolid`
-        instead of :attr:`max_force`
-
-        Note: In order for the calculation to succeed the spring
-            diameter or the spring index should be known
-
-        :param float Ap: for Sut calc
-        :param float m: for Sut calc
-        :param float safety_factor: Static safety factor
-        :param float diameter: The spring diameter
-        :param float spring_index: The spring index
-        :param bool solid: If true calculate to according to the solid max_force
-
-        :returns: The minimal wire diameter
-        :rtype: float
-        """
-        if spring_index is not None:
-            factor_ks = (2 * spring_index + 1) / (2 * spring_index)
-            factor_kw = (4 * spring_index - 1) / (4 * spring_index - 4) + (0.615 / spring_index)
-            factor_k = factor_ks if self.set_removed else factor_kw
-            force = self.Fsolid if solid else self.max_force
-            return ((8 * factor_k * force * spring_index * safety_factor) / (
-                    self.shear_yield_percent * Ap * pi)) ** (1 / (2 - m))
-
-        elif spring_index is None and diameter is not None:
-
-            factor_k, temp_k = 1.1, 0
-            diam = 0
-            while abs(factor_k - temp_k) > 1e-4:
-                # waiting for k to converge
-                diam = ((8 * self.max_force * diameter * safety_factor * factor_k) / (
-                        pi * self.shear_yield_percent * Ap)) ** (1 / (3 - m))
-                temp_k = factor_k
-                factor_ks = (2 * diameter + diam) / (2 * diameter)
-                factor_kb = (4 * diameter + 2 * diam) / (4 * diameter - 3 * diam)
-                factor_k = factor_ks if self.set_removed else factor_kb
-            return diam
-        else:
-            print("Need to know spring index or spring diameter to calculate wire diameter")
-
-    def min_spring_diameter(self, safety_factor, wire_diameter, solid=False):
-        """return the minimum spring diameter to avoid static failure
-        according to the specified safety factor, if the solid flag is True :attr:'Fsolid'
-        is used instead of :attr:`max_force`.
-
-        :param float safety_factor: static safety factor
-        :param float wire_diameter: Spring's wire diameter
-        :param bool solid: If true calculate to according to the solid max_force
-
-        :returns: The minimal spring diameter
-        :rtype: float
-        """
-        force = self.Fsolid if solid else self.max_force
-        d = wire_diameter
-        if self.set_removed:
-            Ssy = self.shear_yield_strength
-            return 0.5 * ((Ssy / safety_factor) * ((pi * d ** 3) / (4 * force)) - d)
-        else:
-            # derived using the KB factor (because it was easier)
-            Sut = self.ultimate_tensile_strength
-            alpha = (Sut * pi * d ** 3) / (8 * self.max_force * safety_factor)
-            return 0.25 * ((2 * alpha - d) + sqrt((d - 2 * alpha) ** 2 - 24 * alpha * d))
 
     def buckling(self, anchors, verbose=True):
         """ Checks if the spring will buckle and find the

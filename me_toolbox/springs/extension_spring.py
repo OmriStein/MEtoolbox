@@ -188,10 +188,6 @@ class ExtensionSpring(HelicalCompressionSpring):
         # return self.calc_max_shear_stress(self.max_force, hook=False)
         return self.calc_shear_stress(self.max_force, self.factor_Kw)
 
-    @property
-    def natural_frequency(self):
-        raise NotImplementedError("Need to adapt the formula to extension spring")
-
     def calc_deflection(self, force):
         """Calculate the spring's deflection (change in length) due to the specified force.
 
@@ -298,72 +294,6 @@ class ExtensionSpring(HelicalCompressionSpring):
         return {'nf_body': nf_body, 'ns_body': ns_body, 'nf_hook_normal': nf_hook_normal,
                 'ns_hook_normal': ns_hook_normal, 'nf_hook_shear': nf_hook_shear,
                 'ns_hook_shear': ns_hook_shear}
-
-    def min_wire_diameter(self, Ap, m, safety_factor, spring_index=None):
-        """The minimal wire diameters (for shear and normal stresses)
-        for given safety factor in order to avoid failure,
-
-        Because KA and KB contains d no simple solution is available as in the
-        HelicalCompressionSpring, so we assume an initial K and iterate until convergence,
-        be aware that for some static_safety_factor convergence my not occur.
-
-        NOTE: for static use only.
-
-        :param float safety_factor: Static safety factor
-        :param float spring_index: Spring index
-
-        :returns: The minimal wire diameter
-        :rtype: tuple(float, float)
-        """
-        F = self.max_force
-        C = spring_index
-
-        factor_k, temp_k = 1.1, 0
-        normal_diam = 0
-        while abs(factor_k - temp_k) > 1e-4:
-            # waiting for k to converge
-            percent = self.hook_normal_yield_percent
-            normal_diam = (safety_factor * F * (16 * factor_k * C - 4) / (percent * Ap * pi)) ** (
-                    1 / (2 - m))
-            temp_k = factor_k
-            factor_k = ((16 * self.hook_r1 ** 2 - 2 * self.hook_r1 * normal_diam - normal_diam ** 2)
-                        / (16 * self.hook_r1 ** 2 - 8 * self.hook_r1 * normal_diam))
-
-        factor_k, temp_k = 1.1, 0
-        shear_diam = 0
-        while abs(factor_k - temp_k) > 1e-4:
-            # waiting for k to converge
-            percent = self.hook_shear_yield_percent
-            shear_diam = ((8 * factor_k * F * C * safety_factor) / (percent * Ap * pi)) ** (
-                    1 / (2 - m))
-            temp_k = factor_k
-            factor_k = (8 * self.hook_r2 - shear_diam) / (8 * self.hook_r2 - 4 * shear_diam)
-
-        try:
-            return max(normal_diam, shear_diam)
-        except TypeError:
-            return normal_diam, shear_diam
-
-    def min_spring_diameter(self, static_safety_factor):
-        """return the minimum spring diameter to avoid static failure
-        according to the given safety factor.
-
-        :param float static_safety_factor: factor of safety
-
-        :returns: The minimal spring diameter
-        :rtype: float
-        """
-        # extracted from shear stress
-        diameter_shear = (self.hook_shear_yield_strength * pi * self.wire_diameter ** 3) / (
-                self.hook_KB * 8 * self.max_force * static_safety_factor)
-        # extracted from normal stress
-        diameter_normal = (1 / (4 * self.hook_KA)) * \
-                          (((self.hook_normal_yield_strength * pi * self.wire_diameter ** 3) /
-                            (4 * self.max_force * static_safety_factor)) - self.wire_diameter)
-        try:
-            return max(diameter_shear, diameter_normal)
-        except TypeError:
-            return diameter_shear, diameter_normal
 
     def buckling(self, anchors, verbose=True):
         raise NotImplementedError("Inherited from HelicalCompressionSpring but useless here")
