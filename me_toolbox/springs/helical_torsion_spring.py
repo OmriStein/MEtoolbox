@@ -180,8 +180,7 @@ class HelicalTorsionSpring(Spring):
 
     @property
     def natural_frequency(self):
-        raise NotImplementedError("natural_frequency has not been implemented yet "
-                                  "for HelicalTorsionSpring")
+        return sqrt(self.spring_rate / self.weight)
 
     @property
     def max_angular_deflection(self):
@@ -251,7 +250,8 @@ class HelicalTorsionSpring(Spring):
         :param float max_moment: Maximal max_force acting on the spring
         :param float min_moment: Minimal max_force acting on the spring
         :param float reliability: in percentage
-        :param str criterion: fatigue criterion
+        :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber',
+                                                 'asme-elliptic')
         :param bool verbose: print more details
         :param bool metric: Metric or imperial
 
@@ -276,56 +276,6 @@ class HelicalTorsionSpring(Spring):
                   f"Alternating stress = {alt_stress}, Mean stress = {mean_stress}\n"
                   f"Sse = {Sse}, Se= {Se}")
         return nf, nl
-
-    def min_wire_diameter(self, safety_factor, Ap, m, spring_diameter=None, spring_index=None):
-        """The minimal wire diameter for given safety factor
-        in order to avoid failure, according to the spring parameters
-
-        Note: In order for the calculation to succeed the
-            spring diameter or the spring index should be known.
-
-        :param float safety_factor: static safety factor
-        :param float spring_diameter: The spring diameter
-        :param float spring_index: The spring index
-
-        :returns: The minimal wire diameter
-        :rtype: float
-        """
-        factor_k, temp_k = 1.1, 0
-        diam = 0
-        while abs(factor_k - temp_k) > 1e-4:
-            # waiting for k to converge
-            diam = ((32 * self.max_moment * factor_k * safety_factor) / (
-                    self.yield_percent * Ap * pi)) ** (
-                           1 / (3 - m))
-            temp_k = factor_k
-            if spring_diameter is not None:
-                D = spring_diameter
-                factor_k = (4 * D ** 2 - D * diam - diam ** 2) / (4 * D * (D - diam))
-            elif spring_index is not None:
-                c = spring_index
-                factor_k = (4 * c ** 2 - c - 1) / (4 * c * (c - 1))
-            else:
-                print("Need to know spring index or spring diameter to calculate wire diameter")
-        return diam
-
-    def min_spring_diameter(self, safety_factor, wire_diameter):
-        """return the minimum spring diameter to avoid static failure
-        according to the specified safety factor.
-
-        :param float safety_factor: static safety factor
-        :param float wire_diameter: Spring's wire diameter
-
-        :returns: The minimal spring diameter
-        :rtype: float
-        """
-        d = wire_diameter
-        Sy = self.yield_strength
-        M = self.max_moment
-        alpha = 4 * (Sy * pi * d ** 3 - 32 * M * safety_factor)
-        beta = -d * (4 * Sy * pi * d ** 3 + 32 * M * safety_factor)
-        gamma = 32 * M * safety_factor * d ** 2
-        return (-beta + sqrt(beta ** 2 - 4 * alpha * gamma)) / (2 * alpha)
 
     @staticmethod
     def calc_spring_rate(wire_diameter, spring_diameter, active_coils, elastic_modulus):

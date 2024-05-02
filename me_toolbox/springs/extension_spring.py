@@ -228,7 +228,8 @@ class ExtensionSpring(HelicalCompressionSpring):
         :param float max_force: Maximal max_force acting on the spring
         :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
-        :param str criterion: fatigue criterion
+        :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber',
+                                                 'asme-elliptic')
         :param bool verbose: print more details
         :param bool metric: Metric or imperial
 
