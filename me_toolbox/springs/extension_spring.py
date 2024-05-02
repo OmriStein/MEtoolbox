@@ -27,8 +27,8 @@ class ExtensionSpring(HelicalCompressionSpring):
                f"k={self.spring_rate}, L={self.free_length})"
 
     def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, hook_r1, hook_r2,
-                 ultimate_tensile_strength, shear_modulus, elastic_modulus,
-                 body_shear_yield_percent, hook_normal_yield_percent, hook_shear_yield_percent,
+                 ultimate_tensile_strength, body_shear_yield_percent, hook_normal_yield_percent,
+                 hook_shear_yield_percent, shear_modulus, elastic_modulus,
                  spring_rate, shot_peened=False, density=None, working_frequency=None):
         """Instantiate an extension spring object with the given parameters
 
@@ -40,12 +40,12 @@ class ExtensionSpring(HelicalCompressionSpring):
         :param float hook_r1: hook internal radius [mm]
         :param float hook_r2: hook bend radius [mm]
         :param float ultimate_tensile_strength: Ultimate tensile strength of the material [Mpa]
-        :param float shear_modulus: Spring's material shear modulus [MPa]
-        :param float elastic_modulus: Spring's material elastic modulus [MPa]
         :param float body_shear_yield_percent: Used to estimate the spring's body shear yield stress
         :param float hook_normal_yield_percent: Used to estimate the spring's hook yield stress
         :param float hook_shear_yield_percent: Used to estimate the spring's hook shear yield stress
-        :param float spring_rate: K - spring constant [Nm/rad]
+        :param float shear_modulus: Spring's material shear modulus [MPa]
+        :param float elastic_modulus: Spring's material elastic modulus [MPa]
+        :param float spring_rate: K - spring constant [N/mm]
         :param bool shot_peened: if True adds to fatigue strength
         :param float or None density: Spring's material density [kg/m^3]
             (used for buckling and weight calculations)

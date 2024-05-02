@@ -10,8 +10,8 @@ Nb = 4.25
 l1 = 1
 l2 = l1
 spring = HelicalTorsionSpring(max_moment, wire_diameter=d, spring_diameter=D, leg1=l1, leg2=l2,
-                              ultimate_tensile_strength=, yield_percent=0.78, shear_modulus=11.75e6,
-                              elastic_modulus=28.5e6, spring_rate=, radius=1, arbor_diameter=0.4,
+                              ultimate_tensile_strength=Sut, yield_percent=0.78, shear_modulus=11.75e6,
+                              elastic_modulus=28.5e6, spring_rate=k, radius=1, arbor_diameter=0.4,
                               shot_peened=False, density=None, working_frequency=None)
 eq = Eq(spring.static_safety_factor, 1)
 F_sol = solve(eq, F)[0]

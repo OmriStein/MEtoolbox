@@ -30,23 +30,23 @@ class HelicalTorsionSpring(Spring):
                  working_frequency=None):
         """Instantiate helical torsion spring object with the given parameters
 
-        :param float  max_moment: The maximum load on the spring
-        :param float  wire_diameter: spring wire diameter
-        :param float  spring_diameter: spring diameter measured from
+        :param float  max_moment: The maximum load on the spring [Nmm]
+        :param float  wire_diameter: spring wire diameter [mm]
+        :param float  spring_diameter: spring diameter measured from [mm]
             the center point of the wire diameter
-        :param float ultimate_tensile_strength: Ultimate tensile strength of the material
-        :param float leg1: spring leg
-        :param float leg2: spring leg
-        :param float shear_modulus: Spring's material shear modulus
-        :param float elastic_modulus: Spring's material elastic modulus
+        :param float leg1: spring leg [mm]
+        :param float leg2: spring leg [mm]
+        :param float ultimate_tensile_strength: Ultimate tensile strength of the material [MPa]
         :param float yield_percent: Used to estimate the spring's yield stress
-        :param float spring_rate: K - spring rate
-        :param float arbor_diameter: the diameter of the pin going through the spring
-        :param float radius: The distance of applied force from the center
+        :param float shear_modulus: Spring's material shear modulus [MPa]
+        :param float elastic_modulus: Spring's material elastic modulus [MPa]
+        :param float spring_rate: K - spring rate [Nmm/rad]
+        :param float radius: The distance from the center to the applied force[mm]
+        :param float arbor_diameter: the diameter of the pin going through the spring [mm]
         :param bool shot_peened: if True adds to fatigue strength
-        :param float or None density: Spring's material density
+        :param float or None density: Spring's material density [kg/m^3]
             (used for buckling and weight calculations)
-        :param float or None working_frequency: the spring working frequency
+        :param float or None working_frequency: the spring working frequency [Hz]
             (used for fatigue calculations)
 
         :returns: HelicalTorsionSpring
