@@ -70,38 +70,30 @@ class ExtensionSpring(HelicalCompressionSpring):
 
         self.check_design()
 
-    def check_design(self, verbose=False):
-        """Check if the spring index,active_coils,zeta and free_length
-        are in acceptable range for good design
+    def check_design(self):
+        """Check if the spring index,active coils and natural frequency
+         are in the acceptable range for good design.
 
-        :returns: True if all the checks are good
+        :returns: True if pass all checks
         :rtype: bool
         """
-        good_design = True
+        good_design = all([self.__check_spring_index(), self.__check_active_coils()])
+
+        natural_frequency_check = self.__check_natural_frequency()
+        if natural_frequency_check is not None:
+            good_design = natural_frequency_check
+
+        return good_design
+
+    def __check_spring_index(self) -> bool:
+        in_range = True
         C = self.spring_index  # pylint: disable=invalid-name
-        if isinstance(C, float) and not 3 <= C <= 16:
+        if isinstance(C, float) and not 3 <= C <= 16 and self.set_removed:
             print("Note: C - spring index should be in range of [3,16],"
                   "lower C causes surface cracks,\n"
                   "higher C causes the spring to tangle and requires separate packing")
-            good_design = False
-
-        active_coils = self.active_coils
-        if isinstance(active_coils, float) and not 3 <= active_coils <= 15:
-            print(f"Note: active_coils={active_coils:.2f} is not in range [3,15],"
-                  f"this can cause non linear behavior")
-            good_design = False
-
-        if (self.density is not None) and (self.working_frequency is not None):
-            natural_freq = self.natural_frequency
-            if natural_freq <= 20 * self.working_frequency:
-                print(
-                    f"Note: the natural frequency={natural_freq} is less than 20*working"
-                    f"frequency={20 * self.working_frequency}")
-                good_design = False
-        if verbose:
-            print(f"good_design = {good_design}")
-
-        return good_design
+            in_range = False
+        return in_range
 
     @property
     def free_length(self) -> float:

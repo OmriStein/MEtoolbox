@@ -1,5 +1,5 @@
 """A module containing the helical push spring class"""
-from math import pi, sqrt
+from math import pi  # , sqrt
 from sympy import sqrt
 
 from me_toolbox.fatigue import FailureCriteria
@@ -78,54 +78,93 @@ class HelicalCompressionSpring(Spring):
         self.check_design()
 
     def check_design(self):
-        """Check if the spring index,active_coils,zeta and free_length
-        are in acceptable range for good design
+        """Check if the spring index,active coils, zeta, free length and natural frequency
+         are in the acceptable range for good design.
 
-        :returns: True if all the checks are good
+        :returns: True if pass all checks
         :rtype: bool
         """
-        good_design = True
+        good_design = all([self.__check_spring_index(),
+                           self.__check_active_coils(),
+                           self.__check_zeta()])
+
+        buckling_check = self.__check_buckling()
+        if buckling_check is not None:
+            good_design = buckling_check
+
+        natural_frequency_check = self.__check_natural_frequency()
+        if natural_frequency_check is not None:
+            good_design = natural_frequency_check
+
+        return good_design
+
+    def __check_spring_index(self) -> bool:
+        in_range = True
         C = self.spring_index  # pylint: disable=invalid-name
         if isinstance(C, float) and not 4 <= C <= 12 and self.set_removed:
             print("Note: C - spring index should be in range of [4,12],"
                   "lower C causes surface cracks,\n"
                   "higher C causes the spring to tangle and requires separate packing")
-            good_design = False
+            in_range = False
         elif isinstance(C, float) and not 3 <= C <= 12:
             print("Note: C - spring index should be in range of [3,12],"
                   "lower C causes surface cracks,\n"
                   "higher C causes the spring to tangle and requires separate packing")
-            good_design = False
+            in_range = False
+        return in_range
 
+    def __check_active_coils(self) -> bool:
+        in_range = True
         active_coils = self.active_coils
         if isinstance(active_coils, float) and not 3 <= active_coils <= 15:
             print(f"Note: active_coils={active_coils:.2f} is not in range [3,15],"
                   f"this can cause non linear behavior")
-            good_design = False
+            in_range = False
+        return in_range
 
+    def __check_zeta(self) -> bool:
+        in_range = True
         zeta = self.zeta
         if zeta < 0.15:
             print(f"Note: zeta={zeta:.2f} is smaller then 0.15,"
                   f"the spring could reach its solid length")
-            good_design = False
-        if (self.free_length is not None) and (self.anchors is not None) \
-                and (self.elastic_modulus is not None):
-            buckling, safe_length = self.buckling(self.anchors, verbose=False)
-            if buckling:
-                print(f"Note: buckling is accruing, max free length"
-                      f"(free_length)= {safe_length:.2f}, "
-                      f"free_length= {self.free_length:.2f}")
-                good_design = False
+            in_range = False
+        return in_range
 
-        if (self.density is not None) and (self.working_frequency is not None):
-            natural_freq = self.natural_frequency
-            if natural_freq <= 20 * self.working_frequency:
-                print(
-                    f"Note: the natural frequency={natural_freq:.2f} is less than 20*working"
-                    f"frequency={20 * self.working_frequency:.2f} which is not good")
-                good_design = False
+    def __check_buckling(self) -> bool or None:
+        if self.anchors is None:
+            return None
 
-        return good_design
+        in_range = True
+
+        buckling, safe_length = self.buckling(self.anchors, verbose=False)
+        if buckling:
+            print(f"Note: buckling is accruing, max free length"
+                  f"(free_length)= {safe_length:.2f}, "
+                  f"free_length= {self.free_length:.2f}")
+            in_range = False
+        return in_range
+
+    def __check_natural_frequency(self) -> bool or None:
+        natural_freq = self.natural_frequency
+        if natural_freq is None:
+            return None
+
+        in_range = True
+
+        if natural_freq['fixed-fixed'] <= 20 * self.working_frequency:
+            print(f"Note: the natural frequency={natural_freq['fixed-fixed']:.2f}"
+                  f"for fixed ends is less than 20*working frequency="
+                  f"{20 * self.working_frequency:.2f} which means the spring can resonance")
+            in_range = False
+
+        if natural_freq['fixed-free'] <= 20 * self.working_frequency:
+            print(f"Note: the natural frequency={natural_freq['fixed-free']:.2f} for one fixed "
+                  f"and one free ends is less than 20*working frequency="
+                  f"{20 * self.working_frequency:.2f} which means the spring can resonance")
+            in_range = False
+
+        return in_range
 
     @property
     def free_length(self) -> float:
@@ -167,14 +206,13 @@ class HelicalCompressionSpring(Spring):
         """Number of active coils (derived using Castigliano's theorem)"""
 
         # The full calculation
-        full = ((self.shear_modulus * self.wire_diameter) /
-                (8 * self.spring_index ** 3 * self.spring_rate)) * (
-                       (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
+        # full = ((self.shear_modulus * self.wire_diameter) /
+        #         (8 * self.spring_index ** 3 * self.spring_rate)) * (
+        #                (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
 
         # The accepted approximation
-        approx = ((self.shear_modulus * self.wire_diameter) /
-                  (8 * self.spring_index ** 3 * self.spring_rate))
-        return approx
+        return ((self.shear_modulus * self.wire_diameter) /
+                (8 * self.spring_index ** 3 * self.spring_rate))
 
     @property
     def end_coils(self) -> float:
@@ -246,18 +284,16 @@ class HelicalCompressionSpring(Spring):
         return (k_factor * 8 * force * self.diameter) / (pi * self.wire_diameter ** 3)
 
     @property
-    def natural_frequency(self) -> dict[str:float]:
+    def natural_frequency(self) -> dict[str:float] or None:
         """Figures out what is the natural frequency of the spring"""
         d = self.wire_diameter
         D = self.diameter
         Na = self.active_coils
         G = self.shear_modulus
         try:
-            alpha = 2
-            fix = ((d * 1e-3) / (alpha * pi * (D * 1e-3) ** 2 * Na)) * sqrt(G / (2 * self.density))
-            alpha = 4
-            free = ((d * 1e-3) / (alpha * pi * (D * 1e-3) ** 2 * Na)) * sqrt(G / (2 * self.density))
-            return {'fixed-fixed': fix, 'fixed-free': free}
+            omega = lambda alpha: ((d * 1e-3) / (alpha * pi * (D * 1e-3) ** 2 * Na)) * \
+                                  sqrt(G / (2 * self.density))
+            return {'fixed-fixed': omega(2), 'fixed-free': omega(4)}
         except TypeError:
             return None
 
