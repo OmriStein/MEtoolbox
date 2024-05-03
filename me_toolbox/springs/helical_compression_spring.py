@@ -84,21 +84,21 @@ class HelicalCompressionSpring(Spring):
         :returns: True if pass all checks
         :rtype: bool
         """
-        good_design = all([self.__check_spring_index(),
-                           self.__check_active_coils(),
-                           self.__check_zeta()])
+        good_design = all([self._check_spring_index(),
+                           self._check_active_coils(),
+                           self._check_zeta()])
 
-        buckling_check = self.__check_buckling()
+        buckling_check = self._check_buckling()
         if buckling_check is not None:
             good_design = buckling_check
 
-        natural_frequency_check = self.__check_natural_frequency()
+        natural_frequency_check = self._check_natural_frequency()
         if natural_frequency_check is not None:
             good_design = natural_frequency_check
 
         return good_design
 
-    def __check_spring_index(self) -> bool:
+    def _check_spring_index(self) -> bool:
         in_range = True
         C = self.spring_index  # pylint: disable=invalid-name
         if isinstance(C, float) and not 4 <= C <= 12 and self.set_removed:
@@ -113,7 +113,7 @@ class HelicalCompressionSpring(Spring):
             in_range = False
         return in_range
 
-    def __check_active_coils(self) -> bool:
+    def _check_active_coils(self) -> bool:
         in_range = True
         active_coils = self.active_coils
         if isinstance(active_coils, float) and not 3 <= active_coils <= 15:
@@ -122,7 +122,7 @@ class HelicalCompressionSpring(Spring):
             in_range = False
         return in_range
 
-    def __check_zeta(self) -> bool:
+    def _check_zeta(self) -> bool:
         in_range = True
         zeta = self.zeta
         if zeta < 0.15:
@@ -131,7 +131,7 @@ class HelicalCompressionSpring(Spring):
             in_range = False
         return in_range
 
-    def __check_buckling(self) -> bool or None:
+    def _check_buckling(self) -> bool or None:
         if self.anchors is None:
             return None
 
@@ -145,7 +145,7 @@ class HelicalCompressionSpring(Spring):
             in_range = False
         return in_range
 
-    def __check_natural_frequency(self) -> bool or None:
+    def _check_natural_frequency(self) -> bool or None:
         natural_freq = self.natural_frequency
         if natural_freq is None:
             return None

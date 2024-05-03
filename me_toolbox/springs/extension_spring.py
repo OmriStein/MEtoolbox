@@ -15,10 +15,10 @@ class ExtensionSpring(HelicalCompressionSpring):
                f"spring_diameter={self.diameter}, hook_r1={self.hook_r1}, " \
                f"hook_r2={self.hook_r2}, " \
                f"ultimate_tensile_strength={self.ultimate_tensile_strength}, " \
-               f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}, " \
                f"body_shear_yield_percent={self.body_shear_yield_percent}, " \
                f"hook_normal_yield_percent={self.hook_normal_yield_percent}, " \
                f"hook_shear_yield_percent={self.hook_normal_yield_percent}, " \
+               f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}, " \
                f"spring_rate={self.spring_rate}, shot_peened={self.shot_peened}, " \
                f"density={self.density}, working_frequency={self.working_frequency})"
 
@@ -77,15 +77,15 @@ class ExtensionSpring(HelicalCompressionSpring):
         :returns: True if pass all checks
         :rtype: bool
         """
-        good_design = all([self.__check_spring_index(), self.__check_active_coils()])
+        good_design = all([self._check_spring_index(), self._check_active_coils()])
 
-        natural_frequency_check = self.__check_natural_frequency()
+        natural_frequency_check = self._check_natural_frequency()
         if natural_frequency_check is not None:
             good_design = natural_frequency_check
 
         return good_design
 
-    def __check_spring_index(self) -> bool:
+    def _check_spring_index(self) -> bool:
         in_range = True
         C = self.spring_index  # pylint: disable=invalid-name
         if isinstance(C, float) and not 3 <= C <= 16 and self.set_removed:
