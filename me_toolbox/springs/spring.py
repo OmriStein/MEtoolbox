@@ -15,8 +15,7 @@ class Spring:
                f"active_coils={self.active_coils}, " \
                f"ultimate_tensile_strength={self.ultimate_tensile_strength}, " \
                f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}," \
-               f"shot_peened={self.shot_peened}, density={self.density}, " \
-               f"working_frequency={self.working_frequency})"
+               f"shot_peened={self.shot_peened}, density={self.density})"
 
     def __str__(self):
         return f"{self.__class__.__name__}(K={self.spring_constant}, d={self.wire_diameter}, " \
@@ -24,7 +23,7 @@ class Spring:
 
     def __init__(self, max_force, wire_diameter, diameter, spring_rate,
                  ultimate_tensile_strength, shear_modulus, elastic_modulus, shot_peened,
-                 density, working_frequency):
+                 density):
         """Instantiate helical push spring object with the given parameters
         :param float or Symbol max_force: The maximum load on the spring [N]
         :param float or Symbol wire_diameter: Spring wire diameter [mm]
@@ -36,13 +35,11 @@ class Spring:
         :param float or None elastic_modulus: Elastic modulus (used for buckling calculations) [MPa]
         :param bool shot_peened: If True adds to fatigue strength
         :param float or None density: Spring's material density [kg/m^3]
-        :param float or None working_frequency: the spring working frequency [Hz]
 
         :returns: Spring object
         """
 
         self.max_force = max_force
-        self.working_frequency = working_frequency
         self.wire_diameter = wire_diameter
         self.diameter = diameter
         self.spring_rate = spring_rate
