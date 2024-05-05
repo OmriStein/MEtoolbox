@@ -354,7 +354,6 @@ class HelicalCompressionSpring(Spring):
         D = self.diameter
         Na = self.active_coils
         G = self.shear_modulus
-
         omega = lambda alpha: ((d * 1e-3) / (alpha * pi * (D * 1e-3) ** 2 * Na)) * sqrt(G / (2 * density))
         results = {'fixed-fixed': omega(2), 'fixed-free': omega(4)}
 
