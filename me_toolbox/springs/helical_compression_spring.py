@@ -18,8 +18,7 @@ class HelicalCompressionSpring(Spring):
                f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}, " \
                f"end_type={self.end_type}, spring_rate={self.spring_rate}, " \
                f"set_removed={self.set_removed}, shot_peened={self.shot_peened}, " \
-               f"density={self.density}, working_frequency={self.working_frequency}, " \
-               f"anchors={self.anchors}, zeta={self.zeta})"
+               f"density={self.density}, zeta={self.zeta})"
 
     def __str__(self):
         return f"HelicalCompressionSpring(d={self.wire_diameter}, D={self.diameter}, " \
@@ -28,7 +27,7 @@ class HelicalCompressionSpring(Spring):
     def __init__(self, max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
                  shear_yield_percent, shear_modulus, elastic_modulus, end_type,
                  spring_rate, set_removed=False, shot_peened=False,
-                 density=None, working_frequency=None, anchors=None, zeta=0.15):
+                 density=None, zeta=0.15):
         """Instantiate helical push spring object with the given parameters.
 
         :param float max_force: The maximum load on the spring [N]
@@ -46,19 +45,15 @@ class HelicalCompressionSpring(Spring):
             (must NOT use for fatigue application)
         :param bool shot_peened: If True adds to fatigue strength
         :param float or None density: Material density (used for finding natural frequency) [kg/m^3]
-        :param float or None working_frequency: the spring working frequency [Hz]
-        :param str or None anchors: How the spring is anchored (for buckling test),
-            The options are: 'fixed-fixed', 'fixed-hinged', 'hinged-hinged', 'clamped-free'
-
-            (used for buckling calculations)
         :param float zeta: Overrun safety factor
 
-        :returns: HelicalCompressionSpring object
+        :returns: Helical Compression Spring object
+        :rtype: HelicalCompressionSpring
         """
 
         super().__init__(max_force, wire_diameter, spring_diameter, spring_rate,
                          ultimate_tensile_strength, shear_modulus, elastic_modulus,
-                         shot_peened, density, working_frequency)
+                         shot_peened, density)
 
         if set_removed:
             print("Note: set should ONLY be removed for static loading"
@@ -84,19 +79,17 @@ class HelicalCompressionSpring(Spring):
         :returns: True if pass all checks
         :rtype: bool
         """
-        good_design = all([self._check_spring_index(),
-                           self._check_active_coils(),
-                           self._check_zeta()])
+        return all([self._check_spring_index(), self._check_active_coils(), self._check_zeta()])
 
-        buckling_check = self._check_buckling()
-        if buckling_check is not None:
-            good_design = buckling_check
+        # buckling_check = self._check_buckling()
+        # if buckling_check is not None:
+        #     good_design = buckling_check
+        #
+        # natural_frequency_check = self._check_natural_frequency()
+        # if natural_frequency_check is not None:
+        #     good_design = natural_frequency_check
 
-        natural_frequency_check = self._check_natural_frequency()
-        if natural_frequency_check is not None:
-            good_design = natural_frequency_check
-
-        return good_design
+        # return good_design
 
     def _check_spring_index(self) -> bool:
         in_range = True
@@ -129,41 +122,6 @@ class HelicalCompressionSpring(Spring):
             print(f"Note: zeta={zeta:.2f} is smaller then 0.15,"
                   f"the spring could reach its solid length")
             in_range = False
-        return in_range
-
-    def _check_buckling(self) -> bool or None:
-        if self.anchors is None:
-            return None
-
-        in_range = True
-
-        buckling, safe_length = self.buckling(self.anchors, verbose=False)
-        if buckling:
-            print(f"Note: buckling is accruing, max free length"
-                  f"(free_length)= {safe_length:.2f}, "
-                  f"free_length= {self.free_length:.2f}")
-            in_range = False
-        return in_range
-
-    def _check_natural_frequency(self) -> bool or None:
-        natural_freq = self.natural_frequency
-        if natural_freq is None:
-            return None
-
-        in_range = True
-
-        if natural_freq['fixed-fixed'] <= 20 * self.working_frequency:
-            print(f"Note: the natural frequency={natural_freq['fixed-fixed']:.2f}"
-                  f"for fixed ends is less than 20*working frequency="
-                  f"{20 * self.working_frequency:.2f} which means the spring can resonance")
-            in_range = False
-
-        if natural_freq['fixed-free'] <= 20 * self.working_frequency:
-            print(f"Note: the natural frequency={natural_freq['fixed-free']:.2f} for one fixed "
-                  f"and one free ends is less than 20*working frequency="
-                  f"{20 * self.working_frequency:.2f} which means the spring can resonance")
-            in_range = False
-
         return in_range
 
     @property
@@ -284,20 +242,6 @@ class HelicalCompressionSpring(Spring):
         return (k_factor * 8 * force * self.diameter) / (pi * self.wire_diameter ** 3)
 
     @property
-    def natural_frequency(self) -> dict[str:float] or None:
-        """Figures out what is the natural frequency of the spring"""
-        d = self.wire_diameter
-        D = self.diameter
-        Na = self.active_coils
-        G = self.shear_modulus
-        try:
-            omega = lambda alpha: ((d * 1e-3) / (alpha * pi * (D * 1e-3) ** 2 * Na)) * \
-                                  sqrt(G / (2 * self.density))
-            return {'fixed-fixed': omega(2), 'fixed-free': omega(4)}
-        except TypeError:
-            return None
-
-    @property
     def max_deflection(self) -> float:
         """Returns the spring maximum deflection (It's change in length)"""
         return self.calc_deflection(self.max_force)
@@ -412,9 +356,43 @@ class HelicalCompressionSpring(Spring):
 
             return self.free_length >= max_safe_length, max_safe_length
 
+    def natural_frequency(self, density, working_frequency, verbose=True) -> dict[str:float] or None:
+        """Figures out what is the natural frequency of the spring
+        :param float density: Spring's material density
+        :param float working_frequency: The expected frequency the spring is used for
+        :param bool verbose: Print if spring frequency is not in range
+        """
+        d = self.wire_diameter
+        D = self.diameter
+        Na = self.active_coils
+        G = self.shear_modulus
+
+        omega = lambda alpha: ((d * 1e-3) / (alpha * pi * (D * 1e-3) ** 2 * Na)) * \
+                              sqrt(G / (2 * density))
+        results = {'fixed-fixed': omega(2), 'fixed-free': omega(4)}
+
+        if verbose:
+            if results['fixed-fixed'] > 20 * working_frequency:
+                print(f"The spring's natural frequency for fixed ends is much grater than the "
+                      f"working frequency \nwhich is good\n")
+            else:
+                print(f"Note: the natural frequency={results['fixed-fixed']:.2f} "
+                      f"for fixed ends is not larger than 20*working frequency="
+                      f"{20 * working_frequency:.2f} \nwhich means the spring can resonance\n")
+
+            if results['fixed-free'] > 20 * working_frequency:
+                print(f"The spring's natural frequency for one fixed and one free ends is much"
+                      f"grater than the working frequency \nwhich is good\n")
+            else:
+                print(f"Note: the natural frequency={results['fixed-free']:.2f} "
+                      f"for one fixed and one free ends is not larger than 20*working frequency="
+                      f"{20 * working_frequency:.2f} \nwhich means the spring can resonance\n")
+
+        return results
+
     @staticmethod
     def calc_spring_rate(wire_diameter, spring_diameter, shear_modulus, active_coils):
-        """Calculate spring constant (using Castigliano's theorem)
+        """Calculate spring constant using the geometric properties
 
         :returns: The spring constant
         :rtype: float
