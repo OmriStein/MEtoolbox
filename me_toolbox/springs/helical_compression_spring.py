@@ -68,8 +68,6 @@ class HelicalCompressionSpring(Spring):
         if self.end_type not in end_types:
             raise ValueError(f"{end_type} not one of this: {end_types}")
 
-        self.anchors = anchors
-
         self.check_design()
 
     def check_design(self):
