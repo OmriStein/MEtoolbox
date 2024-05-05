@@ -20,7 +20,7 @@ class ExtensionSpring(HelicalCompressionSpring):
                f"hook_shear_yield_percent={self.hook_normal_yield_percent}, " \
                f"shear_modulus={self.shear_modulus}, elastic_modulus={self.elastic_modulus}, " \
                f"spring_rate={self.spring_rate}, shot_peened={self.shot_peened}, " \
-               f"density={self.density}, working_frequency={self.working_frequency})"
+               f"density={self.density})"
 
     def __str__(self):
         return f"ExtensionSpring(d={self.wire_diameter}, D={self.diameter}, " \
@@ -29,7 +29,7 @@ class ExtensionSpring(HelicalCompressionSpring):
     def __init__(self, max_force, initial_tension, wire_diameter, spring_diameter, hook_r1, hook_r2,
                  ultimate_tensile_strength, body_shear_yield_percent, hook_normal_yield_percent,
                  hook_shear_yield_percent, shear_modulus, elastic_modulus,
-                 spring_rate, shot_peened=False, density=None, working_frequency=None):
+                 spring_rate, shot_peened=False, density=None):
         """Instantiate an extension spring object with the given parameters
 
         :param float max_force: The maximum load on the spring [N]
@@ -49,8 +49,6 @@ class ExtensionSpring(HelicalCompressionSpring):
         :param bool shot_peened: if True adds to fatigue strength
         :param float or None density: Spring's material density [kg/m^3]
             (used for buckling and weight calculations)
-        :param float or None working_frequency: the spring working frequency [Hz]
-            (used for fatigue calculations)
 
         :returns: HelicalCompressionSpring
         """
@@ -58,8 +56,7 @@ class ExtensionSpring(HelicalCompressionSpring):
         super().__init__(max_force, wire_diameter, spring_diameter, ultimate_tensile_strength,
                          body_shear_yield_percent, shear_modulus, elastic_modulus, end_type='plain',
                          spring_rate=spring_rate, set_removed=False, shot_peened=shot_peened,
-                         density=density, working_frequency=working_frequency,
-                         anchors=None, zeta=0.15)
+                         density=density, zeta=0.15)
 
         self.initial_tension = initial_tension
         self.hook_r1 = hook_r1
@@ -71,19 +68,13 @@ class ExtensionSpring(HelicalCompressionSpring):
         self.check_design()
 
     def check_design(self):
-        """Check if the spring index,active coils and natural frequency
+        """Check if the spring index and active coils
          are in the acceptable range for good design.
 
         :returns: True if pass all checks
         :rtype: bool
         """
-        good_design = all([self._check_spring_index(), self._check_active_coils()])
-
-        natural_frequency_check = self._check_natural_frequency()
-        if natural_frequency_check is not None:
-            good_design = natural_frequency_check
-
-        return good_design
+        return all([self._check_spring_index(), self._check_active_coils()])
 
     def _check_spring_index(self) -> bool:
         in_range = True

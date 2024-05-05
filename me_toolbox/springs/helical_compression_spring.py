@@ -71,23 +71,13 @@ class HelicalCompressionSpring(Spring):
         self.check_design()
 
     def check_design(self):
-        """Check if the spring index,active coils, zeta, free length and natural frequency
+        """Check if the spring index,active coils, zeta and free length
          are in the acceptable range for good design.
 
         :returns: True if pass all checks
         :rtype: bool
         """
         return all([self._check_spring_index(), self._check_active_coils(), self._check_zeta()])
-
-        # buckling_check = self._check_buckling()
-        # if buckling_check is not None:
-        #     good_design = buckling_check
-        #
-        # natural_frequency_check = self._check_natural_frequency()
-        # if natural_frequency_check is not None:
-        #     good_design = natural_frequency_check
-
-        # return good_design
 
     def _check_spring_index(self) -> bool:
         in_range = True
