@@ -2,7 +2,6 @@
 import csv
 import os
 import numpy as np
-from sympy import Symbol
 
 from me_toolbox.tools import print_atributes
 
@@ -25,9 +24,9 @@ class Spring:
                  ultimate_tensile_strength, shear_modulus, elastic_modulus, shot_peened,
                  density):
         """Instantiate helical push spring object with the given parameters
-        :param float or Symbol max_force: The maximum load on the spring [N]
-        :param float or Symbol wire_diameter: Spring wire diameter [mm]
-        :param float or Symbol diameter: Spring diameter measured from [mm]
+        :param float max_force: The maximum load on the spring [N]
+        :param float wire_diameter: Spring wire diameter [mm]
+        :param float diameter: Spring diameter measured from [mm]
             the center point of the wire diameter
         :param float or None spring_rate: Spring rate (k) [N/mm]
         :param float ultimate_tensile_strength: Ultimate tensile strength of the material [MPa]
@@ -58,7 +57,7 @@ class Spring:
         """Getter for the wire diameter attribute
 
         :returns: The spring's wire diameter
-        :rtype: float or Symbol
+        :rtype: float
         """
         return self._wire_diameter
 
@@ -74,7 +73,7 @@ class Spring:
         """Getter for the spring diameter attribute
 
         :returns: The spring diameter
-        :rtype: float or Symbol
+        :rtype: float
         """
         return self._diameter
 
@@ -101,7 +100,7 @@ class Spring:
             higher C causes the spring to tangle and require separate packing
 
         :returns: The spring index
-        :type: float or Symbol
+        :type: float
         """
         return self.diameter / self.wire_diameter
 
@@ -160,11 +159,7 @@ class Spring:
         :rtype: float
         """
 
-        if isinstance(diameter, Symbol):
-            raise ValueError(f"the material keyword can't be used if the diameter is symbolic "
-                             f"specify Ap and m manually")
-
-        path = os.path.dirname(__file__) + "\\tables\\A_and_m.csv"
+        path = os.path.dirname(__file__) + "\\tables\\ultimate _tensile_strength.csv"
         with open(path, newline='') as file:
             reader = csv.DictReader(file)
             table = []
