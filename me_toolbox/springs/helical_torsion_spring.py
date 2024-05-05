@@ -17,8 +17,7 @@ class HelicalTorsionSpring(Spring):
                f"yield_percent={self.yield_percent}, shear_modulus={self.shear_modulus}, " \
                f"elastic_modulus={self.elastic_modulus}, spring_rate={self.spring_rate}, " \
                f"radius={self.radius}, arbor_diameter={self.arbor_diameter}, " \
-               f"shot_peened={self.shot_peened}, density={self.density}, " \
-               f"working_frequency={self.working_frequency})"
+               f"shot_peened={self.shot_peened}, density={self.density})"
 
     def __str__(self):
         return f"HelicalTorsionSpring(d={self.wire_diameter}, D={self.diameter}, " \
@@ -26,8 +25,7 @@ class HelicalTorsionSpring(Spring):
 
     def __init__(self, max_moment, wire_diameter, spring_diameter, leg1, leg2,
                  ultimate_tensile_strength, yield_percent, shear_modulus, elastic_modulus,
-                 spring_rate, radius=None, arbor_diameter=None, shot_peened=False, density=None,
-                 working_frequency=None):
+                 spring_rate, radius=None, arbor_diameter=None, shot_peened=False, density=None):
         """Instantiate helical torsion spring object with the given parameters
 
         :param float  max_moment: The maximum load on the spring [Nmm]
@@ -46,8 +44,6 @@ class HelicalTorsionSpring(Spring):
         :param bool shot_peened: if True adds to fatigue strength
         :param float or None density: Spring's material density [kg/m^3]
             (used for buckling and weight calculations)
-        :param float or None working_frequency: the spring working frequency [Hz]
-            (used for fatigue calculations)
 
         :returns: HelicalTorsionSpring
         """
@@ -55,7 +51,7 @@ class HelicalTorsionSpring(Spring):
 
         super().__init__(max_force, wire_diameter, spring_diameter, spring_rate,
                          ultimate_tensile_strength, shear_modulus, elastic_modulus,
-                         shot_peened, density, working_frequency)
+                         shot_peened, density)
 
         self.radius = radius  # Needs a better name
         self.max_moment = max_moment
@@ -179,10 +175,6 @@ class HelicalTorsionSpring(Spring):
         return self.factor_Ki * ((32 * moment) / (pi * self.wire_diameter ** 3))
 
     @property
-    def natural_frequency(self):
-        return sqrt(self.spring_rate / self.weight)
-
-    @property
     def max_angular_deflection(self):
         """The total angular deflection due to the max moment
         this deflection consists of the angular deflection
@@ -190,7 +182,7 @@ class HelicalTorsionSpring(Spring):
         for *each* leg.
 
         :returns: Max angular deflection
-        :rtype: float 
+        :rtype: float
         """
         return self.calc_angular_deflection(self.max_moment)
 
@@ -207,7 +199,7 @@ class HelicalTorsionSpring(Spring):
         :param bool total_deflection: total or partial deflection
 
         :returns: Total angular deflection in radians
-        :rtype: float 
+        :rtype: float
         """
         d = self.wire_diameter
         D = self.diameter
@@ -233,13 +225,14 @@ class HelicalTorsionSpring(Spring):
         else:
             raise ValueError(f"Can't calculate weight, no density is specified")
 
-    @property
-    def static_safety_factor(self):  # pylint: disable=unused-argument
+    def static_safety_factor(self, verbose=False):
         """ Returns the static safety factor
 
         :returns: Spring's safety factor
         :type: float
         """
+        if verbose:
+            print(f"Sy={self.yield_strength}, Maximal stress={self.max_stress}")
         return self.yield_strength / self.max_stress
 
     def fatigue_analysis(self, max_moment, min_moment, reliability,
@@ -276,6 +269,10 @@ class HelicalTorsionSpring(Spring):
                   f"Alternating stress = {alt_stress}, Mean stress = {mean_stress}\n"
                   f"Sse = {Sse}, Se= {Se}")
         return nf, nl
+
+    def natural_frequency(self):
+        # return sqrt(self.spring_rate / self.weight)
+        raise NotImplementedError("natural_frequency is not implemented yet for HelicalTorsionSpring")
 
     @staticmethod
     def calc_spring_rate(wire_diameter, spring_diameter, active_coils, elastic_modulus):
