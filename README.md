@@ -8,7 +8,7 @@ This library is for my own personal use, use it at your own discretion.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install me_toolbox.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install me-toolbox.
 ```bash
  pip install me_toolbox 
 ```
