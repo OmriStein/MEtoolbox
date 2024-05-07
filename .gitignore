@@ -5,5 +5,7 @@
 /me_toolbox.egg-info/
 /gen_docs/
 venv/
-. gitignore
 setup.py
+/.ipynb_checkpoints/
+/examples/springs_examples/old/
+/old/
