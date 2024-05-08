@@ -96,7 +96,7 @@ print("Mean Equivalent Stress:", fatigue_analysis.mean_eq_stress,
       "\nAlternating Equivalent Stress:", fatigue_analysis.alt_eq_stress)
 
 # number of cycles until failure
-print(f"N={fatigue_analysis.num_of_cycle()[0]:,.2e}, Sf={fatigue_analysis.num_of_cycle()[1]:,.2f}")
+print(f"N={fatigue_analysis.num_of_cycles()[0]:,.2e}, Sf={fatigue_analysis.num_of_cycles()[1]:,.2f}")
 
 # Miners law Sf(5e8)=90[MPa]
 # the format [number_of_repetitions,maximum_stress, minimum_stress]

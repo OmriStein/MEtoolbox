@@ -1,10 +1,9 @@
 """module containing the FatigueAnalysis class and
 calc_kf for calculating dynamic stress concentration factor
 """
-from math import log10
+from math import log10, inf
 from sympy import sqrt
 from me_toolbox.tools import NotInRangeError, print_atributes
-from sympy import oo
 from me_toolbox.fatigue import FailureCriteria
 
 
@@ -324,11 +323,12 @@ class FatigueAnalysis:
                 f"the graph range, f={f(Sut)}")
         return f(Sut) * Sut
 
-    def num_of_cycle(self, z=-3):
+    def num_of_cycles(self, z=-3):
         """ calculate number of cycles until failure
 
-        Note: zeta = log(N1) - log(N2), N1 - number of cycles at Sm_stress,
-            N2 - Number of cycles at Se for steel N1=1e3 and N2 = 1e6
+        Note: zeta = log(N1) - log(N2)
+              N1 - number of cycles at Sm,
+              N2 - Number of cycles at Se (for steel N1=1e3 and N2 = 1e6 -> z=-3)
 
         :param float z: -3 for steel where N=1e6, -5 for metal where N=1e8,
             -5.69 for metal where N=5e8
@@ -341,34 +341,32 @@ class FatigueAnalysis:
         Se = self.Se
         Sut, Sy, Sm = self.Sut, self.Sy, self.Sm_stress
 
+        # calculating the reversible stress (σ_rev)
         if mean_stress >= 0:
             reversible_stress = alternating_stress / (1 - (mean_stress / Sut))
         else:
             reversible_stress = alternating_stress
 
+        # Low Cycle Fatigue
         if Sm < reversible_stress < Sy:
-            # Low Cycle Fatigue
             if z != -3:
-                raise ValueError(
-                    "Number of cycles calculation for low cycle fatigue is only possible for "
-                    "zeta=-3 ")
+                raise ValueError(f"Number of cycles calculation for low cycle fatigue"
+                                 f" is only possible for zeta=-3")
 
             a = Sut
             b = (1 / z) * log10(Sut / Sm)
 
+        # High Cycle Fatigue
         elif Se < reversible_stress < Sm:
-            # High Cycle Fatigue
             a = Sm * (Sm / Se) ** (-3 / z)
             b = (1 / z) * log10(Sm / Se)
 
         elif reversible_stress < Se:
-            print(
-                f"reversible_stress = {reversible_stress} < Se = {Se}, Number of cycles is "
-                f"infinite")
-            return oo  # TODO: add to documentation the meaning of oo
+            print(f"reversible_stress = {reversible_stress} < Se = {Se},"
+                  f"The Number of cycles is infinite")
+            return inf  # from math module - short for infinity
         else:
-            raise NotInRangeError("Reversible Stress", reversible_stress,
-                                  (f'Sy={Sy}', f'Sm_stress={Sm}', f'Se={Se}'))
+            raise NotInRangeError(f"Reversible Stress={reversible_stress} is grater than Sy={Sy}")
         N = (reversible_stress / a) ** (1 / b)
         return N, a * N ** b
 
@@ -421,9 +419,9 @@ class FatigueAnalysis:
             group.append(reversible_stress)
 
             if ((Sy is not None) and (Sm < reversible_stress < Sy)) or reversible_stress < Se:
-                # infinite num of cycle - either the stress is less then
+                # infinite num of cycle - either the stress is less than
                 # the endurance limit or its low cycle fatigue
-                group.append(oo)
+                group.append(inf)
 
             elif Se < reversible_stress < Sm:
                 # High Cycle Fatigue
@@ -448,7 +446,6 @@ class FatigueAnalysis:
             if verbose:
                 print(group)
 
-        # casting the result to float - my be needed because the use of sympy's oo
         N_total = float(1 / result)
 
         if verbose:
