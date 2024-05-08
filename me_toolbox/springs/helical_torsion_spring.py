@@ -72,7 +72,6 @@ class HelicalTorsionSpring(Spring):
         else:
             return True
 
-
     @property
     def diameter_after_deflection(self):
         """ After deflection The spring diameter is shrinking it is important to know the new
