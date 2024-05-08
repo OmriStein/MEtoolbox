@@ -60,8 +60,18 @@ class HelicalTorsionSpring(Spring):
         self.leg2 = leg2
         self.arbor_diameter = arbor_diameter
 
+        self.check_design()
+
     def check_design(self):
-        raise NotImplementedError("check_design is not implemented yet for HelicalTorsionSpring")
+        if self.arbor_diameter is None:
+            return None
+        if self.clearance < 0:
+            print(f"The clearance between the spring and arbor "
+                  f"after tension is applied is negative ({self.clearance})")
+            return False
+        else:
+            return True
+
 
     @property
     def diameter_after_deflection(self):
@@ -77,11 +87,11 @@ class HelicalTorsionSpring(Spring):
     @property
     def clearance(self):
         """Diametrical Clearance between the spring after deflection and the arbor"""
-        if self.arbor_diameter is not None:
-            ID = self.diameter_after_deflection - self.wire_diameter
-            return ID - self.arbor_diameter
-        else:
-            return "The pin diameter was not given"
+        if self.arbor_diameter is None:
+            raise KeyError("Arbor diameter attribute is None")
+
+        ID = self.diameter_after_deflection - self.wire_diameter
+        return ID - self.arbor_diameter
 
     @property
     def length(self):
