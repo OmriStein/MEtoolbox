@@ -377,15 +377,30 @@ class HelicalCompressionSpring(Spring):
         return results
 
     @staticmethod
-    def calc_spring_rate(wire_diameter, spring_diameter, shear_modulus, active_coils):
+    def calc_spring_rate(wire_diameter, spring_diameter, total_coils, end_type, shear_modulus):
         """Calculate spring constant using the geometric properties
+        :param float wire_diameter: Spring's wire diameter.
+        :param float spring_diameter: Spring's mean diameter.
+        :param float total_coils: Spring's total coils.
+        :param str end_type: The way the spring's ends are made
+        :param float shear_modulus: The spring's material shear modulus
 
         :returns: The spring constant
         :rtype: float
         """
+        options = {'plain': 0,
+                   'plain and ground': 1,
+                   'squared or closed': 2,
+                   'squared and ground': 2}
+        if end_type not in options.keys():
+            raise KeyError(f"end_type={end_type} is wrong, valid options are:\n"
+                           f"'plain', 'plain and ground', 'squared or closed',"
+                           f"'squared and ground'")
+        Na = total_coils - options.get(end_type)
+
         d = wire_diameter
         D = spring_diameter
         G = shear_modulus
         C = D / d
-        Na = active_coils
+
         return ((G * d) / (8 * C ** 3 * Na)) * ((2 * C ** 2) / (1 + 2 * C ** 2))
