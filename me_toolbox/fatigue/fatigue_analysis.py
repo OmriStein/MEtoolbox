@@ -3,7 +3,7 @@ calc_kf for calculating dynamic stress concentration factor
 """
 from math import log10, inf
 from sympy import sqrt
-from me_toolbox.tools import NotInRangeError, print_atributes
+from me_toolbox.tools import print_atributes
 from me_toolbox.fatigue import FailureCriteria
 
 
@@ -366,7 +366,7 @@ class FatigueAnalysis:
                   f"The Number of cycles is infinite")
             return inf  # from math module - short for infinity
         else:
-            raise NotInRangeError(f"Reversible Stress={reversible_stress} is grater than Sy={Sy}")
+            raise ValueError(f"Reversible Stress={reversible_stress} is grater than Sy={Sy}")
         N = (reversible_stress / a) ** (1 / b)
         return N, a * N ** b
 
