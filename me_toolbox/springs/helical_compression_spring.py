@@ -152,13 +152,11 @@ class HelicalCompressionSpring(Spring):
         """Number of active coils (derived using Castigliano's theorem)"""
 
         # The full calculation
-        # full = ((self.shear_modulus * self.wire_diameter) /
-        #         (8 * self.spring_index ** 3 * self.spring_rate)) * (
-        #                (2 * self.spring_index ** 2) / (1 + 2 * self.spring_index ** 2))
+        Na = ((self.shear_modulus * self.wire_diameter) /
+                (8 * (self.spring_index ** 3) * self.spring_rate)) * (
+                       (2 * (self.spring_index ** 2)) / (1 + 2 * (self.spring_index ** 2)))
 
-        # The accepted approximation
-        return ((self.shear_modulus * self.wire_diameter) /
-                (8 * self.spring_index ** 3 * self.spring_rate))
+        return Na
 
     @property
     def end_coils(self) -> float:
