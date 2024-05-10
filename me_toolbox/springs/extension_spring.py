@@ -240,36 +240,39 @@ class ExtensionSpring(HelicalCompressionSpring):
         Se = Sse / 0.577  # estimation using distortion-energy theory
         Sut = self.ultimate_tensile_strength
 
-        try:
-            nf_hook_normal, ns_hook_normal = \
-                FailureCriteria.get_safety_factors(Sy_hook, Sut, Se, hook_alt_normal_stress,
-                                                   hook_mean_normal_stress, criterion)
+        nf_hook_normal, ns_hook_normal = \
+            FailureCriteria.get_safety_factors(Sy_hook, Sut, Se, hook_alt_normal_stress,
+                                               hook_mean_normal_stress, criterion)
 
-            nf_hook_shear, ns_hook_shear = \
-                FailureCriteria.get_safety_factors(Ssy_hook, Ssu, Sse, hook_alt_shear_stress,
-                                                   hook_mean_shear_stress, criterion)
-        except TypeError as typ_err:
-            raise ValueError(f"Fatigue analysis can't handle symbolic vars") from typ_err
+        nf_hook_shear, ns_hook_shear = \
+            FailureCriteria.get_safety_factors(Ssy_hook, Ssu, Sse, hook_alt_shear_stress,
+                                               hook_mean_shear_stress, criterion)
 
         # calculating mean and alternating stresses for the body section
         # shear stresses:
-        alt_body_shear_stress = self.calc_shear_stress(alt_force, self.hook_KB)
-        mean_body_shear_stress = (mean_force / alt_force) * hook_alt_shear_stress
+        alt_body_shear_stress = self.calc_shear_stress(alt_force, self.factor_Kw)
+        mean_body_shear_stress = (mean_force / alt_force) * alt_body_shear_stress
+        initial_body_shear_stress = (self.initial_tension / alt_force) * alt_body_shear_stress
+        r = alt_body_shear_stress / (mean_body_shear_stress - initial_body_shear_stress)
+        Ssa = (r/(r+1)) * (Ssy_body - initial_body_shear_stress)
 
-        nf_body, ns_body = FailureCriteria.get_safety_factors(Ssy_body, Ssu, Sse,
+        nf_body, _ = FailureCriteria.get_safety_factors(Ssy_body, Ssu, Sse,
                                                               alt_body_shear_stress,
                                                               mean_body_shear_stress, criterion)
+        ns_body = Ssa/alt_body_shear_stress
 
         if verbose:
             print(f"Alternating force = {alt_force:.2f}, "
                   f"Mean force = {mean_force:.2f}\n\n"
-                  f"Body's alternating body shear stress = {alt_body_shear_stress:.2f}, "
-                  f"Body's mean body shear stress = {mean_body_shear_stress:.2f}\n\n"
+                  f"Body's alternating shear stress = {alt_body_shear_stress:.2f}, "
+                  f"Body's mean shear stress = {mean_body_shear_stress:.2f}, "
+                  f"Body's initial shear stress = {initial_body_shear_stress:.2f}\n\n"
                   f"Hook's alternating shear stress = {hook_alt_shear_stress:.2f}, "
                   f"Hook's mean shear stress = {hook_mean_shear_stress:.2f}\n\n"
                   f"Hook's alternating normal stress = {hook_alt_normal_stress:.2f}, "
                   f"Hook's mean normal stress = {hook_mean_normal_stress:.2f}\n\n"
-                  f"Sut = {Sut:.2f}, Sse = {Sse:.2f}, Se = {Se:.2f}, Ssu = {Ssu:.2f},\n"
+                  f"Sut = {Sut:.2f}, Sse = {Sse:.2f}, Se = {Se:.2f}, Ssu = {Ssu:.2f}, "
+                  f"Ssa = {Ssa:.2f}\n"
                   f"Ssy_body = {Ssy_body:.2f}, Ssy_hook = {Ssy_hook:.2f}, "
                   f"Sy_hook = {Sy_hook:.2f}\n")
 

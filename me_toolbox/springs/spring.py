@@ -146,6 +146,9 @@ class Spring:
 
         return Ke * (Ssa / (1 - (Ssm / self.shear_ultimate_strength) ** 2))
 
+    def endurance_limit(self):
+        raise NotImplementedError(f"endurance_limit has not been implemented yet")
+
     @staticmethod
     def material_prop(material, diameter, metric=True, verbose=False):
         """Reads table A_and_m.csv from file and returns the Sut estimation from the material

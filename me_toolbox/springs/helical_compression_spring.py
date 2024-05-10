@@ -1,5 +1,7 @@
 """A module containing the helical push spring class"""
 from math import pi  # , sqrt
+
+from icecream import ic
 from sympy import sqrt
 
 from me_toolbox.fatigue import FailureCriteria
@@ -151,7 +153,6 @@ class HelicalCompressionSpring(Spring):
     def active_coils(self) -> float:
         """Number of active coils (derived using Castigliano's theorem)"""
 
-        # The full calculation
         Na = ((self.shear_modulus * self.wire_diameter) /
                 (8 * (self.spring_index ** 3) * self.spring_rate)) * (
                        (2 * (self.spring_index ** 2)) / (1 + 2 * (self.spring_index ** 2)))
