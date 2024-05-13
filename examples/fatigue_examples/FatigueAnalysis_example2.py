@@ -41,7 +41,11 @@ Kfs = FatigueAnalysis.calc_kf(0.95, 1.12)
 
 print(f"Kf={Kf:.3f}, Kfs={Kfs:.3f}")
 
-fatigue_analysis = FatigueAnalysis(endurance_limit=endurance_limit, ductile=True, Sy=Sy,
+fatigue_analysis = FatigueAnalysis(modified_endurance_limit=endurance_limit.modified,
+                                   stress_type=endurance_limit.stress_type,
+                                   ductile=True,
+                                   ultimate_tensile_strength=endurance_limit.Sut,
+                                   yield_strength=Sy,
                                    Kf_bending=Kf, Kf_torsion=Kfs, alt_bending_stress=bending_stress,
                                    mean_torsion_stress=torsion_stress)
 
