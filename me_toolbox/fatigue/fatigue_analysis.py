@@ -3,26 +3,26 @@ calc_kf for calculating dynamic stress concentration factor
 """
 from math import log10, inf
 from sympy import sqrt
+
 from me_toolbox.tools import print_atributes
 from me_toolbox.fatigue import FailureCriteria
 
+from icecream import ic
 
 class FatigueAnalysis:
     """Perform fatigue analysis"""
 
-    # TODO: make endurance_limit optional and add option to input Se, Stress_type and Kc directly
-    # TODO: replace Kc with some other way to determine what to do in factors calculation
-
-    def __init__(self, endurance_limit, ductile, Sy=None,
-                 Kf_bending=0, Kf_normal=0, Kf_torsion=0,
+    def __init__(self, modified_endurance_limit, stress_type, ductile, ultimate_tensile_strength,
+                 yield_strength=None, Kf_bending=0, Kf_normal=0, Kf_torsion=0,
                  alt_bending_stress=0, alt_normal_stress=0, alt_torsion_stress=0,
                  mean_bending_stress=0, mean_normal_stress=0, mean_torsion_stress=0):
         """ Instantiating fatigue object
         Note: all stresses are in [MPa]
-        :param EnduranceLimit endurance_limit: EnduranceLimit object containing
-        the modified Se
+        :param float modified_endurance_limit: The modified endurance limit (Se)
+        :type str stress_type: Type of stress loading (bending', 'axial', 'torsion', 'shear', 'multiple')
         :param bool ductile: True if material is ductile
-        :param float Sy: Yield strength in [Mpa]
+        :type ultimate_tensile_strength: Ultimate tensile strength (Sut) of the material in [MPa]
+        :param float yield_strength: Yield strength in [MPa]
         :param float Kf_bending: dynamic stress concentration factor for bending
         :param Kf_normal: dynamic stress concentration factor for normal
         :param Kf_torsion: dynamic stress concentration factor for torsion
@@ -34,11 +34,10 @@ class FatigueAnalysis:
         :param float mean_torsion_stress: Mean torsion stresses
         """
 
-        self.Sy = Sy
-        self.Se = endurance_limit.modified
-        self.Kc = endurance_limit.Kc
-        self.Sut = endurance_limit.Sut
-        self.stress_type = endurance_limit.stress_type
+        self.Sy = yield_strength
+        self.Se = modified_endurance_limit
+        self.Sut = ultimate_tensile_strength
+        self.stress_type = stress_type
         self.ductile = ductile
         self.Kf_bending, self.Kf_normal, self.Kf_torsion = Kf_bending, Kf_normal, Kf_torsion
         self.alt_bending_stress = alt_bending_stress
@@ -92,20 +91,19 @@ class FatigueAnalysis:
         :rtype: float
         """
 
-        Kc = self.Kc
-        if Kc == 1 and self.stress_type == 'multiple':
+        if self.stress_type == 'multiple':
             corrected_bending = self.Kf_bending * self.alt_bending_stress
             corrected_normal = self.Kf_normal * (self.alt_normal_stress / 0.85)
             corrected_torsion = self.Kf_torsion * self.alt_torsion_stress
             return sqrt((corrected_bending + corrected_normal) ** 2 + 3 * corrected_torsion ** 2)
 
-        elif Kc == 1:
+        elif self.stress_type == 'bending':
             return self.Kf_bending * self.alt_bending_stress
 
-        elif Kc == 0.85:
+        elif self.stress_type == 'axial':
             return self.Kf_normal * self.alt_normal_stress
 
-        elif Kc == 0.59:
+        elif self.stress_type == 'torsion' or self.stress_type == 'shear':
             return self.Kf_torsion * self.alt_torsion_stress
 
     def calc_mean_eq_stress(self):
@@ -120,21 +118,20 @@ class FatigueAnalysis:
         else:
             Kf_bending, Kf_normal, Kf_torsion = self.Kf_bending, self.Kf_normal, self.Kf_torsion
 
-        Kc = self.Kc
-        if Kc == 1 and self.stress_type == 'multiple':
+        if self.stress_type == 'multiple':
             corrected_bending = Kf_bending * self.mean_bending_stress
             corrected_normal = Kf_normal * self.mean_normal_stress
             corrected_torsion = Kf_torsion * self.mean_torsion_stress
 
             return sqrt((corrected_bending + corrected_normal) ** 2 + 3 * corrected_torsion ** 2)
 
-        elif Kc == 1:
+        elif self.stress_type == 'bending':
             return Kf_bending * self.mean_bending_stress
 
-        elif Kc == 0.85:
+        elif self.stress_type == 'axial':
             return Kf_normal * self.mean_normal_stress
 
-        elif Kc == 0.59:
+        elif self.stress_type == 'torsion' or self.stress_type == 'shear':
             return Kf_torsion * self.mean_torsion_stress
 
     @property
@@ -171,7 +168,7 @@ class FatigueAnalysis:
             return None
 
         ultimate_strength = self.Sut
-        if self.Kc == 0.59:
+        if self.stress_type == 'torsion' or self.stress_type == 'shear':
             # ultimate_tensile_strength correction for shear stress
             ultimate_strength = self.shear_ultimate_strength
 
@@ -194,7 +191,7 @@ class FatigueAnalysis:
             return None
 
         yield_strength = self.Sy
-        if self.Kc == 0.59:
+        if self.stress_type == 'torsion' or self.stress_type == 'shear':
             # ultimate_tensile_strength correction for shear stress
             yield_strength = self.shear_yield_stress
 
@@ -216,7 +213,7 @@ class FatigueAnalysis:
             return None
 
         ultimate_strength = self.Sut
-        if self.Kc == 0.59:
+        if self.stress_type == 'torsion' or self.stress_type == 'shear':
             # ultimate_tensile_strength correction for shear stress
             ultimate_strength = self.shear_ultimate_strength
 
@@ -238,7 +235,7 @@ class FatigueAnalysis:
             return None
 
         yield_strength = self.Sut
-        if self.Kc == 0.59:
+        if self.stress_type == 'torsion' or self.stress_type == 'shear':
             # ultimate_tensile_strength correction for shear stress
             yield_strength = self.shear_yield_stress
 
@@ -257,7 +254,7 @@ class FatigueAnalysis:
         """
 
         yield_strength = self.Sy
-        if self.Kc == 0.59:
+        if self.stress_type == 'torsion' or self.stress_type == 'shear':
             # yield_strength correction for shear stress
             Ssy = 0.67 * self.Sut
             yield_strength = Ssy
@@ -324,7 +321,7 @@ class FatigueAnalysis:
         return f(Sut) * Sut
 
     def num_of_cycles(self, z=-3):
-        """ calculate number of cycles until failure
+        """Returns the number of cycles until failure
 
         Note: zeta = log(N1) - log(N2)
               N1 - number of cycles at Sm,
@@ -336,16 +333,47 @@ class FatigueAnalysis:
         :returns: The Number of cycles and the fatigue stress at failure
         :rtype: tuple[float, float]
         """
-        mean_stress = self.mean_eq_stress
-        alternating_stress = self.alt_eq_stress
-        Se = self.Se
-        Sut, Sy, Sm = self.Sut, self.Sy, self.Sm_stress
+        return self.calc_num_of_cycles(self.mean_eq_stress, self.alt_eq_stress, self.Se, self.Sut,
+                                       self.Sy, z=-3)
+
+    @staticmethod
+    def calc_num_of_cycles(mean_eq_stress, alt_eq_stress, endurance_limit,
+                           ultimate_tensile_strength, yield_strength, z=-3):
+        """ calculate number of cycles until failure
+
+        Note: zeta = log(N1) - log(N2)
+              N1 - number of cycles at Sm,
+              N2 - Number of cycles at Se (for steel N1=1e3 and N2 = 1e6 -> z=-3)
+
+        :param mean_eq_stress: Mean equivalent stresses
+        :param alt_eq_stress: Alternating equivalent stresses
+        :param endurance_limit: Endurance limit
+        :param ultimate_tensile_strength: Ultimate tensile strength
+        :param yield_strength: Yield Strength
+        :param float z: -3 for steel where N=1e6, -5 for metal where N=1e8,
+            -5.69 for metal where N=5e8
+
+        :returns: The Number of cycles and the fatigue stress at failure
+        :rtype: tuple[float, float] or tuple[float, None]
+        """
+        mean_stress = mean_eq_stress
+        alternating_stress = alt_eq_stress
+        Se = endurance_limit
+        Sut = ultimate_tensile_strength
+        Sy = yield_strength
+        Sm = FatigueAnalysis.calc_Sm(Sut)
+
+        # if mean_stress is larger or equal to Sut then the reversible_stress is either negative or
+        # undefined because of a division by zero error
+        if mean_stress >= Sut:
+            return 0, None
 
         # calculating the reversible stress (σ_rev)
         if mean_stress >= 0:
             reversible_stress = alternating_stress / (1 - (mean_stress / Sut))
         else:
             reversible_stress = alternating_stress
+
 
         # Low Cycle Fatigue
         if Sm < reversible_stress < Sy:
@@ -362,11 +390,9 @@ class FatigueAnalysis:
             b = (1 / z) * log10(Sm / Se)
 
         elif reversible_stress < Se:
-            print(f"reversible_stress = {reversible_stress} < Se = {Se},"
-                  f"The Number of cycles is infinite")
-            return inf  # from math module - short for infinity
+            return inf, None  # inf is from math module - short for infinity
         else:
-            raise ValueError(f"Reversible Stress={reversible_stress} is grater than Sy={Sy}")
+            return  0, None
         N = (reversible_stress / a) ** (1 / b)
         return N, a * N ** b
 
