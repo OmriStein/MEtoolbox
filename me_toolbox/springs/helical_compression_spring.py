@@ -4,7 +4,7 @@ from math import pi  # , sqrt
 from icecream import ic
 from sympy import sqrt
 
-from me_toolbox.fatigue import FailureCriteria
+from me_toolbox.fatigue import FailureCriteria, FatigueAnalysis
 from me_toolbox.springs import Spring
 from me_toolbox.tools import percent_to_decimal
 
@@ -282,8 +282,10 @@ class HelicalCompressionSpring(Spring):
         :param bool metric: Metric or imperial
 
         :returns: static and dynamic safety factor
-        :rtype: tuple[float, float]
+        :rtype: tuple[float, float, float, float] or tuple[float, float, float, None]
         """
+        if max_force == min_force:
+            raise ValueError("max_force can't equal the min_force")
         # calculating mean and alternating forces
         alternating_force = abs(max_force - min_force) / 2
         mean_force = (max_force + min_force) / 2
@@ -298,12 +300,15 @@ class HelicalCompressionSpring(Spring):
         Ssy = self.shear_yield_strength
         nf, nl = FailureCriteria.get_safety_factors(Ssy, Ssu, Sse, alt_shear_stress,
                                                     mean_shear_stress, criterion)
+        N, Sf = FatigueAnalysis.calc_num_of_cycles(mean_shear_stress, alt_shear_stress, Sse, Ssu, Ssy,
+                                               z=-3) #TODO: add input to override z
+
         if verbose:
             print(f"Alternating force = {alternating_force:.2f}, Mean force = {mean_force:.2f}\n"
                   f"Alternating shear stress = {alt_shear_stress:.2f}, "
                   f"Mean shear stress = {mean_shear_stress:.2f}\n"
-                  f"Sse = {Sse:.2f}")
-        return nf, nl
+                  f"Sse = {Sse:.2f}, Ssu = {Ssu:.2f}, Ssy = {Ssy:.2f}")
+        return nf, nl, N, Sf
 
     def buckling(self, anchors, verbose=True):
         """ Checks if the spring will buckle and find the
@@ -345,6 +350,7 @@ class HelicalCompressionSpring(Spring):
 
     def natural_frequency(self, density, working_frequency, verbose=True) -> dict[str:float] or None:
         """Figures out what is the natural frequency of the spring
+
         :param float density: Spring's material density
         :param float working_frequency: The expected frequency the spring is used for
         :param bool verbose: Print if spring frequency is not in range
