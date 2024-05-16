@@ -1,5 +1,5 @@
 """A module containing the helical torsion spring class"""
-from math import pi, sqrt
+from math import pi
 
 from me_toolbox.fatigue import FailureCriteria
 from me_toolbox.springs import Spring
@@ -16,8 +16,8 @@ class HelicalTorsionSpring(Spring):
                f"ultimate_tensile_strength={self.ultimate_tensile_strength}, " \
                f"yield_percent={self.yield_percent}, shear_modulus={self.shear_modulus}, " \
                f"elastic_modulus={self.elastic_modulus}, spring_rate={self.spring_rate}, " \
-               f"radius={self.radius}, arbor_diameter={self.arbor_diameter}, " \
-               f"shot_peened={self.shot_peened}, density={self.density})"
+               f"arbor_diameter={self.arbor_diameter}, shot_peened={self.shot_peened}, " \
+               f"density={self.density})"
 
     def __str__(self):
         return f"HelicalTorsionSpring(d={self.wire_diameter}, D={self.diameter}, " \
@@ -25,21 +25,20 @@ class HelicalTorsionSpring(Spring):
 
     def __init__(self, max_moment, wire_diameter, spring_diameter, leg1, leg2,
                  ultimate_tensile_strength, yield_percent, shear_modulus, elastic_modulus,
-                 spring_rate, radius=None, arbor_diameter=None, shot_peened=False, density=None):
+                 spring_rate, arbor_diameter=None, shot_peened=False, density=None):
         """Instantiate helical torsion spring object with the given parameters
 
         :param float  max_moment: The maximum load on the spring [Nmm]
         :param float  wire_diameter: spring wire diameter [mm]
         :param float  spring_diameter: spring diameter measured from [mm]
             the center point of the wire diameter
-        :param float leg1: spring leg [mm]
-        :param float leg2: spring leg [mm]
+        :param float leg1: Effective length of the first spring's leg [mm] (where the force is applied)
+        :param float leg2: Effective length of the second spring's leg [mm] (where the force is applied)
         :param float ultimate_tensile_strength: Ultimate tensile strength of the material [MPa]
         :param float yield_percent: Used to estimate the spring's yield stress
         :param float shear_modulus: Spring's material shear modulus [MPa]
         :param float elastic_modulus: Spring's material elastic modulus [MPa]
         :param float spring_rate: K - spring rate [Nmm/rad]
-        :param float radius: The distance from the center to the applied force[mm]
         :param float arbor_diameter: the diameter of the pin going through the spring [mm]
         :param bool shot_peened: if True adds to fatigue strength
         :param float or None density: Spring's material density [kg/m^3]
@@ -47,13 +46,14 @@ class HelicalTorsionSpring(Spring):
 
         :returns: HelicalTorsionSpring
         """
-        max_force = max_moment / radius if radius is not None else None
+        force1 = max_moment / leg1
+        force2 = max_moment / leg2
+        max_force = max(force1, force2)
 
         super().__init__(max_force, wire_diameter, spring_diameter, spring_rate,
                          ultimate_tensile_strength, shear_modulus, elastic_modulus,
                          shot_peened, density)
 
-        self.radius = radius  # Needs a better name
         self.max_moment = max_moment
         self.yield_percent = yield_percent
         self.leg1 = leg1
@@ -69,6 +69,9 @@ class HelicalTorsionSpring(Spring):
             print(f"The clearance between the spring and arbor "
                   f"after tension is applied is negative ({self.clearance})")
             return False
+        elif self.clearance == 0:
+            print(f"The clearance between the spring and arbor "
+                  f"after tension is applied is zero")
         else:
             return True
 
@@ -133,8 +136,8 @@ class HelicalTorsionSpring(Spring):
 
     @property
     def yield_strength(self):
-        """ Sy - yield strength
-        (shear_yield_stress = % * ultimate_tensile_strength))
+        """Yield strength (Sy)
+        (shear_yield_stress = % * ultimate_tensile_strength)
         """
         try:
             return percent_to_decimal(self.yield_percent) * self.ultimate_tensile_strength
@@ -244,22 +247,24 @@ class HelicalTorsionSpring(Spring):
             print(f"Sy={self.yield_strength}, Maximal stress={self.max_stress}")
         return self.yield_strength / self.max_stress
 
-    def fatigue_analysis(self, max_moment, min_moment, reliability,
-                         criterion='gerber', verbose=False, metric=True):
+    def fatigue_analysis(self, max_moment, min_moment, fatigue_percent, reliability,
+                         criterion='gerber', verbose=False):
         """ Returns safety factors for fatigue and
         for first cycle according to Langer failure criteria.
 
         :param float max_moment: Maximal max_force acting on the spring
         :param float min_moment: Minimal max_force acting on the spring
+        :param float fatigue_percent: Percent of Tensile Strength
         :param float reliability: in percentage
         :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber',
                                                  'asme-elliptic')
         :param bool verbose: print more details
-        :param bool metric: Metric or imperial
 
         :returns: static and dynamic safety factor
         :rtype: tuple[float, float]
         """
+        #TODO: add number of cycles calculation
+
         # calculating mean and alternating forces
         alt_moment = abs(max_moment - min_moment) / 2
         mean_moment = (max_moment + min_moment) / 2
@@ -268,15 +273,14 @@ class HelicalTorsionSpring(Spring):
         alt_stress = self.calc_max_stress(alt_moment)
         mean_stress = self.calc_max_stress(mean_moment)
 
-        Sse = self.shear_endurance_limit(reliability, metric)
-        Se = Sse / 0.577  # based on the distortion energy method
+        Se = self.endurance_limit(fatigue_percent, reliability)
         Sut = self.ultimate_tensile_strength
         Sy = self.yield_strength
         nf, nl = FailureCriteria.get_safety_factors(Sy, Sut, Se, alt_stress, mean_stress, criterion)
         if verbose:
-            print(f"Alternating moment = {alt_moment}, Mean moment = {mean_moment}\n"
-                  f"Alternating stress = {alt_stress}, Mean stress = {mean_stress}\n"
-                  f"Sse = {Sse}, Se= {Se}")
+            print(f"Alternating moment = {alt_moment}, Mean moment = {mean_moment}\n\n"
+                  f"Alternating stress = {alt_stress}, Mean stress = {mean_stress}\n\n"
+                  f"Se= {Se}")
         return nf, nl
 
     def natural_frequency(self):

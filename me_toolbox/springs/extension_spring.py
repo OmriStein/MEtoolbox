@@ -78,7 +78,7 @@ class ExtensionSpring(HelicalCompressionSpring):
 
     def _check_spring_index(self) -> bool:
         in_range = True
-        C = self.spring_index  # pylint: disable=invalid-name
+        C = self.spring_index
         if isinstance(C, float) and not 3 <= C <= 16 and self.set_removed:
             print("Note: C - spring index should be in range of [3,16],"
                   "lower C causes surface cracks,\n"
@@ -112,7 +112,7 @@ class ExtensionSpring(HelicalCompressionSpring):
                                   "but has no use in ExtensionSpring")
 
     @property
-    def hook_normal_yield_strength(self) -> float:  # pylint: disable=invalid-name
+    def hook_normal_yield_strength(self) -> float:
         """Hook's yield strength (Sy = % * Sut)"""
         try:
             return (percent_to_decimal(self.hook_normal_yield_percent) *
@@ -130,15 +130,15 @@ class ExtensionSpring(HelicalCompressionSpring):
             return self.hook_shear_yield_percent * self.ultimate_tensile_strength
 
     @property
-    def hook_KA(self) -> float:  # pylint: disable=invalid-name
+    def hook_KA(self) -> float:
         """Hook's bending stress correction factor"""
-        C1 = 2 * self.hook_r1 / self.wire_diameter  # pylint: disable=invalid-name
+        C1 = 2 * self.hook_r1 / self.wire_diameter
         return ((4 * C1 ** 2) - C1 - 1) / (4 * C1 * (C1 - 1))
 
     @property
     def hook_KB(self) -> float:
         """Hook's torsional stress correction factor"""
-        C2 = 2 * self.hook_r2 / self.wire_diameter  # pylint: disable=invalid-name
+        C2 = 2 * self.hook_r2 / self.wire_diameter
         return (4 * C2 - 1) / (4 * C2 - 4)
 
     @property
@@ -220,6 +220,8 @@ class ExtensionSpring(HelicalCompressionSpring):
             static and dynamic safety factors for body section
         :rtype: dict[str, float]
         """
+        #TODO: add Number off cycles calculation
+
         # calculating mean and alternating forces
         alt_force = abs(max_force - min_force) / 2
         mean_force = (max_force + min_force) / 2
@@ -232,7 +234,7 @@ class ExtensionSpring(HelicalCompressionSpring):
         hook_alt_normal_stress = self.calc_normal_stress(alt_force)
         hook_mean_normal_stress = (mean_force / alt_force) * hook_alt_normal_stress
 
-        Sse = self.shear_endurance_limit(reliability, metric)  # pylint: disable=invalid-name
+        Sse = self.shear_endurance_limit(reliability, metric)
         Ssu = self.shear_ultimate_strength
         Ssy_body = self.shear_yield_strength
         Ssy_hook = self.hook_shear_yield_strength
@@ -276,8 +278,11 @@ class ExtensionSpring(HelicalCompressionSpring):
                   f"Ssy_body = {Ssy_body:.2f}, Ssy_hook = {Ssy_hook:.2f}, "
                   f"Sy_hook = {Sy_hook:.2f}\n")
 
-        return {'nf_body': nf_body, 'ns_body': ns_body, 'nf_hook_normal': nf_hook_normal,
-                'ns_hook_normal': ns_hook_normal, 'nf_hook_shear': nf_hook_shear,
+        return {'nf_body': nf_body,
+                'ns_body': ns_body,
+                'nf_hook_normal': nf_hook_normal,
+                'ns_hook_normal': ns_hook_normal,
+                'nf_hook_shear': nf_hook_shear,
                 'ns_hook_shear': ns_hook_shear}
 
     def buckling(self, anchors, verbose=True):

@@ -4,6 +4,7 @@ import os
 import numpy as np
 
 from me_toolbox.tools import print_atributes
+from me_toolbox.tools import percent_to_decimal
 
 
 class Spring:
@@ -125,7 +126,7 @@ class Spring:
         """ Ssu - ultimate tensile strength for shear """
         return 0.67 * self.ultimate_tensile_strength
 
-    def shear_endurance_limit(self, reliability, metric=True):
+    def shear_endurance_limit(self, reliability=50, metric=True):
         """Sse - Shear endurance limit according to Zimmerli
         :param float reliability: reliability in percentage
         :param bool metric: metric or imperial
@@ -146,8 +147,28 @@ class Spring:
 
         return Ke * (Ssa / (1 - (Ssm / self.shear_ultimate_strength) ** 2))
 
-    def endurance_limit(self):
-        raise NotImplementedError(f"endurance_limit has not been implemented yet")
+    def endurance_limit(self, percent, reliability=50):
+        """Endurance limit (Se) according to the repeated bending stress
+        :param float percent: Percent of Tensile Strength
+        :param float reliability: reliability in percentage
+
+        :returns: Endurance limit (Se)
+        :rtype: float
+        """
+        # data from table
+        percentage = np.array([50, 90, 95, 99, 99.9, 99.99, 99.999, 99.9999])
+        reliability_factors = np.array([1, 0.897, 0.868, 0.814, 0.753, 0.702, 0.659, 0.620])
+        # interpolating from data
+        Ke = np.interp(reliability, percentage, reliability_factors)
+
+        Sut = self.ultimate_tensile_strength
+
+        try:
+            return percent_to_decimal(percent) * Sut
+        except TypeError:
+            Sr = percent * Sut
+
+        return Ke * (0.5 * Sr) / (1 - (0.5*Sr/Sut)**2)
 
     @staticmethod
     def material_prop(material, diameter, metric=True, verbose=False):
