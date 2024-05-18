@@ -1,7 +1,7 @@
 """A module containing the helical torsion spring class"""
 from math import pi
 
-from me_toolbox.fatigue import FailureCriteria
+from me_toolbox.fatigue import FailureCriteria, FatigueAnalysis
 from me_toolbox.springs import Spring
 from me_toolbox.tools import percent_to_decimal
 
@@ -76,29 +76,29 @@ class HelicalTorsionSpring(Spring):
             return True
 
     @property
-    def diameter_after_deflection(self):
-        """ After deflection The spring diameter is shrinking it is important to know the new
-        diameter to check if it conflicts with the arbor size
-
-        :return: The spring diameter after deflection
-        :rtype: float
-        """
+    def loaded_diameter(self) -> float:
+        """Diameter after load is applied"""
         Nb = self.body_coils
         return (Nb * self.diameter) / (Nb + self.calc_angular_deflection(self.max_moment, False))
 
     @property
-    def clearance(self):
+    def clearance(self) -> float:
         """Diametrical Clearance between the spring after deflection and the arbor"""
         if self.arbor_diameter is None:
             raise KeyError("Arbor diameter attribute is None")
 
-        ID = self.diameter_after_deflection - self.wire_diameter
+        ID = self.loaded_diameter - self.wire_diameter
         return ID - self.arbor_diameter
 
     @property
-    def length(self):
-        """ The length of the spring - L """
+    def free_length(self) -> float:
+        """Free length of the spring (L) """
         return self.wire_diameter * self.body_coils
+
+    @property
+    def loaded_length(self) -> float:
+        """Length after load is applied"""
+        return self.wire_diameter * (self.body_coils + 1 + (self.partial_turn / 360))
 
     @property
     def active_coils(self):
@@ -117,25 +117,17 @@ class HelicalTorsionSpring(Spring):
         return active_coils
 
     @property
-    def body_coils(self):
-        """Total number of coils
-
-        :returns: number of body coils
-        :rtype: float
-        """
+    def body_coils(self) -> float:
+        """Total number of coils"""
         return self.active_coils - ((self.leg1 + self.leg2) / (3 * pi * self.diameter))
 
     @property
-    def partial_turn(self):
-        """Partial number of coils (β/360)
-
-        :returns: Partial number of coils
-        :rtype: float
-        """
-        return self.body_coils - int(self.body_coils)
+    def partial_turn(self) -> float:
+        """Partial number of coils (β) in degrees, i.e. The angle between the legs of the spring"""
+        return (self.body_coils - int(self.body_coils))*360
 
     @property
-    def yield_strength(self):
+    def yield_strength(self) -> float:
         """Yield strength (Sy)
         (shear_yield_stress = % * ultimate_tensile_strength)
         """
@@ -167,12 +159,8 @@ class HelicalTorsionSpring(Spring):
         return (4 * index ** 2 - index - 1) / (4 * index * (index - 1))
 
     @property
-    def max_stress(self):
-        """The normal stress due to bending and axial loads
-
-        :returns: Normal stress
-        :rtype: float 
-        """
+    def max_stress(self) -> float:
+        """The normal stress due to bending and axial loads"""
         return self.calc_max_stress(self.max_moment)
 
     def calc_max_stress(self, moment):
@@ -223,12 +211,8 @@ class HelicalTorsionSpring(Spring):
         return ((67.8584 * moment * D) / (d ** 4 * E)) * (Nb + legs_deflection_part)
 
     @property
-    def weight(self):
-        """Return's the spring *active coils* weight according to the specified density
-
-        :returns: Spring weight
-        :type: float
-        """
+    def weight(self) -> float:
+        """Return's the spring weight"""
         area = 0.25 * pi * (self.wire_diameter * 1e-3) ** 2  # cross-section area
         length = pi * self.diameter * 1e-3  # the circumference of the spring
         coil_volume = area * length
@@ -240,6 +224,8 @@ class HelicalTorsionSpring(Spring):
     def static_safety_factor(self, verbose=False):
         """ Returns the static safety factor
 
+        :param bool verbose: Print additional information
+
         :returns: Spring's safety factor
         :type: float
         """
@@ -248,7 +234,7 @@ class HelicalTorsionSpring(Spring):
         return self.yield_strength / self.max_stress
 
     def fatigue_analysis(self, max_moment, min_moment, fatigue_percent, reliability,
-                         criterion='gerber', verbose=False):
+                         criterion='gerber', z=-3, verbose=False):
         """ Returns safety factors for fatigue and
         for first cycle according to Langer failure criteria.
 
@@ -256,15 +242,15 @@ class HelicalTorsionSpring(Spring):
         :param float min_moment: Minimal max_force acting on the spring
         :param float fatigue_percent: Percent of Tensile Strength
         :param float reliability: in percentage
-        :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber',
-                                                 'asme-elliptic')
+        :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber', 'asme-elliptic')
+        :param float z: -3 for steel where N=1e6, -5 for metal where N=1e8, -5.69 for metal where N=5e8
         :param bool verbose: print more details
 
         :returns: static and dynamic safety factor
         :rtype: tuple[float, float]
         """
-        #TODO: add number of cycles calculation
-
+        if max_moment == min_moment:
+            raise ValueError("max_moment can't equal the min_moment")
         # calculating mean and alternating forces
         alt_moment = abs(max_moment - min_moment) / 2
         mean_moment = (max_moment + min_moment) / 2
@@ -277,11 +263,12 @@ class HelicalTorsionSpring(Spring):
         Sut = self.ultimate_tensile_strength
         Sy = self.yield_strength
         nf, nl = FailureCriteria.get_safety_factors(Sy, Sut, Se, alt_stress, mean_stress, criterion)
+        N, Sf = FatigueAnalysis.calc_num_of_cycles(mean_stress, alt_stress, Se, Sut, Sy, z)
         if verbose:
             print(f"Alternating moment = {alt_moment}, Mean moment = {mean_moment}\n\n"
                   f"Alternating stress = {alt_stress}, Mean stress = {mean_stress}\n\n"
                   f"Se= {Se}")
-        return nf, nl
+        return nf, nl, N, Sf
 
     def natural_frequency(self):
         # return sqrt(self.spring_rate / self.weight)

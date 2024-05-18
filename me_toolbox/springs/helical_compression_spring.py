@@ -1,7 +1,6 @@
 """A module containing the helical push spring class"""
 from math import pi  # , sqrt
 
-from icecream import ic
 from sympy import sqrt
 
 from me_toolbox.fatigue import FailureCriteria, FatigueAnalysis
@@ -269,15 +268,15 @@ class HelicalCompressionSpring(Spring):
         return self.shear_yield_strength / shear_stress
 
     def fatigue_analysis(self, max_force, min_force, reliability,
-                         criterion='modified goodman', verbose=False, metric=True):
+                         criterion='modified goodman', z=-3, verbose=False, metric=True):
         """ Returns safety factors for fatigue and for first cycle according to Lange failure
         criteria.
 
         :param float max_force: Maximal max_force acting on the spring
         :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
-        :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber',
-                                                 'asme-elliptic')
+        :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber', 'asme-elliptic')
+        :param float z: -3 for steel where N=1e6, -5 for metal where N=1e8, -5.69 for metal where N=5e8
         :param bool verbose: print more details
         :param bool metric: Metric or imperial
 
@@ -300,8 +299,7 @@ class HelicalCompressionSpring(Spring):
         Ssy = self.shear_yield_strength
         nf, nl = FailureCriteria.get_safety_factors(Ssy, Ssu, Sse, alt_shear_stress,
                                                     mean_shear_stress, criterion)
-        N, Sf = FatigueAnalysis.calc_num_of_cycles(mean_shear_stress, alt_shear_stress, Sse, Ssu, Ssy,
-                                               z=-3) #TODO: add input to override z
+        N, Sf = FatigueAnalysis.calc_num_of_cycles(mean_shear_stress, alt_shear_stress, Sse, Ssu, Ssy, z)
 
         if verbose:
             print(f"Alternating force = {alternating_force:.2f}, Mean force = {mean_force:.2f}\n"
