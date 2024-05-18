@@ -1,7 +1,7 @@
 """A module containing the extension spring class"""
 from math import pi
 
-from me_toolbox.fatigue import FailureCriteria
+from me_toolbox.fatigue import FailureCriteria, FatigueAnalysis
 from me_toolbox.springs import HelicalCompressionSpring
 from me_toolbox.tools import percent_to_decimal
 
@@ -204,15 +204,15 @@ class ExtensionSpring(HelicalCompressionSpring):
         return {'n_body': n_body, 'n_hook_normal': n_hook_normal, 'n_hook_shear': n_hook_shear}
 
     def fatigue_analysis(self, max_force, min_force, reliability,
-                         criterion='gerber', verbose=False, metric=True):
+                         criterion='gerber', z=-3, verbose=False, metric=True):
         """Fatigue analysis of the hook section, for normal and shear stress,and for the
         body section for shear and static yield.
 
         :param float max_force: Maximal max_force acting on the spring
         :param float min_force: Minimal max_force acting on the spring
         :param float reliability: in percentage
-        :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber',
-                                                 'asme-elliptic')
+        :param str criterion: fatigue criterion ('modified goodman', 'soderberg', 'gerber', 'asme-elliptic')
+        :param float z: -3 for steel where N=1e6, -5 for metal where N=1e8, -5.69 for metal where N=5e8
         :param bool verbose: print more details
         :param bool metric: Metric or imperial
 
@@ -220,7 +220,6 @@ class ExtensionSpring(HelicalCompressionSpring):
             static and dynamic safety factors for body section
         :rtype: dict[str, float]
         """
-        #TODO: add Number off cycles calculation
 
         # calculating mean and alternating forces
         alt_force = abs(max_force - min_force) / 2
@@ -245,13 +244,18 @@ class ExtensionSpring(HelicalCompressionSpring):
         nf_hook_normal, ns_hook_normal = \
             FailureCriteria.get_safety_factors(Sy_hook, Sut, Se, hook_alt_normal_stress,
                                                hook_mean_normal_stress, criterion)
+        N_hook_normal, Sf_hook_normal = FatigueAnalysis.calc_num_of_cycles(hook_mean_normal_stress,
+                                                                           hook_alt_normal_stress,
+                                                                           Se, Sut, Sy_hook, z)
 
         nf_hook_shear, ns_hook_shear = \
             FailureCriteria.get_safety_factors(Ssy_hook, Ssu, Sse, hook_alt_shear_stress,
                                                hook_mean_shear_stress, criterion)
+        N_hook_shear, Sf_hook_shear = FatigueAnalysis.calc_num_of_cycles(hook_mean_shear_stress,
+                                                                         hook_alt_shear_stress,
+                                                                         Sse, Ssu, Ssy_hook, z)
 
         # calculating mean and alternating stresses for the body section
-        # shear stresses:
         alt_body_shear_stress = self.calc_shear_stress(alt_force, self.factor_Kw)
         mean_body_shear_stress = (mean_force / alt_force) * alt_body_shear_stress
         initial_body_shear_stress = (self.initial_tension / alt_force) * alt_body_shear_stress
@@ -262,7 +266,9 @@ class ExtensionSpring(HelicalCompressionSpring):
                                                               alt_body_shear_stress,
                                                               mean_body_shear_stress, criterion)
         ns_body = Ssa/alt_body_shear_stress
-
+        N_body, Sf_body = FatigueAnalysis.calc_num_of_cycles(mean_body_shear_stress,
+                                                             alt_body_shear_stress,
+                                                             Sse, Ssu, Ssy_body, z)
         if verbose:
             print(f"Alternating force = {alt_force:.2f}, "
                   f"Mean force = {mean_force:.2f}\n\n"
@@ -278,12 +284,9 @@ class ExtensionSpring(HelicalCompressionSpring):
                   f"Ssy_body = {Ssy_body:.2f}, Ssy_hook = {Ssy_hook:.2f}, "
                   f"Sy_hook = {Sy_hook:.2f}\n")
 
-        return {'nf_body': nf_body,
-                'ns_body': ns_body,
-                'nf_hook_normal': nf_hook_normal,
-                'ns_hook_normal': ns_hook_normal,
-                'nf_hook_shear': nf_hook_shear,
-                'ns_hook_shear': ns_hook_shear}
+        return {'body': {'nf': nf_body, 'ns': ns_body, 'N': N_body, 'Sf': Sf_body},
+                'hook_normal': {'nf': nf_hook_normal, 'ns': ns_hook_normal, 'N': N_hook_normal, 'Sf': Sf_hook_normal},
+                'hook_shear': {'nf': nf_hook_shear, 'ns': ns_hook_shear, 'N': N_hook_shear, 'Sf': Sf_hook_shear}}
 
     def buckling(self, anchors, verbose=True):
         raise NotImplementedError("Inherited from HelicalCompressionSpring but useless here")
