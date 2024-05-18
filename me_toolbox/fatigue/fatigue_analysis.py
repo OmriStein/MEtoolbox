@@ -310,7 +310,6 @@ class FatigueAnalysis:
             return (-2.56710686e-16 * x ** 5 + 1.35729780e-12 * x ** 4 - 2.92474777e-09 * x ** 3 +
                     3.28990748e-06 * x ** 2 - 2.04929617e-03 * x + 1.38405394e+00)
 
-        # TODO: add proper warning and solutions to ultimate_tensile_strength out of graph range
         if Sut < 482.633:  # 482.633[Mpa] = 70[kPsi]
             # print(f"Note: ultimate_tensile_strength={Sut} < 482.633[Mpa] (70[kPsi]) so f~0.9")
             return 0.9 * Sut
