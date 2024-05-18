@@ -6,6 +6,6 @@
 /gen_docs/
 venv/
 setup.py
-/.ipynb_checkpoints/
+.ipynb_checkpoints/
 /examples/springs_examples/old/
 /old/
