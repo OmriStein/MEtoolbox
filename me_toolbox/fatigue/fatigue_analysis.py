@@ -312,12 +312,13 @@ class FatigueAnalysis:
 
         # TODO: add proper warning and solutions to ultimate_tensile_strength out of graph range
         if Sut < 482.633:  # 482.633[Mpa] = 70[kPsi]
-            print(f"Note: ultimate_tensile_strength={Sut} < 482.633[Mpa] (70[kPsi]) so f~0.9")
+            # print(f"Note: ultimate_tensile_strength={Sut} < 482.633[Mpa] (70[kPsi]) so f~0.9")
             return 0.9 * Sut
         elif Sut > 1378.95:
-            print(
-                f"Note: ultimate_tensile_strength={Sut} > 1378.95[Mpa] (200[kPsi]) which is out of "
-                f"the graph range, f={f(Sut)}")
+            # print(
+            #     f"Note: ultimate_tensile_strength={Sut} > 1378.95[Mpa] (200[kPsi]) which is out of "
+            #     f"the graph range, f={f(Sut)}")
+            return  0.75 * Sut
         return f(Sut) * Sut
 
     def num_of_cycles(self, z=-3):
