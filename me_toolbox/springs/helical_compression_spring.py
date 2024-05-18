@@ -188,7 +188,7 @@ class HelicalCompressionSpring(Spring):
     @property
     def shear_yield_strength(self) -> float:
         """ The material shear yield strength (Ssy)
-        (shear_yield_stress = % * ultimate_tensile_strength))"""
+        (shear_yield_stress = % * ultimate_tensile_strength)"""
         try:
             return percent_to_decimal(self.shear_yield_percent) * self.ultimate_tensile_strength
         except TypeError:
