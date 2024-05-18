@@ -266,9 +266,10 @@ class ExtensionSpring(HelicalCompressionSpring):
                                                               alt_body_shear_stress,
                                                               mean_body_shear_stress, criterion)
         ns_body = Ssa/alt_body_shear_stress
+
         N_body, Sf_body = FatigueAnalysis.calc_num_of_cycles(mean_body_shear_stress,
-                                                             alt_body_shear_stress,
-                                                             Sse, Ssu, Ssy_body, z)
+                                                         alt_body_shear_stress,
+                                                         Sse, Ssu, Ssy_body, z)
         if verbose:
             print(f"Alternating force = {alt_force:.2f}, "
                   f"Mean force = {mean_force:.2f}\n\n"
