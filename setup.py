@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="me_toolbox",
-    version="0.0.17",
+    version="0.0.18",
     author="Omri Stein",
     author_email="omri.stein@gmail.com",
     description="Mechanical engineering design tools",
