@@ -56,29 +56,33 @@ class HelicalCompressionSpring(Spring):
                          ultimate_tensile_strength, shear_modulus, elastic_modulus,
                          shot_peened, density)
 
-        if set_removed:
-            print("Note: set should ONLY be removed for static loading"
-                  "and NOT for periodical loading")
-
         self.set_removed = set_removed
         self.shear_yield_percent = shear_yield_percent
         self.zeta = zeta  # overrun safety factor
         self.end_type = end_type.lower()
+        self._check_end_type()
 
+    def _check_end_type(self) -> None:
         end_types = ('plain', 'plain and ground', 'squared or closed', 'squared and ground')
         if self.end_type not in end_types:
-            raise ValueError(f"{end_type} not one of this: {end_types}")
+            raise ValueError(f"{self.end_type} not one of this: {end_types}")
 
-        self.check_design()
 
-    def check_design(self):
+    def check_design(self) -> bool:
         """Check if the spring index,active coils, zeta and free length
          are in the acceptable range for good design.
 
         :returns: True if pass all checks
         :rtype: bool
         """
+        self._alert_set_removed()
         return all([self._check_spring_index(), self._check_active_coils(), self._check_zeta()])
+
+    def _alert_set_removed(self):
+        """Print a Note if set is removed"""
+        if self.set_removed:
+            print("Note: set should ONLY be removed for static loading"
+                  "and NOT for periodical loading")
 
     def _check_spring_index(self) -> bool:
         in_range = True
@@ -254,11 +258,9 @@ class HelicalCompressionSpring(Spring):
         else:
             raise ValueError(f"Can't calculate weight, no density is specified")
 
-    def static_safety_factor(self, solid=False):
+    def static_safety_factor(self, solid=False) -> float:
         """ Returns the static safety factor according to the object attributes
-
-        :returns: static factor of safety
-        :type: float
+        :param bool solid: If true use the Fsolid instead of Fmax
         """
         k_factor = self.factor_Ks if self.set_removed else self.factor_Kw
         if solid:
@@ -308,7 +310,7 @@ class HelicalCompressionSpring(Spring):
                   f"Sse = {Sse:.2f}, Ssu = {Ssu:.2f}, Ssy = {Ssy:.2f}")
         return nf, nl, N, Sf
 
-    def buckling(self, anchors, verbose=True):
+    def buckling(self, anchors, verbose=False) -> tuple[bool, float]:
         """ Checks if the spring will buckle and find the
         maximum free length to avoid buckling
         :param str or None anchors: How the spring is anchored
@@ -316,7 +318,6 @@ class HelicalCompressionSpring(Spring):
         :param bool verbose: Print buckling test result
         :returns: True if buckling occurring and The maximum safe length (free_length)
             to avoid buckling
-        :rtype: tuple(bool, float)
         """
         # alpha values from table 10-2
         options = {'fixed-fixed': 0.5, 'fixed-hinged': 0.707, 'hinged-hinged': 1, 'clamped-free': 2}
@@ -346,7 +347,7 @@ class HelicalCompressionSpring(Spring):
 
             return self.free_length >= max_safe_length, max_safe_length
 
-    def natural_frequency(self, density, working_frequency, verbose=True) -> dict[str:float] or None:
+    def natural_frequency(self, density, working_frequency, verbose=False) -> dict[str:float] or None:
         """Figures out what is the natural frequency of the spring
 
         :param float density: Spring's material density
@@ -380,16 +381,13 @@ class HelicalCompressionSpring(Spring):
         return results
 
     @staticmethod
-    def calc_spring_rate(wire_diameter, spring_diameter, total_coils, end_type, shear_modulus):
+    def calc_spring_rate(wire_diameter, spring_diameter, total_coils, end_type, shear_modulus) -> float:
         """Calculate spring constant using the geometric properties
         :param float wire_diameter: Spring's wire diameter.
         :param float spring_diameter: Spring's mean diameter.
         :param float total_coils: Spring's total coils.
         :param str end_type: The way the spring's ends are made
         :param float shear_modulus: The spring's material shear modulus
-
-        :returns: The spring constant
-        :rtype: float
         """
         options = {'plain': 0,
                    'plain and ground': 1,
