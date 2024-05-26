@@ -1,4 +1,5 @@
-from me_toolbox.fatigue import stress, EnduranceLimit, FatigueAnalysis
+from me_toolbox.fatigue import EnduranceLimit, FatigueAnalysis
+from me_toolbox.tools import stress
 from math import pi, sqrt
 
 Sut = 900  # [Mpa]
