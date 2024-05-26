@@ -221,7 +221,7 @@ class HelicalTorsionSpring(Spring):
         else:
             raise ValueError(f"Can't calculate weight, no density is specified")
 
-    def static_safety_factor(self, verbose=False):
+    def static_analysis(self, verbose=False):
         """ Returns the static safety factor
 
         :param bool verbose: Print additional information

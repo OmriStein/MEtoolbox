@@ -5,9 +5,9 @@ import numpy as np
 
 from me_toolbox.tools import print_atributes
 from me_toolbox.tools import percent_to_decimal
+from abc import ABC, abstractmethod
 
-
-class Spring:
+class Spring(ABC):
 
     def __repr__(self):
         return f"Spring(max_force={self.max_force}, wire_diameter={self.wire_diameter}, " \
@@ -205,3 +205,11 @@ class Spring:
             raise KeyError("The material is unknown")
         else:
             raise ValueError("The diameter don't match any of the values in the table")
+
+    @abstractmethod
+    def static_analysis(self):
+        pass
+
+    @abstractmethod
+    def fatigue_analysis(self):
+        pass

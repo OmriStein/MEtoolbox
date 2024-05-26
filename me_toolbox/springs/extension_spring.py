@@ -179,7 +179,7 @@ class ExtensionSpring(HelicalCompressionSpring):
         """
         return (force - self.initial_tension) / self.spring_rate
 
-    def static_safety_factor(self, verbose=False):
+    def static_analysis(self, verbose=False):
         """ Returns the static safety factors for the hook (torsion and
         bending), and for the spring's body (torsion)
 

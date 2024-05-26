@@ -258,7 +258,7 @@ class HelicalCompressionSpring(Spring):
         else:
             raise ValueError(f"Can't calculate weight, no density is specified")
 
-    def static_safety_factor(self, solid=False) -> float:
+    def static_analysis(self, solid=False) -> float:
         """ Returns the static safety factor according to the object attributes
         :param bool solid: If true use the Fsolid instead of Fmax
         """
